@@ -56,4 +56,4 @@ If you are unable to solve the issue yourself, please post an issue containing t
 <p><img src="http://i.imgur.com/Npl0vBb.png" alt="discord chat being sent to in-game"></p>
 
 
-
+Special thanks again to FMCore for creating the initial FactoCord project. https://github.com/FactoKit/FactoCord
