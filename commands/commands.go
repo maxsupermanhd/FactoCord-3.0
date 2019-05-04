@@ -32,17 +32,17 @@ var CL Commands
 func RegisterCommands() {
 	// Admin Commands
 	CL.CommandList = append(CL.CommandList, Command{Name: "Stop", Command: admin.StopServer,
-		Admin: true, Args:0, Desc: "Save the game and stop the factorio server. - Admin Only"})
+		Admin: true, Args:0, Desc: "Save the game and stop the factorio server."})
 	CL.CommandList = append(CL.CommandList, Command{Name: "Restart", Command: admin.Restart,
-		Admin: true, Args:0, Desc: "Save the game and restart the factorio server. - Admin Only"})
+		Admin: true, Args:0, Desc: "Save the game and restart the factorio server."})
         CL.CommandList = append(CL.CommandList, Command{Name: "Save", Command: admin.SaveServer,
-                Admin: true, Args:0, Desc: "Save the game. - Admin Only"})
+                Admin: true, Args:0, Desc: "Save the game."})
 	CL.CommandList = append(CL.CommandList, Command{Name: "Kick", Command2: admin.KickPlayer,
-		Admin: true, Args:2, Desc: "Kick a user from the server. Usage: !kick <player> <reason> - Admin Only"})
+		Admin: true, Args:2, Desc: "Kick a user from the server. Usage: !kick <player> <reason>"})
 	CL.CommandList = append(CL.CommandList, Command{Name: "Ban", Command2: admin.BanPlayer,
-		Admin: true, Args:2, Desc: "Ban a user from the server. Usage: !ban <player> <reason> - Admin Only"})
+		Admin: true, Args:2, Desc: "Ban a user from the server. Usage: !ban <player> <reason>"})
 	CL.CommandList = append(CL.CommandList, Command{Name: "Unban", Command1: admin.UnbanPlayer,
-		Admin: true, Args:1, Desc: "Unban a user from the server. Usage !unban <player> - Admin Only"})
+		Admin: true, Args:1, Desc: "Unban a user from the server. Usage !unban <player>"})
 	// Util Commands
 	CL.CommandList = append(CL.CommandList, Command{Name: "Mods", Command: utils.ModsList,
 		Admin: false, Args:0, Desc: "List the mods on the server"})
@@ -53,9 +53,12 @@ func RegisterCommands() {
 func commandListEmbed() *discordgo.MessageEmbed {
 	fields := []*discordgo.MessageEmbedField{}
 	for _, command := range CL.CommandList {
+		strAdmin := ""
+		if command.Admin == true {
+			strAdmin = " - Admin Only!"
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name: "!"+ command.Name,
-			Value: command.Desc,
+			Value: command.Desc + strAdmin,
 		})
 	}
 	embed := &discordgo.MessageEmbed{
