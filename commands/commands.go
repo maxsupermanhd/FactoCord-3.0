@@ -56,6 +56,7 @@ func commandListEmbed() *discordgo.MessageEmbed {
 		strAdmin := ""
 		if command.Admin == true {
 			strAdmin = " - Admin Only!"
+		}
 		fields = append(fields, &discordgo.MessageEmbedField{
 			Name: "!"+ command.Name,
 			Value: command.Desc + strAdmin,
