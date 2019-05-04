@@ -1,5 +1,5 @@
 <p align="center"><img src="http://i.imgur.com/QrhAeBe.png"></p>
-<p align="center">FactoCord 2.0 -- a Continuation of the Factorio to Discord bridge bot for Linux</p>
+<p align="center">FactoCord 2.0 - a Continuation of the <a href="https://github.com/FactoKit/FactoCord">Factocord</a> - Factorio to Discord bridge bot for Linux</p>
 <p align="center">
 <a href="https://goreportcard.com/report/github.com/thecmdradama/FactoCord-2.0"><img src="https://goreportcard.com/badge/github.com/thecmdradama/FactoCord-2.0" alt="Go Report Card"></a>
 </p>
