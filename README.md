@@ -1,5 +1,5 @@
 <p align="center"><img src="http://i.imgur.com/QrhAeBe.png"></p>
-<p align="center">FactoCord -- a Factorio to Discord bridge bot for Linux</p>
+<p align="center">FactoCord 2.0 -- a Continuation of the Factorio to Discord bridge bot for Linux</p>
 <p align="center">
 <a href="https://goreportcard.com/report/github.com/thecmdradama/FactoCord-2.0"><img src="https://goreportcard.com/badge/github.com/thecmdradama/FactoCord-2.0" alt="Go Report Card"></a>
 </p>
@@ -10,7 +10,7 @@
 There are two ways of starting FactoCord
 
 1. Using the start.sh bash script (bash start.sh or ./start.sh) (make sure you chmod +x the script first)
-2. Manually running the binary (./FactoCord)
+2. Manually running the binary (./FactoCord) Note: File must be in CamelCase... 
 
 # Installing as a service
 
@@ -50,24 +50,11 @@ If you are having an issue make sure to check the error.log to see what the prob
 If you are unable to solve the issue yourself, please post an issue containing the error.log and I will review and attempt to solve what the problem is.
 
 
-# Windows Support?
-
-Currently I haven't had any luck getting FactoCord to run correctly on Windows, [see this](https://github.com/FactoKit/FactoCord/issues/3) for information
-
-If a way is found to fix this problem, then Windows support will be added.
-
-
 # Screenshots
 
-<p><img src="http://i.imgur.com/JsLOVst.png" alt="restart command"></p>
-<p><img src="http://i.imgur.com/1cxq54P.png" alt="mod list command"></p>
-<p><img src="http://i.imgur.com/qN3NsO6.png" alt="stop command"></p>
-<p><img src="http://i.imgur.com/cxjvFG8.png" alt="save command"></p>
+<p><img src="https://i.imgur.com/nrPMtBK.png" alt="list of commands"></p>
 <p><img src="http://i.imgur.com/dztOTrk.png" alt="in-game chat being sent to discord, notice how you can mention discord members"></p>
 <p><img src="http://i.imgur.com/Npl0vBb.png" alt="discord chat being sent to in-game"></p>
 
 
-# Special Thanks
 
-  - Brett and MajesticFudgie for making the logo!
-  - [UclCommander](https://github.com/UclCommander) for finding me the tails library which made this a lot easier to build.
