@@ -30,6 +30,7 @@ var Pipe io.WriteCloser
 var Session *discordgo.Session
 
 func main() {
+	fmt.Println("Welcome to FactoCord-3.0!")
 	support.Config.LoadEnv()
 	Running = false
 	admin.R = &Running
