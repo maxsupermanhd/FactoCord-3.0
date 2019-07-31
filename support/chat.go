@@ -17,7 +17,7 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 			ErrorLog(fmt.Errorf("%s: An error occurred when attempting to tail factorio.log\nDetails: %s", time.Now(), err))
 		}
 		for line := range t.Lines {
-			if strings.Contains(line.Text, "[CHAT]") || strings.Contains(line.Text, "[JOIN]") || strings.Contains(line.Text, "[LEAVE]") {
+			if strings.Contains(line.Text, "[CHAT]") || strings.Contains(line.Text, "[EMBED]") || strings.Contains(line.Text, "[JOIN]") || strings.Contains(line.Text, "[LEAVE]") {
 				if !strings.Contains(line.Text, "<server>") {
 
 					if strings.Contains(line.Text, "[JOIN]") ||
@@ -25,6 +25,12 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 						TmpList := strings.Split(line.Text, " ")
 						// Don't hard code the channelID! }:<
 						s.ChannelMessageSend(Config.FactorioChannelID, fmt.Sprintf("%s", strings.Join(TmpList[3:], " ")))
+					} else if strings.Contains(line.Text, "[EMBED]") {
+						TmpList := strings.Split(line.Text, " ")
+						embed := new(discordgo.MessageEmbed)
+						json.Unmarshal([]byte(fmt.Sprintf("%s", strings.Join(TmpList[3:], " "))), embed)
+						// Don't hard code the channelID! }:<
+						s.ChannelMessageSendEmbed(Config.FactorioChannelID, embed)
 					} else {
 
 						TmpList := strings.Split(line.Text, " ")
