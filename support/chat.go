@@ -29,9 +29,10 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 					} else if strings.Contains(line.Text, "[EMBED]") {
 						TmpList := strings.Split(line.Text, " ")
 						embed := new(discordgo.MessageEmbed)
-						json.Unmarshal([]byte(fmt.Sprintf("%s", strings.Join(TmpList[3:], " "))), embed)
-						// Don't hard code the channelID! }:<
-						s.ChannelMessageSendEmbed(Config.FactorioChannelID, embed)
+						err := json.Unmarshal([]byte(fmt.Sprintf("%s", strings.Join(TmpList[3:], " "))), embed)
+						if err == nil {
+							s.ChannelMessageSendEmbed(Config.FactorioChannelID, embed)
+						}
 					} else {
 
 						TmpList := strings.Split(line.Text, " ")
