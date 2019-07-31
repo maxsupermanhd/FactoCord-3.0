@@ -143,12 +143,10 @@ func discord() {
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	log.Print("[" + m.Author.Username + "] " + m.Content)
-
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-
+	log.Print("[" + m.Author.Username + "] " + m.Content)
 	if m.ChannelID == support.Config.FactorioChannelID {
 		if strings.HasPrefix(m.Content, support.Config.Prefix) {
 			//command := strings.Split(m.Content[1:len(m.Content)], " ")
@@ -158,7 +156,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 		// Pipes normal chat allowing it to be seen ingame
-		_, err := io.WriteString(Pipe, fmt.Sprintf("[Discord] <%s>: %s\r\n", m.Author.Username, m.ContentWithMentionsReplaced()))
+		_, err := io.WriteString(Pipe, fmt.Sprintf("[Discord] <%s>: %s\r\n", m.Author.Username, strings.Replace(m.ContentWithMentionsReplaced(), "\n", fmt.Sprintf("\n[Discord] <%s>: ", m.Author.Username), -1)))
 		if err != nil {
 			support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to pass Discord chat to in-game\nDetails: %s", time.Now(), err))
 		}
