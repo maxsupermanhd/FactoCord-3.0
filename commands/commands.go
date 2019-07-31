@@ -46,8 +46,8 @@ func RegisterCommands() {
 	// Util Commands
 	CL.CommandList = append(CL.CommandList, Command{Name: "Mods", Command: utils.ModsList,
 		Admin: false, Args:0, Desc: "List the mods on the server"})
-        CL.CommandList = append(CL.CommandList, Command{Name: "List",
-                Admin: false, Args:0, Desc: "List the commands for Factocord"})
+    CL.CommandList = append(CL.CommandList, Command{Name: "Help",
+            Admin: false, Args:0, Desc: "List the commands for Factocord"})
 }
 
 func commandListEmbed() *discordgo.MessageEmbed {
@@ -76,7 +76,7 @@ func commandListEmbed() *discordgo.MessageEmbed {
 func RunCommand(input string, s *discordgo.Session, m *discordgo.MessageCreate) {
 	inputvars := strings.SplitN(input, " ", 3)
 	for _, command := range CL.CommandList {
-		if strings.ToLower(command.Name) == strings.ToLower("List") {
+		if strings.ToLower(command.Name) == strings.ToLower("Help") {
 			s.ChannelMessageSendEmbed(support.Config.FactorioChannelID, commandListEmbed())
 			return
 		}
