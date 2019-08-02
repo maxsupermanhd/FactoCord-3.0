@@ -65,7 +65,7 @@ func commandListEmbed() *discordgo.MessageEmbed {
 	embed := &discordgo.MessageEmbed{
 		Type:  "rich",
 		Color: 52,
-		Description: "List of all commands currently available in version 2.0 of FactoCord",
+		Description: "List of all commands currently available in version 3.0 of FactoCord",
 		Title:  "FactoCord Commands",
 		Fields: fields,
 	}
