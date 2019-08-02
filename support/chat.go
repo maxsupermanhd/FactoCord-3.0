@@ -21,9 +21,9 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 			if !strings.Contains(line.Text, "TransmissionControlHelper.cpp") {
 				s.ChannelMessageSend(Config.FactorioConsoleChatID, fmt.Sprintf("%s", line.Text))
 			}
-			
-			if strings.Contains(line.Text, "[CHAT]") || strings.Contains(line.Text, "[EMBED]") || strings.Contains(line.Text, "[JOIN]") || strings.Contains(line.Text, "[LEAVE]") || strings.Contains(line.Text, "[KICK]") || strings.Contains(line.Text, "[BAN]"){
-				if !strings.Contains(line.Text, "<server>") || Config.PassConsoleChat{
+
+			if strings.Contains(line.Text, "[CHAT]") || strings.Contains(line.Text, "[EMBED]") || strings.Contains(line.Text, "[JOIN]") || strings.Contains(line.Text, "[LEAVE]") || strings.Contains(line.Text, "[KICK]") || strings.Contains(line.Text, "[BAN]") {
+				if !strings.Contains(line.Text, "<server>") || Config.PassConsoleChat {
 
 					if strings.Contains(line.Text, "[JOIN]") ||
 						strings.Contains(line.Text, "[LEAVE]") {
@@ -32,10 +32,11 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 						s.ChannelMessageSend(Config.FactorioChannelID, fmt.Sprintf("%s", strings.Join(TmpList[3:], " ")))
 					} else if strings.Contains(line.Text, "[EMBED]") {
 						TmpList := strings.Split(line.Text, " ")
-						embed := new(discordgo.MessageEmbed)
-						err := json.Unmarshal([]byte(fmt.Sprintf("%s", strings.Join(TmpList[3:], " "))), embed)
+						message := new(discordgo.MessageSend)
+						err := json.Unmarshal([]byte(fmt.Sprintf("%s", strings.Join(TmpList[3:], " "))), message)
 						if err == nil {
-							s.ChannelMessageSendEmbed(Config.FactorioChannelID, embed)
+							message.Tts = false
+							s.ChannelMessageSendComplex(Config.FactorioChannelID, message)
 						}
 					} else {
 
