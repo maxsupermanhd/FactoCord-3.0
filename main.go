@@ -162,5 +162,24 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		return
 	}
+	
+	
+		if m.ChannelID == support.Config.FactorioConsoleChatID {
+		fmt.Println("wrote to console from channel: \"", fmt.Sprintf("%s", m.Content), "\"")
+		s.ChannelMessageSend(support.Config.FactorioConsoleChatID, fmt.Sprintf("wrote %s", m.Content))
+		_, err := io.WriteString(Pipe, fmt.Sprintf("%s\n", m.Content))
+		if err != nil {
+			support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to pass Discord console to in-game\nDetails: %s", time.Now(), err))
+		}
+	}
+	return
 }
 
+func CheckAdmin(ID string) bool {
+	for _, admin := range support.Config.AdminIDs {
+		if ID == admin {
+			return true
+		}
+	}
+	return false
+}
