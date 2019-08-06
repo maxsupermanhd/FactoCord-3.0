@@ -25,6 +25,9 @@ type config struct {
 	PassConsoleChat       bool
 	EnableConsoleChannel  bool
 	FactorioConsoleChatID string
+	ServerStart           string
+	PlayerJoin		      string
+	PlayerLeave			  string
 }
 
 func getenvStr(key string) (string, error) {
