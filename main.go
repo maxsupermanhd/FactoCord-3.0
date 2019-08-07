@@ -109,6 +109,7 @@ func main() {
 func discord() {
 	// No hard coding the token }:<
 	discordToken := support.Config.DiscordToken
+	ServerStart := (support.Config.ServerStart)
 	commands.RegisterCommands()
 	admin.P = &Pipe
 	fmt.Println("Starting bot..")
@@ -131,7 +132,7 @@ func discord() {
 	bot.AddHandler(messageCreate)
 	bot.AddHandlerOnce(support.Chat)
 	time.Sleep(3 * time.Second)
-	bot.ChannelMessageSend(support.Config.FactorioChannelID, support.Config.ServerStart)
+	bot.ChannelMessageSend(support.Config.FactorioChannelID, ServerStart)
 	bot.UpdateStatus(0, support.Config.GameName)
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
