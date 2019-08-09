@@ -68,6 +68,8 @@ func (conf *config) LoadEnv() {
 		PassConsoleChat:         getenvBool("PassConsoleChat"),
 		EnableConsoleChannel:    getenvBool("EnableConsoleChannel"),
 		FactorioConsoleChatID:   os.Getenv("FactorioConsoleChatID"),
-		ServerStart:		 os.Getenv("ServerStart"),
+		ServerStart:		 				 os.Getenv("ServerStart"),
+		PlayerJoin: 						 os.Getenv("PlayerJoin"),
+		PlayerLeave:						 os.Getenv("PlayerLeave"),
 	}
 }
