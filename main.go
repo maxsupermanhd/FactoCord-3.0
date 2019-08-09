@@ -109,7 +109,6 @@ func main() {
 func discord() {
 	// No hard coding the token }:<
 	discordToken := support.Config.DiscordToken
-	ServerStart := support.Config.ServerStart
 	commands.RegisterCommands()
 	admin.P = &Pipe
 	fmt.Println("Starting bot..")
@@ -132,7 +131,7 @@ func discord() {
 	bot.AddHandler(messageCreate)
 	bot.AddHandlerOnce(support.Chat)
 	time.Sleep(3 * time.Second)
-	bot.ChannelMessageSend(support.Config.FactorioChannelID, ServerStart)
+	bot.ChannelMessageSend(support.Config.FactorioChannelID, support.Config.ServerStart)
 	bot.UpdateStatus(0, support.Config.GameName)
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
@@ -163,8 +162,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		return
 	}
-	
-	
+
+
 		if m.ChannelID == support.Config.FactorioConsoleChatID {
 		fmt.Println("wrote to console from channel: \"", fmt.Sprintf("%s", m.Content), "\"")
 		s.ChannelMessageSend(support.Config.FactorioConsoleChatID, fmt.Sprintf("wrote %s", m.Content))
