@@ -14,4 +14,8 @@ ModListLocation = "/path/to/mods/mod-list.json"
 
 GameName = "Factorio"
 
-ServerStart = "The server has started!"
+ServerStart = "**:white_check_mark: The server has started!**"
+
+PlayerJoin = "**:arrow_up: %s**"
+
+PlayerLeave = "**:arrow_down: %s**"
