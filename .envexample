@@ -1,0 +1,21 @@
+DiscordToken = "DiscordTokenHere"
+
+FactorioChannelID = "ChannelIDHere"
+
+LaunchParameters = "--start-server-load-latest --server-settings /path/to/file.json"
+
+Executable = "/path/to/file"
+
+AdminIDs = "AdminIDsHere,SeperateByComma"
+
+Prefix = "$"
+
+ModListLocation = "/path/to/mods/mod-list.json"
+
+GameName = "Factorio"
+
+ServerStart = "**:white_check_mark: The server has started!**"
+
+PlayerJoin = "**:arrow_up: %s**"
+
+PlayerLeave = "**:arrow_down: %s**"
