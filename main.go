@@ -109,7 +109,7 @@ func main() {
 func discord() {
 	// No hard coding the token }:<
 	discordToken := support.Config.DiscordToken
-	ServerStart := (support.Config.ServerStart)
+	ServerStart := support.Config.ServerStart
 	commands.RegisterCommands()
 	admin.P = &Pipe
 	fmt.Println("Starting bot..")
