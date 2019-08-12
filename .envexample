@@ -14,7 +14,7 @@ Prefix = "$"
 
 ModListLocation = "/path/to/mod-list.json"
 
-GameName = ""
+GameName = "Factorio"
 
 ServerStart = "**:white_check_mark: The server has started!**"
 
