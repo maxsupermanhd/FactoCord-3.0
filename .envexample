@@ -1,21 +1,27 @@
-DiscordToken = "DiscordTokenHere"
+DiscordToken = "Discord Token Here"
 
-FactorioChannelID = "ChannelIDHere"
+FactorioChannelID = "ChannelMessageswillSendTo"
 
-LaunchParameters = "--start-server-load-latest --server-settings /path/to/file.json"
+FactorioConsoleChatID = "FactorioConsoleChannelHere"
 
-Executable = "/path/to/file"
+LaunchParameters = "--start-server-load-latest /path/to/save.zip --server-settings /path/to/server-settings.json"
 
-AdminIDs = "AdminIDsHere,SeperateByComma"
+Executable = "path/to/factorio"
+
+AdminIDs = "AdminIDs,CommaSeparated"
 
 Prefix = "$"
 
-ModListLocation = "/path/to/mods/mod-list.json"
+ModListLocation = "/path/to/mod-list.json"
 
-GameName = "Factorio"
+GameName = ""
 
 ServerStart = "**:white_check_mark: The server has started!**"
 
 PlayerJoin = "**:arrow_up: %s**"
 
 PlayerLeave = "**:arrow_down: %s**"
+
+PassConsoleChat = False
+
+EnableConsoleCoannel = False
