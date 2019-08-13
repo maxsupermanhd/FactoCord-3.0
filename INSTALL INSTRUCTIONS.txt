@@ -1,0 +1,31 @@
+Ubuntu 18.4.2
+Normal Installation, Download updates, get drivers
+
+you will need Factorio linux installed on this computer. For this build I am using 0.17.tar.xz headless 
+
+I extracted mine to /home/factorio
+Open terminal in /home/factorio
+
+sudo apt install golang-go -y
+sudo apt install git
+Sudo apt-get update -y && sudo apt-get upgrade -y
+go get github.com/bwmarrin/discordgo
+go get github.com/joho/godotenv
+go get github.com/hpcloud/tail/...
+git clone https://github.com/maxsupermanhd/FactoCord-3.0.git
+open ~/factorio/FactoCord-3.0 folder
+	click 3 bars in top right
+	show hidden files
+right click .envexample
+	open with text editor
+
+Put in variables
+	if you followed me it should be something like
+
+LaunchParameters = "--start-server-load-latest /home/factorio/factorio/save/save.zip --server-settings /home/factorio /factorio/data/server-settings.json"
+Executable = " /home/factorio /factorio/bin/x64/factorio"
+ModListLocation = "/home/factorio/factorio/mod-list.json"
+Click three lines in top right
+	Save as
+	.env
+From /factorio/FactoCord-3.0 open terminal and type go build
