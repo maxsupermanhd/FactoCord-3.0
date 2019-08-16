@@ -131,7 +131,6 @@ func discord() {
 	bot.AddHandler(messageCreate)
 	bot.AddHandlerOnce(support.Chat)
 	time.Sleep(3 * time.Second)
-	//bot.ChannelMessageSend(support.Config.FactorioChannelID, "The server has started!")
 	bot.UpdateStatus(0, support.Config.GameName)
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
@@ -150,7 +149,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if strings.HasPrefix(m.Content, support.Config.Prefix) {
 			//command := strings.Split(m.Content[1:len(m.Content)], " ")
 			//name := strings.ToLower(command[0])
-			input := strings.Replace(m.Content, "!", "", -1)
+			input := strings.Replace(m.Content, support.Config.Prefix, "", -1)
 			commands.RunCommand(input, s, m)
 			return
 		}
@@ -162,8 +161,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		return
 	}
-	
-	
 	if m.ChannelID == support.Config.FactorioConsoleChatID {
 		fmt.Println("wrote to console from channel: \"", fmt.Sprintf("%s", m.Content), "\"")
 		s.ChannelMessageSend(support.Config.FactorioConsoleChatID, fmt.Sprintf("wrote %s", m.Content))

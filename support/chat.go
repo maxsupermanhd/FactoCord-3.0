@@ -19,12 +19,8 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		for line := range t.Lines {
 			if strings.Contains(line.Text, "Hosting game at IP ADDR") {
-				s.ChannelMessageSend(Config.FactorioChannelID, "Server started!")
+				s.ChannelMessageSend(support.Config.FactorioChannelID, support.Config.ServerStart)
 			}
-			if !strings.Contains(line.Text, "TransmissionControlHelper.cpp") {
-				s.ChannelMessageSend(Config.FactorioConsoleChatID, fmt.Sprintf("%s", line.Text))
-			}
-			
 			if Config.HaveServerEssentials == true {
 				if strings.Contains(line.Text, "[DISCORD]") ||
 				   strings.Contains(line.Text, "[DISCORD-EMBED]") {
