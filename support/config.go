@@ -25,6 +25,7 @@ type config struct {
 	PassConsoleChat       bool
 	EnableConsoleChannel  bool
 	FactorioConsoleChatID string
+	HaveServerEssentials  bool
 }
 
 func getenvStr(key string) (string, error) {
@@ -65,5 +66,10 @@ func (conf *config) LoadEnv() {
 		PassConsoleChat:         getenvBool("PassConsoleChat"),
 		EnableConsoleChannel:    getenvBool("EnableConsoleChannel"),
 		FactorioConsoleChatID:   os.Getenv("FactorioConsoleChatID"),
+		HaveServerEssentials:    getenvBool("HaveServerEssentials"),
 	}
 }
+
+
+
+

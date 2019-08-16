@@ -131,7 +131,7 @@ func discord() {
 	bot.AddHandler(messageCreate)
 	bot.AddHandlerOnce(support.Chat)
 	time.Sleep(3 * time.Second)
-	bot.ChannelMessageSend(support.Config.FactorioChannelID, "The server has started!")
+	//bot.ChannelMessageSend(support.Config.FactorioChannelID, "The server has started!")
 	bot.UpdateStatus(0, support.Config.GameName)
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
@@ -146,7 +146,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	log.Print("[" + m.Author.Username + "] " + m.Content)
 	if m.ChannelID == support.Config.FactorioChannelID {
 		if strings.HasPrefix(m.Content, support.Config.Prefix) {
 			//command := strings.Split(m.Content[1:len(m.Content)], " ")
@@ -155,6 +154,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			commands.RunCommand(input, s, m)
 			return
 		}
+		log.Print("[" + m.Author.Username + "] " + m.Content)
 		// Pipes normal chat allowing it to be seen ingame
 		_, err := io.WriteString(Pipe, fmt.Sprintf("[Discord] <%s>: %s\r\n", m.Author.Username, strings.Replace(m.ContentWithMentionsReplaced(), "\n", fmt.Sprintf("\n[Discord] <%s>: ", m.Author.Username), -1)))
 		if err != nil {
@@ -164,7 +164,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	
 	
-		if m.ChannelID == support.Config.FactorioConsoleChatID {
+	if m.ChannelID == support.Config.FactorioConsoleChatID {
 		fmt.Println("wrote to console from channel: \"", fmt.Sprintf("%s", m.Content), "\"")
 		s.ChannelMessageSend(support.Config.FactorioConsoleChatID, fmt.Sprintf("wrote %s", m.Content))
 		_, err := io.WriteString(Pipe, fmt.Sprintf("%s\n", m.Content))
