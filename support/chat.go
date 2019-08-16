@@ -18,9 +18,6 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 			ErrorLog(fmt.Errorf("%s: An error occurred when attempting to tail factorio.log\nDetails: %s", time.Now(), err))
 		}
 		for line := range t.Lines {
-			if strings.Contains(line.Text, "Hosting game at IP ADDR") {
-				s.ChannelMessageSend(Config.FactorioChannelID, Config.ServerStart)
-			}
 			if Config.HaveServerEssentials == true {
 				if strings.Contains(line.Text, "[DISCORD]") ||
 				   strings.Contains(line.Text, "[DISCORD-EMBED]") {
