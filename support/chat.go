@@ -19,7 +19,7 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		for line := range t.Lines {
 			if strings.Contains(line.Text, "Hosting game at IP ADDR") {
-				s.ChannelMessageSend(support.Config.FactorioChannelID, support.Config.ServerStart)
+				s.ChannelMessageSend(Config.FactorioChannelID, Config.ServerStart)
 			}
 			if Config.HaveServerEssentials == true {
 				if strings.Contains(line.Text, "[DISCORD]") ||
