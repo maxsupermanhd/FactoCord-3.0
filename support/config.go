@@ -26,7 +26,12 @@ type config struct {
 	EnableConsoleChannel  bool
 	FactorioConsoleChatID string
 	HaveServerEssentials  bool
+	BotStart              string
+	SendBotStart          bool
 	ServerStart           string
+	ServerStop            string
+	ServerFail            string
+	ServerSave            string
 	PlayerJoin	          string
 	PlayerLeave	          string
 }
@@ -70,7 +75,12 @@ func (conf *config) LoadEnv() {
 		EnableConsoleChannel:    getenvBool("EnableConsoleChannel"),
 		FactorioConsoleChatID:   os.Getenv("FactorioConsoleChatID"),
 		HaveServerEssentials:    getenvBool("HaveServerEssentials"),
+		BotStart:				 os.Getenv("BotStart"),
+		SendBotStart:            getenvBool("SendBotStart"),
 		ServerStart:		 	 os.Getenv("ServerStart"),
+		ServerStop:              os.Getenv("ServerStop"),
+		ServerFail:              os.Getenv("ServerFail"),
+		ServerSave:              os.Getenv("ServerSave"),
 		PlayerJoin: 			 os.Getenv("PlayerJoin"),
 		PlayerLeave:			 os.Getenv("PlayerLeave"),
 	}
