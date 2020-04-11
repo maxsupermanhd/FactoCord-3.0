@@ -27,3 +27,5 @@ PassConsoleChat = False
 EnableConsoleCoannel = False
 
 HaveServerEssentials = False
+
+PossiblyService = False

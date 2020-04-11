@@ -29,6 +29,7 @@ type config struct {
 	ServerStart           string
 	PlayerJoin	          string
 	PlayerLeave	          string
+	PossiblyService		  bool
 }
 
 func getenvStr(key string) (string, error) {
@@ -73,6 +74,7 @@ func (conf *config) LoadEnv() {
 		ServerStart:		 	 os.Getenv("ServerStart"),
 		PlayerJoin: 			 os.Getenv("PlayerJoin"),
 		PlayerLeave:			 os.Getenv("PlayerLeave"),
+		PossiblyService:		 getenvBool("PossiblyService"),
 	}
 }
 

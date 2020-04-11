@@ -81,15 +81,20 @@ func main() {
 
 	go func() {
 		Console := bufio.NewReader(os.Stdin)
+		service := support.Config.PossiblyService
 		for {
 			line, _, err := Console.ReadLine()
 			if err != nil {
+				if service {
+					return
+				}
 				support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to read the input to pass as input to the console\nDetails: %s", time.Now(), err))
 			}
 			_, err = io.WriteString(Pipe, fmt.Sprintf("%s\n", line))
 			if err != nil {
 				support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to pass input to the console\nDetails: %s", time.Now(), err))
 			}
+			service = false
 		}
 	}()
 
