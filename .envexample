@@ -4,7 +4,7 @@ FactorioChannelID = "ChannelMessageswillSendTo"
 
 FactorioConsoleChatID = "FactorioConsoleChannelHere"
 
-LaunchParameters = "--start-server-load-latest /path/to/save.zip --server-settings /path/to/factorio/server-settings.json"
+LaunchParameters = "--start-server-load-latest /path/to/factorio/saves/save.zip --server-settings /path/to/factorio/server-settings.json"
 
 Executable = "path/to/factorio/bin/x64/factorio"
 
