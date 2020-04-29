@@ -1,14 +1,20 @@
-# This file contains install instructions for Ubuntu 18.04
-In instruction used headless factorio copy (from website) in /home/factorio
+# This file contains install instructions for Debian based systems
+In instruction used headless factorio copy (from website) in `/home/factorio`.
+
+Tested on Ubuntu 18.04.4 LTS, Ubuntu 18.04.4 LTS (Server)
 
 # Step 0
 Installing deps
 
-`sudo apt-get update -y && sudo apt-get upgrade -y`
-`sudo apt install golang-go git -y`
-`go get github.com/bwmarrin/discordgo`
-`go get github.com/joho/godotenv`
-`go get github.com/hpcloud/tail/...`
+Make sure system is up to date `sudo apt-get update -y && sudo apt-get upgrade -y`
+
+Download go 1.8+ (`sudo apt install golang-go git -y`)
+
+Get go packages:
+
+- [DiscordGo](https://github.com/bwmarrin/discordgo) `go get github.com/bwmarrin/discordgo`
+- [godotenv](https://github.com/joho/godotenv/) `go get github.com/joho/godotenv`
+- [tails](https://github.com/hpcloud/tail) `go get github.com/hpcloud/tail/...`
 
 # Step 1
 Cloning repo
@@ -18,8 +24,9 @@ Cloning repo
 # Step 2
 Configuring
 
-`cd FactoCord-3.0/`
-`nano .envexample`
+Enter created directory `cd FactoCord-3.0/`
+
+Open `.envexample` with any editor (ex. `nano .envexample`)
 
 Then in text editor you must set:
 1. Your Discord token for the bot (DiscordToken)
@@ -29,7 +36,7 @@ Then in text editor you must set:
 5. Admin IDs (for commands) (AdminIDs)
 6. Mod list .json file location (include filename) (ModListLocation)
 
-Then rename `.envexample` to `.env` (`mv .envexample .env`)
+Then rename (or copy) `.envexample` to `.env` (`cp .envexample .env`)
 
 # Step 3
 Building
