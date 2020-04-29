@@ -3,7 +3,7 @@
 <a href="https://goreportcard.com/report/github.com/thecmdradama/FactoCord-2.0"><img src="https://goreportcard.com/badge/github.com/thecmdradama/FactoCord-2.0" alt="Go Report Card"></a>
 </p>
 
-# For installation instructions see <a href=https://github.com/maxsupermanhd/FactoCord-3.0/blob/master/INSTALL.md"> INSTALL.md </a>
+# For installation instructions see [INSTALL.md](https://github.com/maxsupermanhd/FactoCord-3.0/blob/master/INSTALL.md)
 
 # Error reporting
 
