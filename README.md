@@ -6,6 +6,8 @@
 # Compiling
 
 `Requires go 1.8 or above`
+sudo apt install golang-go
+sudo apt install git
 
 FactoCord uses the following packages:
 
@@ -19,6 +21,12 @@ You will need to add these lib as go get:
 - `go get github.com/joho/godotenv`
 - `go get github.com/hpcloud/tail/...`
 
+CD <File path you want FactoCord>
+  sudo git clone https://github.com/maxsupermanhd/FactoCord-3.0.git\
+  cd FactoCord-3.0
+  cp .envexample .env
+  nano .env
+  
 To compile just do `go build`
 
 for more detailed instructions see INSTALL.md file
