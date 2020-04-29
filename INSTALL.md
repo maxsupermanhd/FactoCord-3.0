@@ -26,7 +26,9 @@ Configuring
 
 Enter created directory `cd FactoCord-3.0/`
 
-Open `.envexample` with any editor (ex. `nano .envexample`)
+rename (or copy) `.envexample` to `.env` (`cp .envexample .env`)
+
+Open `.env` with any editor (ex. `nano .env`)
 
 Then in text editor you must set:
 1. Your Discord token for the bot (DiscordToken)
@@ -36,7 +38,6 @@ Then in text editor you must set:
 5. Admin IDs (for commands) (AdminIDs)
 6. Mod list .json file location (include filename) (ModListLocation)
 
-Then rename (or copy) `.envexample` to `.env` (`cp .envexample .env`)
 
 # Step 3
 Building
