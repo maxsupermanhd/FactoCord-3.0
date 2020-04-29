@@ -4,15 +4,15 @@ FactorioChannelID = "ChannelMessageswillSendTo"
 
 FactorioConsoleChatID = "FactorioConsoleChannelHere"
 
-LaunchParameters = "--start-server-load-latest /path/to/save.zip --server-settings /path/to/server-settings.json"
+LaunchParameters = "--start-server-load-latest /path/to/save.zip --server-settings /path/to/factorio/server-settings.json"
 
-Executable = "path/to/factorio"
+Executable = "path/to/factorio/bin/x64/factorio"
 
 AdminIDs = "AdminIDs,CommaSeparated"
 
 Prefix = "$"
 
-ModListLocation = "/path/to/mod-list.json"
+ModListLocation = "/path/to/factorio/mods/mod-list.json"
 
 GameName = "Factorio"
 
