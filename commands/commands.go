@@ -46,6 +46,8 @@ func RegisterCommands() {
 	// Util Commands
 	CL.CommandList = append(CL.CommandList, Command{Name: "Mods", Command: utils.ModsList,
 		Admin: false, Args:0, Desc: "List the mods on the server"})
+	CL.CommandList = append(CL.CommandList, Command{Name: "Version", Command: utils.VersionString,
+		Admin: false, Args:0, Desc: "Get server version"})
     CL.CommandList = append(CL.CommandList, Command{Name: "Help",
             Admin: false, Args:0, Desc: "List the commands for Factocord"})
 }
