@@ -40,7 +40,10 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 							err := json.Unmarshal([]byte(fmt.Sprintf("%s", strings.Join(TmpList[3:], " "))), message)
 							if err == nil {
 								message.Tts = false
-								s.ChannelMessageSendComplex(Config.FactorioChannelID, message)
+								_, serrn := s.ChannelMessageSendComplex(Config.FactorioChannelID, message)
+								if serrn != nil {
+									fmt.Println(fmt.Sprintf("Discord-embed error %s\n", serrn))
+								}
 							}
 						} else {
 							TmpList := strings.Split(line.Text, " ")
