@@ -1,6 +1,7 @@
 factorio/
 .env
 FactoCord-3.0
+FactoCord
 error.log
 factorio.log
 .exit
