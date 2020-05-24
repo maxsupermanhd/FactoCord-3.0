@@ -1,0 +1,7 @@
+factorio/
+.env
+.envexample
+FactoCord-3.0
+error.log
+factorio.log
+.exit
