@@ -2,14 +2,29 @@ package admin
 
 import (
 	"io"
+	"strings"
 
 	"../../support"
 	"github.com/bwmarrin/discordgo"
 )
 
+var KickPlayerUsage = "Usage: $kick <player> <reason>"
+
 // SaveServer executes the save command on the server.
-func KickPlayer(s *discordgo.Session, m *discordgo.MessageCreate, arg1 string, arg2 string) {
-	io.WriteString(*P, "/kick " + arg1 + " " + arg2 + "\n")
-	s.ChannelMessageSend(support.Config.FactorioChannelID, "Player "+ arg1 + " kicked with reason " + arg2 + "!")
+func KickPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
+	if len(args) == 0 {
+		s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(KickPlayerUsage))
+		return
+	}
+	args2 := strings.SplitN(args + " ", " ", 2)
+	player := strings.TrimSpace(args2[0])
+	reason := strings.TrimSpace(args2[1])
+
+	if len(player) == 0 || len(reason) == 0 {
+		s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(KickPlayerUsage))
+		return
+	}
+	io.WriteString(*P, "/kick " + player + " " + reason + "\n")
+	s.ChannelMessageSend(support.Config.FactorioChannelID, "Player "+ player + " kicked with reason " + reason + "!")
 	return
 }

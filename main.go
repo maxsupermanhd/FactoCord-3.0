@@ -111,7 +111,7 @@ func main() {
 func discord() {
 	// No hard coding the token }:<
 	discordToken := support.Config.DiscordToken
-	commands.RegisterCommands()
+	//commands.RegisterCommands()
 	admin.P = &Pipe
 	fmt.Println("Starting bot..")
 	bot, err := discordgo.New("Bot " + discordToken)
