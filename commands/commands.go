@@ -67,6 +67,12 @@ var Commands = [...]Command{
         Desc: "List the mods on the server. " + utils.ModListUsage,
     },
     {
+        Name: "Version",
+        Command: utils.VersionString,
+        Admin: false,
+        Desc: "Get server version " + utils.VersionStringUsage,
+    },
+    {
         Name: "Help",
         Admin: false,
         Desc: "List the commands for Factocord",

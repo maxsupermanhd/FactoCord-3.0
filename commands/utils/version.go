@@ -9,7 +9,9 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func VersionString(s *discordgo.Session, m *discordgo.MessageCreate) {
+var VersionStringUsage = "Usage: $version"
+
+func VersionString(s *discordgo.Session, m *discordgo.MessageCreate, ar string) {
 	cmd := exec.Command(support.Config.Executable, "--version")
     out, err := cmd.CombinedOutput()
 	if err != nil {
