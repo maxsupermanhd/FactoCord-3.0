@@ -1,13 +1,13 @@
 package support
 
 import (
-	"encoding/json"
-	"fmt"
-	"strings"
-	"time"
+    "encoding/json"
+    "fmt"
+    "strings"
+    "time"
 
-	"github.com/bwmarrin/discordgo"
-	"github.com/hpcloud/tail"
+    "github.com/bwmarrin/discordgo"
+    "github.com/hpcloud/tail"
 )
 
 // Chat pipes in-game chat to Discord.
