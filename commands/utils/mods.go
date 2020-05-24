@@ -65,7 +65,7 @@ func modList(ModList *ModJson, return_enabled bool, return_disabled bool) string
 func ModsList(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
     return_enabled := true
     return_disabled := false
-    if args == "on" {
+    if args == "on" || args == "" {
         return_enabled = true
     } else if args == "off" {
         return_enabled = false
