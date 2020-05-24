@@ -108,8 +108,12 @@ func RunCommand(input string, s *discordgo.Session, m *discordgo.MessageCreate) 
         }
 
         if strings.ToLower(command.Name) == strings.ToLower(command_name) {
-            if command.Admin && CheckAdmin(m.Author.ID) {
-                command.Command(s, m, args)
+            if command.Admin {
+                if CheckAdmin(m.Author.ID) {
+                    command.Command(s, m, args)
+                } else {
+                    s.ChannelMessageSend(support.Config.FactorioChannelID, "You are not an admin!")
+                }
             }
 
             if !command.Admin {
