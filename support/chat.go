@@ -1,13 +1,13 @@
 package support
 
 import (
-	"encoding/json"
-	"fmt"
-	"strings"
-	"time"
+    "encoding/json"
+    "fmt"
+    "strings"
+    "time"
 
-	"github.com/bwmarrin/discordgo"
-	"github.com/hpcloud/tail"
+    "github.com/bwmarrin/discordgo"
+    "github.com/hpcloud/tail"
 )
 
 // Chat pipes in-game chat to Discord.
@@ -18,6 +18,18 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 			ErrorLog(fmt.Errorf("%s: An error occurred when attempting to tail factorio.log\nDetails: %s", time.Now(), err))
 		}
 		for line := range t.Lines {
+			if strings.Contains(line.Text, "Quitting: multiplayer error.") {
+				s.ChannelMessageSend(Config.FactorioChannelID, Config.ServerFail)
+			}
+			if strings.Contains(line.Text, "Info UDPSocket.cpp:39: Opening socket for broadcast") {
+				s.ChannelMessageSend(Config.FactorioChannelID, Config.ServerStart)
+			}
+			if strings.Contains(line.Text, "Info AppManagerStates.cpp:1843: Saving finished") {
+				s.ChannelMessageSend(Config.FactorioChannelID, "Saving finished!")
+			}
+			if strings.Contains(line.Text, "Info ServerMultiplayerManager.cpp:138: Quitting multiplayer connection.") {
+				s.ChannelMessageSend(Config.FactorioChannelID, Config.ServerStop)
+			}
 			if Config.HaveServerEssentials == true {
 				if strings.Contains(line.Text, "[DISCORD]") ||
 				   strings.Contains(line.Text, "[DISCORD-EMBED]") {
@@ -28,7 +40,10 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 							err := json.Unmarshal([]byte(fmt.Sprintf("%s", strings.Join(TmpList[3:], " "))), message)
 							if err == nil {
 								message.Tts = false
-								s.ChannelMessageSendComplex(Config.FactorioChannelID, message)
+								_, serrn := s.ChannelMessageSendComplex(Config.FactorioChannelID, message)
+								if serrn != nil {
+									fmt.Println(fmt.Sprintf("Discord-embed error %s\n", serrn))
+								}
 							}
 						} else {
 							TmpList := strings.Split(line.Text, " ")

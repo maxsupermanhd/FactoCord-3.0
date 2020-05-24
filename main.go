@@ -23,6 +23,8 @@ import (
 // Running is the boolean that tells if the server is running or not
 var Running bool
 
+var SaveRequested bool = false
+
 // Pipe is an WriteCloser interface
 var Pipe io.WriteCloser
 
@@ -109,7 +111,7 @@ func main() {
 func discord() {
 	// No hard coding the token }:<
 	discordToken := support.Config.DiscordToken
-	commands.RegisterCommands()
+	//commands.RegisterCommands()
 	admin.P = &Pipe
 	fmt.Println("Starting bot..")
 	bot, err := discordgo.New("Bot " + discordToken)
@@ -133,7 +135,9 @@ func discord() {
 	time.Sleep(3 * time.Second)
 	bot.UpdateStatus(0, support.Config.GameName)
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
-	bot.ChannelMessageSend(support.Config.FactorioChannelID, support.Config.ServerStart)
+	if support.Config.SendBotStart {
+		bot.ChannelMessageSend(support.Config.FactorioChannelID, support.Config.BotStart)
+	}
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
