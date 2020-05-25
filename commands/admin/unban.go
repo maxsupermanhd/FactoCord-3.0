@@ -8,9 +8,10 @@ import (
     "github.com/bwmarrin/discordgo"
 )
 
+// UnbanPlayerUsage comment...
 var UnbanPlayerUsage = "Usage $unban <player>"
 
-// SaveServer executes the save command on the server.
+// UnbanPlayer unbannes a player on the server.
 func UnbanPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
     if strings.ContainsAny(args, " \n\t") {
         s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(UnbanPlayerUsage))
