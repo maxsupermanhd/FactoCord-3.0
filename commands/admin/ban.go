@@ -8,9 +8,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// BanPlayerUsage comment...
 var BanPlayerUsage = "Usage: $ban <player> <reason>"
 
-// SaveServer executes the save command on the server.
+// BanPlayer bannes a player on the server.
 func BanPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 	if len(args) == 0 {
 		s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(BanPlayerUsage))

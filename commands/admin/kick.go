@@ -8,9 +8,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// KickPlayerUsage comment...
 var KickPlayerUsage = "Usage: $kick <player> <reason>"
 
-// SaveServer executes the save command on the server.
+// KickPlayer kicks a player from the server.
 func KickPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 	if len(args) == 0 {
 		s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(KickPlayerUsage))

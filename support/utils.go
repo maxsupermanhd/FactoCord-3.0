@@ -58,3 +58,13 @@ func ChunkedMessageSend(s *discordgo.Session, channel string, message string) {
 func FormatUsage(s string) string {
 	return strings.Replace(s, "$", Config.Prefix, -1)
 }
+
+func DeleteEmptyStrings (s []string) []string {
+    var r []string
+    for _, str := range s {
+        if str != "" {
+            r = append(r, str)
+        }
+    }
+    return r
+}

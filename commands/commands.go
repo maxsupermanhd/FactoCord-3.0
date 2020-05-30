@@ -19,7 +19,7 @@ type Command struct {
     Desc	string
 }
 
-
+// Commands is a list of all available commands
 var Commands = [...]Command{
     // Admin Commands
     {
@@ -57,6 +57,12 @@ var Commands = [...]Command{
         Command: admin.UnbanPlayer,
         Admin: true,
         Desc: "Unban a user from the server. " + admin.UnbanPlayerUsage,
+    },
+    {
+        Name: "Mod",
+        Command: admin.ModCommand,
+        Admin: true,
+        Desc: "Manage mod-list.json. " + admin.ModCommandUsage,
     },
     
     // Util Commands
@@ -104,7 +110,7 @@ func commandListEmbed() *discordgo.MessageEmbed {
 // RunCommand runs a specified command.
 func RunCommand(input string, s *discordgo.Session, m *discordgo.MessageCreate) {
     inputvars := strings.SplitN(input + " ", " ", 2)
-    command_name := inputvars[0]
+    commandName := inputvars[0]
     args := strings.TrimSpace(inputvars[1])
 
     for _, command := range Commands {
@@ -113,7 +119,7 @@ func RunCommand(input string, s *discordgo.Session, m *discordgo.MessageCreate) 
             return
         }
 
-        if strings.ToLower(command.Name) == strings.ToLower(command_name) {
+        if strings.ToLower(command.Name) == strings.ToLower(commandName) {
             if command.Admin {
                 if CheckAdmin(m.Author.ID) {
                     command.Command(s, m, args)
