@@ -10,6 +10,8 @@ Executable = "path/to/factorio/bin/x64/factorio"
 
 AdminIDs = "AdminIDs,CommaSeparated"
 
+CommandRoles = "<RoleID>:<command name>,<command name>; <RoleID>:<command name>; etc..."
+
 Prefix = "$"
 
 ModListLocation = "/path/to/factorio/mods/mod-list.json"

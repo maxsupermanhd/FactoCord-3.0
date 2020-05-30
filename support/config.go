@@ -13,12 +13,15 @@ var Config config
 
 var ErrEnvVarEmpty = errors.New("getenv: environment variable empty")
 
+type commandRolesType map[string]string
+
 type config struct {
 	DiscordToken          string
 	FactorioChannelID     string
 	Executable            string
 	LaunchParameters      []string
 	AdminIDs              []string
+	CommandRoles		  commandRolesType
 	Prefix                string
 	ModListLocation       string
 	GameName              string
@@ -56,6 +59,42 @@ func getenvBool(key string) (bool) {
     return v
 }
 
+func getRolesMap(key string) commandRolesType {
+	commandRoles := make(commandRolesType)
+	s := os.Getenv(key)
+	for _, roleCommands := range strings.Split(s, ";") {
+		roleCommands = strings.TrimSpace(roleCommands)
+		if roleCommands == "" {
+			continue
+		}
+		roleCommandsSplit := strings.SplitN(roleCommands, ":", 2)
+		if len(roleCommandsSplit) < 2 {
+			fmt.Println(".env CommandRoles: Error parsing role with commands")
+			Exit(1)
+		}
+		role := strings.TrimSpace(roleCommandsSplit[0])
+		commands := strings.Split(strings.TrimSpace(roleCommandsSplit[1]), ",")
+		if num, err := strconv.Atoi(role); err != nil || num <= 0 {
+			fmt.Println(".env CommandRoles: " + key + " is incorrect: role is not an integer")
+			Exit(1)
+		}
+
+		for _, command := range commands {
+			if command == "" {
+				continue
+			}
+			command = strings.ToLower(command)
+			if _, exists := commandRoles[command]; exists {
+				fmt.Println(".env CommandRoles: Command \"" + command + "\" is assigned multiple roles")
+				Exit(1)
+			}
+			commandRoles[command] = role
+		}
+	}
+	fmt.Println(commandRoles)
+	return commandRoles
+}
+
 func (conf *config) LoadEnv() {
 	if _, err := os.Stat(".env"); os.IsNotExist(err) {
 		fmt.Println("Environment file not found, cannot continue!")
@@ -68,6 +107,7 @@ func (conf *config) LoadEnv() {
 		LaunchParameters:        strings.Split(os.Getenv("LaunchParameters"), " "),
 		Executable:              os.Getenv("Executable"),
 		AdminIDs:                strings.Split(os.Getenv("AdminIDs"), ","),
+		CommandRoles: 		 	 getRolesMap("CommandRoles"),
 		Prefix:                  os.Getenv("Prefix"),
 		ModListLocation:         os.Getenv("ModListLocation"),
 		GameName:                os.Getenv("GameName"),

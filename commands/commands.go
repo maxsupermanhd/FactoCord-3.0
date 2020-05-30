@@ -85,7 +85,7 @@ var Commands = [...]Command{
     },
 }
 
-func commandListEmbed() *discordgo.MessageEmbed {
+func helpCommand(s *discordgo.Session) {
     fields := []*discordgo.MessageEmbedField{}
     for _, command := range Commands {
         desc := support.FormatUsage(command.Desc)
@@ -104,37 +104,53 @@ func commandListEmbed() *discordgo.MessageEmbed {
         Title:  "FactoCord Commands",
         Fields: fields,
     }
-    return embed
+    s.ChannelMessageSendEmbed(support.Config.FactorioChannelID, embed)
 }
 
 // RunCommand runs a specified command.
 func RunCommand(input string, s *discordgo.Session, m *discordgo.MessageCreate) {
     inputvars := strings.SplitN(input + " ", " ", 2)
-    commandName := inputvars[0]
+    commandName := strings.ToLower(inputvars[0])
     args := strings.TrimSpace(inputvars[1])
 
-    for _, command := range Commands {
-        if strings.ToLower(command.Name) == strings.ToLower("Help") {
-            s.ChannelMessageSendEmbed(support.Config.FactorioChannelID, commandListEmbed())
-            return
-        }
+    if commandName == strings.ToLower("Help") {
+        helpCommand(s)
+        return
+    }
 
-        if strings.ToLower(command.Name) == strings.ToLower(commandName) {
+    for _, command := range Commands {
+
+        if strings.ToLower(command.Name) == commandName {
+            execute := false
+            error := ""
+
             if command.Admin {
                 if CheckAdmin(m.Author.ID) {
-                    command.Command(s, m, args)
+                    execute = true
                 } else {
-                    s.ChannelMessageSend(support.Config.FactorioChannelID, "You are not an admin!")
+                    error = "You are not an admin!"
+                }
+            } else {
+                execute = true
+            }
+            if roleID, exists := support.Config.CommandRoles[commandName]; exists {
+                // TODO? role name
+                error = "You don't have the required role"
+                for _, memberRoleID := range m.Member.Roles {
+                    if memberRoleID == roleID {
+                        execute = true
+                    }
                 }
             }
-
-            if !command.Admin {
+            if execute {
                 command.Command(s, m, args)
+            } else {
+                s.ChannelMessageSend(support.Config.FactorioChannelID, error)
             }
             return
         }
     }
-    s.ChannelMessageSend(support.Config.FactorioChannelID, "Command not found!")
+    s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage("Command not found. Try using \"$help\""))
 }
 
 // CheckAdmin checks if the user attempting to run an admin command is an admin
