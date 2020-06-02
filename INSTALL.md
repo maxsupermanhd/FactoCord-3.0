@@ -49,3 +49,6 @@ Running
 
 `./FactoCord`
 
+# Using scenario support
+... will eventually disable achievements but you will have nice and clear chat in Discord.
+To have afk kicked people showed and be able to customize/potentially modify messages please use control.lua **addition** from repo root. If you don't want to be control.lua modified so hard, you can place it near and use a `require` to get discord sending function (wraper) and have full functionality of FactoCord.
