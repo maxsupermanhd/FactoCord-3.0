@@ -85,11 +85,27 @@ var Commands = [...]Command{
     },
 }
 
-func helpCommand(s *discordgo.Session) {
+func helpCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
     fields := []*discordgo.MessageEmbedField{}
     for _, command := range Commands {
         desc := support.FormatUsage(command.Desc)
-        if command.Admin {
+        if roleID, exists := support.Config.CommandRoles[command.Name]; exists {
+            roles, err := s.GuildRoles(m.GuildID)
+            if err != nil {
+                support.ErrorLog(err)
+            }
+            found := false
+            for _, role := range roles {
+                if role.ID == roleID {
+                    found = true
+                    desc += " - Role \"" + role.Name + "\""
+                    break
+                }
+            }
+            if !found {
+                desc += " - Role not found in guild"
+            }
+        } else if command.Admin {
             desc += " - Admin Only!"
         }
         fields = append(fields, &discordgo.MessageEmbedField{
@@ -114,7 +130,7 @@ func RunCommand(input string, s *discordgo.Session, m *discordgo.MessageCreate) 
     args := strings.TrimSpace(inputvars[1])
 
     if commandName == strings.ToLower("Help") {
-        helpCommand(s)
+        helpCommand(s, m)
         return
     }
 
