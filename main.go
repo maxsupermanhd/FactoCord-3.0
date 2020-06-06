@@ -13,9 +13,9 @@ import (
 	"syscall"
 	"time"
 
-	"./support"
 	"./commands"
 	"./commands/admin"
+	"./support"
 	"github.com/bwmarrin/discordgo"
 	_ "github.com/joho/godotenv/autoload"
 )

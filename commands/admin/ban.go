@@ -17,7 +17,7 @@ func BanPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 		s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(BanPlayerUsage))
 		return
 	}
-	args2 := strings.SplitN(args + " ", " ", 2)
+	args2 := strings.SplitN(args+" ", " ", 2)
 	player := strings.TrimSpace(args2[0])
 	reason := strings.TrimSpace(args2[1])
 
@@ -26,7 +26,7 @@ func BanPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 		return
 	}
 
-	io.WriteString(*P, "/ban " + player + " " + reason +"\n")
-	s.ChannelMessageSend(support.Config.FactorioChannelID, "Player "+ player + " banned with reason \"" + reason + "\"!")
+	io.WriteString(*P, "/ban "+player+" "+reason+"\n")
+	s.ChannelMessageSend(support.Config.FactorioChannelID, "Player "+player+" banned with reason \""+reason+"\"!")
 	return
 }

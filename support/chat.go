@@ -1,13 +1,13 @@
 package support
 
 import (
-    "encoding/json"
-    "fmt"
-    "strings"
-    "time"
+	"encoding/json"
+	"fmt"
+	"strings"
+	"time"
 
-    "github.com/bwmarrin/discordgo"
-    "github.com/hpcloud/tail"
+	"github.com/bwmarrin/discordgo"
+	"github.com/hpcloud/tail"
 )
 
 // Chat pipes in-game chat to Discord.
@@ -32,7 +32,7 @@ func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}
 			if Config.HaveServerEssentials == true {
 				if strings.Contains(line.Text, "[DISCORD]") ||
-				   strings.Contains(line.Text, "[DISCORD-EMBED]") {
+					strings.Contains(line.Text, "[DISCORD-EMBED]") {
 					if !strings.Contains(line.Text, "<server>") || Config.PassConsoleChat {
 						if strings.Contains(line.Text, "[DISCORD-EMBED]") {
 							TmpList := strings.Split(line.Text, " ")
