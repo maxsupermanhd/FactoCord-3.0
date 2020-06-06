@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 // Config is a config interface.
@@ -21,7 +21,7 @@ type config struct {
 	Executable            string
 	LaunchParameters      []string
 	AdminIDs              []string
-	CommandRoles		  commandRolesType
+	CommandRoles          commandRolesType
 	Prefix                string
 	ModListLocation       string
 	GameName              string
@@ -35,28 +35,28 @@ type config struct {
 	ServerStop            string
 	ServerFail            string
 	ServerSave            string
-	PlayerJoin	          string
-	PlayerLeave	          string
+	PlayerJoin            string
+	PlayerLeave           string
 }
 
 func getenvStr(key string) (string, error) {
-    v := os.Getenv(key)
-    if v == "" {
-        return v, ErrEnvVarEmpty
-    }
-    return v, nil
+	v := os.Getenv(key)
+	if v == "" {
+		return v, ErrEnvVarEmpty
+	}
+	return v, nil
 }
 
-func getenvBool(key string) (bool) {
-    s, err := getenvStr(key)
-    if err != nil {
-        return false
-    }
-    v, err := strconv.ParseBool(s)
-    if err != nil {
-        return false
-    }
-    return v
+func getenvBool(key string) bool {
+	s, err := getenvStr(key)
+	if err != nil {
+		return false
+	}
+	v, err := strconv.ParseBool(s)
+	if err != nil {
+		return false
+	}
+	return v
 }
 
 func getRolesMap(key string) commandRolesType {
@@ -91,7 +91,6 @@ func getRolesMap(key string) commandRolesType {
 			commandRoles[command] = role
 		}
 	}
-	fmt.Println(commandRoles)
 	return commandRoles
 }
 
@@ -102,30 +101,26 @@ func (conf *config) LoadEnv() {
 		ErrorLog(Error)
 	}
 	Config = config{
-		DiscordToken:            os.Getenv("DiscordToken"),
-		FactorioChannelID:       os.Getenv("FactorioChannelID"),
-		LaunchParameters:        strings.Split(os.Getenv("LaunchParameters"), " "),
-		Executable:              os.Getenv("Executable"),
-		AdminIDs:                strings.Split(os.Getenv("AdminIDs"), ","),
-		CommandRoles: 		 	 getRolesMap("CommandRoles"),
-		Prefix:                  os.Getenv("Prefix"),
-		ModListLocation:         os.Getenv("ModListLocation"),
-		GameName:                os.Getenv("GameName"),
-		PassConsoleChat:         getenvBool("PassConsoleChat"),
-		EnableConsoleChannel:    getenvBool("EnableConsoleChannel"),
-		FactorioConsoleChatID:   os.Getenv("FactorioConsoleChatID"),
-		HaveServerEssentials:    getenvBool("HaveServerEssentials"),
-		BotStart:				 os.Getenv("BotStart"),
-		SendBotStart:            getenvBool("SendBotStart"),
-		ServerStart:		 	 os.Getenv("ServerStart"),
-		ServerStop:              os.Getenv("ServerStop"),
-		ServerFail:              os.Getenv("ServerFail"),
-		ServerSave:              os.Getenv("ServerSave"),
-		PlayerJoin: 			 os.Getenv("PlayerJoin"),
-		PlayerLeave:			 os.Getenv("PlayerLeave"),
+		DiscordToken:          os.Getenv("DiscordToken"),
+		FactorioChannelID:     os.Getenv("FactorioChannelID"),
+		LaunchParameters:      strings.Split(os.Getenv("LaunchParameters"), " "),
+		Executable:            os.Getenv("Executable"),
+		AdminIDs:              strings.Split(os.Getenv("AdminIDs"), ","),
+		CommandRoles:          getRolesMap("CommandRoles"),
+		Prefix:                os.Getenv("Prefix"),
+		ModListLocation:       os.Getenv("ModListLocation"),
+		GameName:              os.Getenv("GameName"),
+		PassConsoleChat:       getenvBool("PassConsoleChat"),
+		EnableConsoleChannel:  getenvBool("EnableConsoleChannel"),
+		FactorioConsoleChatID: os.Getenv("FactorioConsoleChatID"),
+		HaveServerEssentials:  getenvBool("HaveServerEssentials"),
+		BotStart:              os.Getenv("BotStart"),
+		SendBotStart:          getenvBool("SendBotStart"),
+		ServerStart:           os.Getenv("ServerStart"),
+		ServerStop:            os.Getenv("ServerStop"),
+		ServerFail:            os.Getenv("ServerFail"),
+		ServerSave:            os.Getenv("ServerSave"),
+		PlayerJoin:            os.Getenv("PlayerJoin"),
+		PlayerLeave:           os.Getenv("PlayerLeave"),
 	}
 }
-
-
-
-
