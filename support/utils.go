@@ -1,8 +1,8 @@
 package support
 
 import (
-	"strings"
 	"fmt"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -30,12 +30,11 @@ func LocateMentionPosition(List []string) []int {
 	return positionlist
 }
 
-
 func ChunkedMessageSend(s *discordgo.Session, channel string, message string) {
 	lines := strings.Split(message, "\n")
 	message = ""
 	for _, line := range lines {
-		if len(message) + len(line) + 1 >= 2000 {
+		if len(message)+len(line)+1 >= 2000 {
 			_, err := s.ChannelMessageSend(channel, message)
 			if err != nil {
 				fmt.Println("ChannelMessageSend failed")
@@ -54,17 +53,16 @@ func ChunkedMessageSend(s *discordgo.Session, channel string, message string) {
 	}
 }
 
-
 func FormatUsage(s string) string {
 	return strings.Replace(s, "$", Config.Prefix, -1)
 }
 
-func DeleteEmptyStrings (s []string) []string {
-    var r []string
-    for _, str := range s {
-        if str != "" {
-            r = append(r, str)
-        }
-    }
-    return r
+func DeleteEmptyStrings(s []string) []string {
+	var r []string
+	for _, str := range s {
+		if str != "" {
+			r = append(r, str)
+		}
+	}
+	return r
 }
