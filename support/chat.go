@@ -11,7 +11,7 @@ import (
 )
 
 // Chat pipes in-game chat to Discord.
-func Chat(s *discordgo.Session, m *discordgo.MessageCreate) {
+func Chat(s *discordgo.Session) {
 	for {
 		t, err := tail.TailFile("factorio.log", tail.Config{Follow: true})
 		if err != nil {

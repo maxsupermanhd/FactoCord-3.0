@@ -131,7 +131,8 @@ func discord() {
 	}
 
 	bot.AddHandler(messageCreate)
-	bot.AddHandlerOnce(support.Chat)
+	go support.Chat(bot)
+
 	time.Sleep(3 * time.Second)
 	bot.UpdateStatus(0, support.Config.GameName)
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
