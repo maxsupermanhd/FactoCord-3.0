@@ -143,6 +143,9 @@ func discord() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 
+	if support.Config.BotStop != "" {
+		support.Send(bot, support.Config.BotStop)
+	}
 	// Cleanly close down the Discord session.
 	bot.Close()
 }

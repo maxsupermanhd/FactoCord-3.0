@@ -24,6 +24,8 @@ BotStart = "**:white_check_mark: Bot started! Launching server...**"
 
 SendBotStart = True
 
+BotStop = ":v:"
+
 ServerStop = "**:octagonal_sign: The server has stopped!**"
 
 ServerFail = "**:skull: The server has crashed!**"

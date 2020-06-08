@@ -31,6 +31,7 @@ type config struct {
 	HaveServerEssentials  bool
 	BotStart              string
 	SendBotStart          bool
+	BotStop               string
 	ServerStart           string
 	ServerStop            string
 	ServerFail            string
@@ -116,6 +117,7 @@ func (conf *config) LoadEnv() {
 		HaveServerEssentials:  getenvBool("HaveServerEssentials"),
 		BotStart:              os.Getenv("BotStart"),
 		SendBotStart:          getenvBool("SendBotStart"),
+		BotStop:               os.Getenv("BotStop"),
 		ServerStart:           os.Getenv("ServerStart"),
 		ServerStop:            os.Getenv("ServerStop"),
 		ServerFail:            os.Getenv("ServerFail"),
