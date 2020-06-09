@@ -10,7 +10,6 @@ import (
 	"os/signal"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"./commands"
@@ -22,6 +21,11 @@ import (
 
 // Running is the boolean that tells if the server is running or not
 var Running bool
+
+var Close bool = false
+
+// Factorio is a running factorio server instance
+var Factorio *exec.Cmd
 
 var SaveRequested bool = false
 
@@ -37,117 +41,93 @@ func main() {
 	Running = false
 	admin.R = &Running
 
-	// Do not exit the app on this error.
-	if err := os.Remove("factorio.log"); err != nil {
-		fmt.Println("Factorio.log doesn't exist, continuing anyway")
-	}
-
-	logging, err := os.OpenFile("factorio.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-
-	if err != nil {
-		support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to open factorio.log\nDetails: %s", time.Now(), err))
-	}
+	logging, err := os.OpenFile("factorio.log", os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_TRUNC, 0666)
+	support.Critical(err, "... when attempting to open factorio.log")
 
 	mwriter := io.MultiWriter(logging, os.Stdout)
 	var wg sync.WaitGroup
 	wg.Add(3)
 
-	go func() {
-		defer wg.Done()
-		for {
-			// If the process is already running DO NOT RUN IT AGAIN
-			if !Running {
-				Running = true
-				cmd := exec.Command(support.Config.Executable, support.Config.LaunchParameters...)
-				cmd.Stderr = os.Stderr
-				cmd.Stdout = mwriter
-				Pipe, err = cmd.StdinPipe()
-				if err != nil {
-					support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to execute cmd.StdinPipe()\nDetails: %s", time.Now(), err))
-				}
+	go factorioManager(&wg, &mwriter)
+	go console()
+	go discordCache()
 
-				err := cmd.Start()
-
-				if err != nil {
-					support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to start the server\nDetails: %s", time.Now(), err))
-				}
-				if admin.RestartCount > 0 {
-					time.Sleep(3 * time.Second)
-					Session.ChannelMessageSend(support.Config.FactorioChannelID,
-						"Server restarted successfully!")
-				}
-			}
-			time.Sleep(5 * time.Second)
-		}
-	}()
-
-	go func() {
-		Console := bufio.NewReader(os.Stdin)
-		for {
-			line, _, err := Console.ReadLine()
-			if err != nil {
-				support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to read the input to pass as input to the console\nDetails: %s", time.Now(), err))
-			}
-			_, err = io.WriteString(Pipe, fmt.Sprintf("%s\n", line))
-			if err != nil {
-				support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to pass input to the console\nDetails: %s", time.Now(), err))
-			}
-		}
-	}()
-
-	go func() {
-		// Wait 10 seconds on start up before continuing
-		time.Sleep(10 * time.Second)
-
-		for {
-			support.CacheDiscordMembers(Session)
-			//sleep for 4 hours (caches every 4 hours)
-			time.Sleep(4 * time.Hour)
-		}
-	}()
 	discord()
+}
+
+func factorioManager(wg *sync.WaitGroup, mwriter *io.Writer) {
+	defer wg.Done()
+	for !Close {
+		// If the process is already running DO NOT RUN IT AGAIN
+		if !Running {
+			Running = true
+			Factorio = exec.Command(support.Config.Executable, support.Config.LaunchParameters...)
+			Factorio.Stderr = os.Stderr
+			Factorio.Stdout = *mwriter
+			var err error
+			Pipe, err = Factorio.StdinPipe()
+			support.Critical(err, "... when attempting to execute cmd.StdinPipe()")
+
+			err = Factorio.Start()
+			support.Critical(err, "... when attempting to start the server")
+
+			if admin.RestartCount > 0 {
+				time.Sleep(3 * time.Second)
+				support.Send(Session, "Server restarted successfully!")
+			}
+		}
+		time.Sleep(5 * time.Second)
+	}
 }
 
 func discord() {
 	// No hard coding the token }:<
 	discordToken := support.Config.DiscordToken
-	//commands.RegisterCommands()
+
 	admin.P = &Pipe
 	fmt.Println("Starting bot..")
 	bot, err := discordgo.New("Bot " + discordToken)
+	support.Critical(err, "... when attempting to create the Discord session")
 	Session = bot
-	if err != nil {
-		fmt.Println("Error creating Discord session: ", err)
-		support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to create the Discord session\nDetails: %s", time.Now(), err))
-		return
-	}
 
 	err = bot.Open()
-
-	if err != nil {
-		fmt.Println("error opening connection,", err)
-		support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to connect to Discord\nDetails: %s", time.Now(), err))
-		return
-	}
+	support.Critical(err, "... when attempting to connect to Discord")
 
 	bot.AddHandler(messageCreate)
 	go support.Chat(bot)
 
 	time.Sleep(3 * time.Second)
-	bot.UpdateStatus(0, support.Config.GameName)
+	err = bot.UpdateStatus(0, support.Config.GameName)
+	support.Panik(err, "... when updating bot status")
+
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	if support.Config.SendBotStart {
-		bot.ChannelMessageSend(support.Config.FactorioChannelID, support.Config.BotStart)
+		support.Send(bot, support.Config.BotStart)
 	}
+
 	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	signal.Notify(sc, os.Interrupt, os.Kill)
 	<-sc
+
+	Close = true
 
 	if support.Config.BotStop != "" {
 		support.Send(bot, support.Config.BotStop)
 	}
 	// Cleanly close down the Discord session.
-	bot.Close()
+	err = bot.Close()
+	support.Panik(err, "... when closing connection")
+
+	if Running {
+		fmt.Println("Waiting for factorio server to exit...")
+		err = Factorio.Wait()
+		if Factorio.ProcessState.Exited() {
+			fmt.Println("\nFactorio server was closed, exit code", Factorio.ProcessState.ExitCode())
+		} else {
+			fmt.Println("\nError waiting for factorio to exit")
+			support.Panik(err, "Error waiting for factorio to exit")
+		}
+	}
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -156,36 +136,42 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	if m.ChannelID == support.Config.FactorioChannelID {
 		if strings.HasPrefix(m.Content, support.Config.Prefix) {
-			//command := strings.Split(m.Content[1:len(m.Content)], " ")
-			//name := strings.ToLower(command[0])
-			input := strings.Replace(m.Content, support.Config.Prefix, "", -1)
+			input := strings.Replace(m.Content, support.Config.Prefix, "", 1)
 			commands.RunCommand(input, s, m)
 			return
 		}
 		log.Print("[" + m.Author.Username + "] " + m.Content)
 		// Pipes normal chat allowing it to be seen ingame
 		_, err := io.WriteString(Pipe, fmt.Sprintf("[Discord] <%s>: %s\r\n", m.Author.Username, strings.Replace(m.ContentWithMentionsReplaced(), "\n", fmt.Sprintf("\n[Discord] <%s>: ", m.Author.Username), -1)))
-		if err != nil {
-			support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to pass Discord chat to in-game\nDetails: %s", time.Now(), err))
-		}
+		support.Panik(err, "An error occurred when attempting to pass Discord chat to in-game")
 		return
 	}
 	if m.ChannelID == support.Config.FactorioConsoleChatID {
 		fmt.Println("wrote to console from channel: \"", fmt.Sprintf("%s", m.Content), "\"")
-		s.ChannelMessageSend(support.Config.FactorioConsoleChatID, fmt.Sprintf("wrote %s", m.Content))
+		support.Send(s, fmt.Sprintf("wrote %s", m.Content))
 		_, err := io.WriteString(Pipe, fmt.Sprintf("%s\n", m.Content))
-		if err != nil {
-			support.ErrorLog(fmt.Errorf("%s: An error occurred when attempting to pass Discord console to in-game\nDetails: %s", time.Now(), err))
-		}
+		support.Panik(err, "An error occurred when attempting to pass Discord console to in-game")
 	}
 	return
 }
 
-func CheckAdmin(ID string) bool {
-	for _, admin := range support.Config.AdminIDs {
-		if ID == admin {
-			return true
-		}
+func discordCache() {
+	// Wait 10 seconds on start up before continuing
+	time.Sleep(10 * time.Second)
+
+	for !Close {
+		support.CacheDiscordMembers(Session)
+		//sleep for 4 hours (caches every 4 hours)
+		time.Sleep(4 * time.Hour)
 	}
-	return false
+}
+
+func console() {
+	Console := bufio.NewReader(os.Stdin)
+	for !Close {
+		line, _, err := Console.ReadLine()
+		support.Panik(err, "An error occurred when attempting to read the input to pass as input to the console")
+		_, err = io.WriteString(Pipe, fmt.Sprintf("%s\n", line))
+		support.Panik(err, "An error occurred when attempting to pass input to the console")
+	}
 }

@@ -7,6 +7,13 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+func Send(s *discordgo.Session, message string) {
+	_, err := s.ChannelMessageSend(Config.FactorioChannelID, message)
+	if err != nil {
+		Panik(err, "Failed to send message: "+message)
+	}
+}
+
 // SearchForUser searches for the user to be mentioned.
 func SearchForUser(name string) *discordgo.User {
 	name = strings.Replace(name, "@", "", -1)
