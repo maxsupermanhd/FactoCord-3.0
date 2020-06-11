@@ -18,17 +18,20 @@ func Chat(s *discordgo.Session) {
 			ErrorLog(fmt.Errorf("%s: An error occurred when attempting to tail factorio.log\nDetails: %s", time.Now(), err))
 		}
 		for line := range t.Lines {
-			if strings.Contains(line.Text, "Quitting: multiplayer error.") {
+			if strings.Compare(line.Text, "Quitting: multiplayer error.") == 0 {
 				s.ChannelMessageSend(Config.FactorioChannelID, Config.ServerFail)
 			}
-			if strings.Contains(line.Text, "Info UDPSocket.cpp:39: Opening socket for broadcast") {
+			if strings.Compare(line.Text, "Info UDPSocket.cpp:39: Opening socket for broadcast") == 0 {
 				s.ChannelMessageSend(Config.FactorioChannelID, Config.ServerStart)
 			}
-			if strings.Contains(line.Text, "Info AppManagerStates.cpp:1843: Saving finished") {
-				s.ChannelMessageSend(Config.FactorioChannelID, "Saving finished!")
+			if strings.Compare(line.Text, "Info AppManagerStates.cpp:1843: Saving finished") == 0 {
+				s.ChannelMessageSend(Config.FactorioChannelID, Config.ServerSave)
 			}
-			if strings.Contains(line.Text, "Info ServerMultiplayerManager.cpp:138: Quitting multiplayer connection.") {
+			if strings.Compare(line.Text, "Info ServerMultiplayerManager.cpp:138: Quitting multiplayer connection.") == 0 {
 				s.ChannelMessageSend(Config.FactorioChannelID, Config.ServerStop)
+			}
+			if Config.EnableConsoleChannel {
+				s.ChannelMessageSend(Config.FactorioConsoleChatID, fmt.Sprintf("%s", line.Text))
 			}
 			if Config.HaveServerEssentials == true {
 				if strings.Contains(line.Text, "[DISCORD]") ||
