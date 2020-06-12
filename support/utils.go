@@ -14,6 +14,17 @@ func Send(s *discordgo.Session, message string) {
 	}
 }
 
+func SendFormat(s *discordgo.Session, message string) {
+	Send(s, FormatUsage(message))
+}
+
+func SendEmbed(s *discordgo.Session, embed *discordgo.MessageEmbed) {
+	_, err := s.ChannelMessageSendEmbed(Config.FactorioChannelID, embed)
+	if err != nil {
+		Panik(err, fmt.Sprintf("Failed to send embed: %+v", embed))
+	}
+}
+
 // SearchForUser searches for the user to be mentioned.
 func SearchForUser(name string) *discordgo.User {
 	name = strings.Replace(name, "@", "", -1)
@@ -37,26 +48,18 @@ func LocateMentionPosition(List []string) []int {
 	return positionlist
 }
 
-func ChunkedMessageSend(s *discordgo.Session, channel string, message string) {
+func ChunkedMessageSend(s *discordgo.Session, message string) {
 	lines := strings.Split(message, "\n")
 	message = ""
 	for _, line := range lines {
 		if len(message)+len(line)+1 >= 2000 {
-			_, err := s.ChannelMessageSend(channel, message)
-			if err != nil {
-				fmt.Println("ChannelMessageSend failed")
-				return
-			}
+			Send(s, message)
 			message = ""
 		}
 		message += "\n" + line
 	}
 	if len(message) > 0 {
-		_, err := s.ChannelMessageSend(channel, message)
-		if err != nil {
-			fmt.Println("ChannelMessageSend failed")
-			return
-		}
+		Send(s, message)
 	}
 }
 

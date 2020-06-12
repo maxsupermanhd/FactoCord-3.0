@@ -11,13 +11,19 @@ import (
 // UnbanPlayerUsage comment...
 var UnbanPlayerUsage = "Usage $unban <player>"
 
-// UnbanPlayer unbannes a player on the server.
+// UnbanPlayer unbans a player on the server.
 func UnbanPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 	if strings.ContainsAny(args, " \n\t") {
-		s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(UnbanPlayerUsage))
+		support.SendFormat(s, UnbanPlayerUsage)
 		return
 	}
-	io.WriteString(*P, "/unban "+args+"\n")
-	s.ChannelMessageSend(support.Config.FactorioChannelID, "Player "+args+" unbanned!")
+	command := "/unban " + args + "\n"
+	_, err := io.WriteString(*P, command)
+	if err != nil {
+		support.Send(s, "Sorry, there was an error sending /unban command")
+		support.Panik(err, "... when sending \""+command+"\"")
+		return
+	}
+	support.Send(s, "Player "+args+" unbanned!")
 	return
 }

@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"os/exec"
 	"strings"
 
@@ -11,23 +10,26 @@ import (
 
 var VersionStringUsage = "Usage: $version"
 
-func VersionString(s *discordgo.Session, m *discordgo.MessageCreate, ar string) {
+func VersionString(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 	cmd := exec.Command(support.Config.Executable, "--version")
 	out, err := cmd.CombinedOutput()
 	factorioVersion := strings.Fields(string(out))[1]
 	if err != nil {
-		s.ChannelMessageSend(support.Config.FactorioChannelID, fmt.Sprintf("Sorry, there was an error. Error details: %s", err))
+		support.Send(s, "Sorry, there was an error checking factorio version")
+		support.Panik(err, "... when running `factorio --version`")
+		return
 	}
 	res := "Server version: **" + factorioVersion + "**"
 
 	cmd = exec.Command("git", "describe", "--tags")
 	out, err = cmd.CombinedOutput()
 	if err != nil {
-		s.ChannelMessageSend(support.Config.FactorioChannelID, fmt.Sprintf("Sorry, there was an error. Error details: %s", err))
+		support.Send(s, "Sorry, there was an error checking git version")
+		support.Panik(err, "... when running `git describe --tags`")
+		return
 	}
 	factocord := "FactoCord version: **" + string(out) + "**"
 	res += "\n" + factocord
 
-	s.ChannelMessageSend(support.Config.FactorioChannelID, res)
-	return
+	support.Send(s, res)
 }

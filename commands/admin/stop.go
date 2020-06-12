@@ -1,10 +1,10 @@
 package admin
 
 import (
-    "io"
+	"io"
 
-    "../../support"
-    "github.com/bwmarrin/discordgo"
+	"../../support"
+	"github.com/bwmarrin/discordgo"
 )
 
 // P references the var Pipe in main
@@ -12,13 +12,24 @@ var P *io.WriteCloser
 
 // StopServer saves and stops the server.
 func StopServer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
-    if len(args) != 0 {
-        s.ChannelMessageSend(support.Config.FactorioChannelID, "Stop accepts no arguments")
-        return
-    }
-    io.WriteString(*P, "/save\n")
-    io.WriteString(*P, "/quit\n")
-    s.ChannelMessageSend(support.Config.FactorioChannelID, "Server saved and shutting down; Cya!")
-    s.Close()
-    support.Exit(0)
+	if len(args) != 0 {
+		support.Send(s, "Stop accepts no arguments")
+		return
+	}
+	_, err := io.WriteString(*P, "/save\n")
+	if err != nil {
+		support.Send(s, "Sorry, there was an error sending /save command")
+		support.Panik(err, "... when sending \"/save\"")
+		return
+	}
+	_, err = io.WriteString(*P, "/quit\n")
+	if err != nil {
+		support.Send(s, "Sorry, there was an error sending /quit command")
+		support.Panik(err, "... when sending \"/quit\"")
+		return
+	}
+	support.Send(s, "Server saved and shutting down; Cya!")
+	err = s.Close()
+	support.Critical(err, "... when closing discord connection")
+	support.Exit(0)
 }

@@ -29,34 +29,33 @@ var ModCommandUsage = "Usage: $mod purge | (add|remove|enable|disable) <modnames
 func ModCommand(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 	argsList := strings.Split(args, " ")
 	if len(argsList) == 0 {
-		s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(ModCommandUsage))
+		support.SendFormat(s, ModCommandUsage)
 		return
 	}
 
 	action := argsList[0]
 	if action == "add" || action == "remove" || action == "enable" || action == "disable" {
 		if len(argsList) < 2 {
-			s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage("Usage: $mod "+action+" <modname> [<modname>]+"))
+			support.SendFormat(s, "Usage: $mod "+action+" <modname> [<modname>]+")
 			return
 		}
 	} else if action != "purge" {
-		s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(ModCommandUsage))
+		support.SendFormat(s, ModCommandUsage)
 		return
 	}
 
 	mods := &ModJSON{}
 	modsListFile, err := ioutil.ReadFile(support.Config.ModListLocation)
-	// Don't exit on this error, just sent message to the channel!
 	if err != nil {
-		s.ChannelMessageSend(support.Config.FactorioChannelID,
-			fmt.Sprintf("Sorry, there was an error reading your mods list, did you specify it in the .env file? Error details: %s", err))
+		support.Send(s, "Sorry, there was an error reading your mod list")
+		support.Panik(err, "there was an error reading mods list, did you specify it in the .env file?")
 		return
 	}
 
 	err = json.Unmarshal(modsListFile, &mods)
 	if err != nil {
-		s.ChannelMessageSend(support.Config.FactorioChannelID,
-			fmt.Sprintf("Sorry, there was an error reading your mods list. Error details: %s", err))
+		support.Send(s, "Sorry, there was an error reading your mod list")
+		support.Panik(err, "there was an error reading mod list")
 		return
 	}
 
@@ -76,13 +75,18 @@ func ModCommand(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 
 	modsListFile, err = json.MarshalIndent(mods, "", "    ")
 	if err != nil {
-		s.ChannelMessageSend(support.Config.FactorioChannelID,
-			fmt.Sprintf("Sorry, there was an error. Error details: %s", err))
+		support.Send(s, "Sorry, there was an error converting mod list to json")
+		support.Panik(err, "there was an error converting mod list to json")
 		return
 	}
-	ioutil.WriteFile(support.Config.ModListLocation, modsListFile, 0666)
+	err = ioutil.WriteFile(support.Config.ModListLocation, modsListFile, 0666)
+	if err != nil {
+		support.Send(s, "Sorry, there was an error saving mod list")
+		support.Panik(err, "there was an error saving mod list")
+		return
+	}
 
-	support.ChunkedMessageSend(s, support.Config.FactorioChannelID, res)
+	support.ChunkedMessageSend(s, res)
 	return
 }
 

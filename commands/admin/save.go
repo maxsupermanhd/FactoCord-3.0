@@ -1,19 +1,24 @@
 package admin
 
 import (
-    "io"
+	"io"
 
-    "../../support"
-    "github.com/bwmarrin/discordgo"
+	"../../support"
+	"github.com/bwmarrin/discordgo"
 )
 
 // SaveServer executes the save command on the server.
 func SaveServer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
-    if len(args) != 0 {
-        s.ChannelMessageSend(support.Config.FactorioChannelID, "Save accepts no arguments")
-        return
-    }
-    io.WriteString(*P, "/save\n")
-    s.ChannelMessageSend(support.Config.FactorioChannelID, "Server saved successfully!")
-    return
+	if len(args) != 0 {
+		support.Send(s, "Save accepts no arguments")
+		return
+	}
+	_, err := io.WriteString(*P, "/save\n")
+	if err != nil {
+		support.Send(s, "Sorry, there was an error sending /save command")
+		support.Panik(err, "... when sending \"/save\"")
+		return
+	}
+	support.Send(s, "Server saved successfully!")
+	return
 }

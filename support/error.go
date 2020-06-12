@@ -8,28 +8,28 @@ import (
 	"time"
 )
 
-// ErrorLog logs the error to file and then exits the application with an
-// exit code of 1.
-func ErrorLog(err error) {
-	errorlog, rip := os.OpenFile("error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	// If we encounter an error here, something is seriously wrong.
+// Exit exits the application.
+func Exit(ExitCode int) {
+	exit, rip := os.OpenFile(".exit", os.O_RDWR|os.O_CREATE, 0666)
 	if rip != nil {
+		fmt.Println("Error opening \".exit\" file")
 		panic(rip)
 	}
-	defer errorlog.Close()
-	errorlog.WriteString(fmt.Sprintf("%s\n", err))
-	fmt.Println("Opps, it looks like an error happened!")
-	fmt.Println("Please post your error.log on https://github.com/maxsupermanhd/FactoCord-3.0/issues")
-	Exit(1)
+	_, rip = exit.WriteString(fmt.Sprintf("%d", ExitCode))
+	if rip != nil {
+		fmt.Println("Error writing to \".exit\"")
+		panic(rip)
+	}
+	os.Exit(ExitCode)
 }
 
+// Panik checks error != nil and logs the error without exiting the app
+// P.S. it's a meme
 func Panik(err error, message string) {
 	if err == nil {
 		return
 	}
-	if message == "" {
-		message = "An error occurred"
-	} else if strings.HasPrefix(message, "...") {
+	if strings.HasPrefix(message, "...") {
 		message = "An error occurred " + strings.TrimSpace(message[3:])
 	}
 
@@ -37,7 +37,11 @@ func Panik(err error, message string) {
 	if pc, fn, line, ok := runtime.Caller(1); ok {
 		res += fmt.Sprintf(", %s @ %s:%d", runtime.FuncForPC(pc).Name(), fn, line)
 	}
-	res += fmt.Sprintf("\n\t%s: %v\n", message, err)
+	if message == "" {
+		res += fmt.Sprintf("\n\t%v\n", err)
+	} else {
+		res += fmt.Sprintf("\n\t%s: %v\n", message, err)
+	}
 
 	errorLog, rip := os.OpenFile("error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	// If we encounter an error here, something is seriously wrong.
@@ -60,11 +64,10 @@ func Panik(err error, message string) {
 	fmt.Println("Please post your issue on https://github.com/maxsupermanhd/FactoCord-3.0/issues")
 }
 
+// Critical checks error != nil, logs the error and closes the app
 func Critical(err error, message string) {
 	if err != nil {
 		Panik(err, message)
 		Exit(1)
 	}
 }
-
-// P.S. panik is a meme

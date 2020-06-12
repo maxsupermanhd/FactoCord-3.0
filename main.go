@@ -116,7 +116,7 @@ func discord() {
 	}
 	// Cleanly close down the Discord session.
 	err = bot.Close()
-	support.Panik(err, "... when closing connection")
+	support.Panik(err, "... when closing discord connection")
 
 	if Running {
 		fmt.Println("Waiting for factorio server to exit...")
@@ -170,8 +170,14 @@ func console() {
 	Console := bufio.NewReader(os.Stdin)
 	for !Close {
 		line, _, err := Console.ReadLine()
-		support.Panik(err, "An error occurred when attempting to read the input to pass as input to the console")
+		if err != nil {
+			support.Panik(err, "An error occurred when attempting to read the input to pass as input to the console")
+			return
+		}
 		_, err = io.WriteString(Pipe, fmt.Sprintf("%s\n", line))
-		support.Panik(err, "An error occurred when attempting to pass input to the console")
+		if err != nil {
+			support.Panik(err, "An error occurred when attempting to pass input to the console")
+			return
+		}
 	}
 }

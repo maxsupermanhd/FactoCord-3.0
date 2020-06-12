@@ -98,8 +98,7 @@ func getRolesMap(key string) commandRolesType {
 func (conf *config) LoadEnv() {
 	if _, err := os.Stat(".env"); os.IsNotExist(err) {
 		fmt.Println("Environment file not found, cannot continue!")
-		Error := errors.New("Failed to load environment file")
-		ErrorLog(Error)
+		Exit(1)
 	}
 	Config = config{
 		DiscordToken:          os.Getenv("DiscordToken"),
