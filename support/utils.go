@@ -25,16 +25,11 @@ func SendEmbed(s *discordgo.Session, embed *discordgo.MessageEmbed) {
 	}
 }
 
-// SearchForUser searches for the user to be mentioned.
-func SearchForUser(name string) *discordgo.User {
-	name = strings.Replace(name, "@", "", -1)
-	for _, user := range Users {
-		if strings.ToLower(user.Nick) == strings.ToLower(name) ||
-			strings.ToLower(user.User.Username) == strings.ToLower(name) {
-			return user.User
-		}
+func SendComplex(s *discordgo.Session, message *discordgo.MessageSend) {
+	_, err := s.ChannelMessageSendComplex(Config.FactorioChannelID, message)
+	if err != nil {
+		Panik(err, fmt.Sprintf("Failed to send embed: %+v", message))
 	}
-	return nil
 }
 
 // LocateMentionPosition locates the position in a string list for the discord mention.

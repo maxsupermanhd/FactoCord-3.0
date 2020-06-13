@@ -14,7 +14,6 @@ Get go packages:
 
 - [DiscordGo](https://github.com/bwmarrin/discordgo) `go get github.com/bwmarrin/discordgo`
 - [godotenv](https://github.com/joho/godotenv/) `go get github.com/joho/godotenv`
-- [tails](https://github.com/hpcloud/tail) `go get github.com/hpcloud/tail/...`
 
 # Step 1
 Cloning repo
