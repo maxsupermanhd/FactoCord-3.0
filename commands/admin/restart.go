@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"io"
 	"time"
 
 	"../../support"
@@ -24,19 +23,18 @@ func Restart(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 		support.Send(s, "Server is not running!")
 		return
 	}
-	_, err := io.WriteString(*P, "/save\n")
-	if err != nil {
+	success := support.SendToFactorio("/save")
+	if !success {
 		support.Send(s, "Sorry, there was an error sending /save command")
-		support.Panik(err, "... when sending \"/save\"")
 		return
 	}
-	_, err = io.WriteString(*P, "/quit\n")
-	if err != nil {
+	success = support.SendToFactorio("/quit")
+	if !success {
 		support.Send(s, "Sorry, there was an error sending /quit command")
-		support.Panik(err, "... when sending \"/quit\"")
 		return
 	}
 	support.Send(s, "Saved server, now restarting!")
+	// TODO wait for factorio to exit
 	time.Sleep(3 * time.Second)
 	*R = false
 	RestartCount = RestartCount + 1

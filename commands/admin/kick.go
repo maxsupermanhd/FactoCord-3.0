@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"io"
 	"strings"
 
 	"../../support"
@@ -25,13 +24,11 @@ func KickPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 		support.SendFormat(s, KickPlayerUsage)
 		return
 	}
-	command := "/kick " + player + " " + reason + "\n"
-	_, err := io.WriteString(*P, command)
-	if err != nil {
+	command := "/kick " + player + " " + reason
+	success := support.SendToFactorio(command)
+	if success {
+		support.Send(s, "Player "+player+" kicked with reason "+reason+"!")
+	} else {
 		support.Send(s, "Sorry, there was an error sending /kick command")
-		support.Panik(err, "... when sending \""+command+"\"")
-		return
 	}
-	support.Send(s, "Player "+player+" kicked with reason "+reason+"!")
-	return
 }

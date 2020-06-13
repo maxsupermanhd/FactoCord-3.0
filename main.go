@@ -12,28 +12,21 @@ import (
 	"./commands/admin"
 	"./discord"
 	"./support"
-	"github.com/bwmarrin/discordgo"
 	_ "github.com/joho/godotenv/autoload"
 )
 
 // Running is the boolean that tells if the server is running or not
-var Running bool
+var Running = false
 
 var closing = false
 
 // Factorio is a running factorio server instance
 var Factorio *exec.Cmd
 
-// Pipe is an WriteCloser interface
-var Pipe io.WriteCloser
-
-// Session is a discordgo session
-var Session *discordgo.Session
-
 func main() {
 	fmt.Println("Welcome to FactoCord-3.0!")
 	support.Config.LoadEnv()
-	Running = false
+
 	admin.R = &Running
 
 	discord.StartSession()
@@ -77,18 +70,17 @@ func factorioManager() {
 			Factorio.Stderr = os.Stderr
 			Factorio.Stdout = mwriter
 			var err error
-			Pipe, err = Factorio.StdinPipe()
+			pipe, err := Factorio.StdinPipe()
 			support.Critical(err, "... when attempting to execute cmd.StdinPipe()")
 
-			admin.P = &Pipe
-			discord.Pipe = &Pipe
+			support.FactorioPipe = &pipe
 
 			err = Factorio.Start()
 			support.Critical(err, "... when attempting to start the server")
 
 			if admin.RestartCount > 0 {
 				time.Sleep(3 * time.Second)
-				support.Send(Session, "Server restarted successfully!")
+				support.Send(discord.Session, "Server restarted successfully!")
 			}
 		}
 		time.Sleep(5 * time.Second)
@@ -103,10 +95,6 @@ func console() {
 			support.Panik(err, "An error occurred when attempting to read the input to pass as input to the console")
 			return
 		}
-		_, err = io.WriteString(Pipe, fmt.Sprintf("%s\n", line))
-		if err != nil {
-			support.Panik(err, "An error occurred when attempting to pass input to the console")
-			return
-		}
+		support.SendToFactorio(string(line))
 	}
 }

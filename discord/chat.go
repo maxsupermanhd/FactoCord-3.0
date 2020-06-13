@@ -3,7 +3,6 @@ package discord
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"strings"
 	"time"
@@ -15,7 +14,6 @@ import (
 )
 
 var Session *discordgo.Session
-var Pipe *io.WriteCloser
 
 func StartSession() {
 	fmt.Println("Starting bot..")
@@ -63,15 +61,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		log.Print("[" + m.Author.Username + "] " + m.Content)
 		// Pipes normal chat allowing it to be seen ingame
-		_, err := io.WriteString(*Pipe, fmt.Sprintf("[Discord] <%s>: %s\r\n", m.Author.Username, strings.Replace(m.ContentWithMentionsReplaced(), "\n", fmt.Sprintf("\n[Discord] <%s>: ", m.Author.Username), -1)))
-		support.Panik(err, "An error occurred when attempting to pass Discord chat to in-game")
+		support.SendToFactorio(fmt.Sprintf("[Discord] <%s>: %s", m.Author.Username, strings.Replace(m.ContentWithMentionsReplaced(), "\n", fmt.Sprintf("\n[Discord] <%s>: ", m.Author.Username), -1)))
 		return
 	}
 	if m.ChannelID == support.Config.FactorioConsoleChatID {
-		fmt.Println("wrote to console from channel: \"", fmt.Sprintf("%s", m.Content), "\"")
-		support.Send(s, fmt.Sprintf("wrote %s", m.Content))
-		_, err := io.WriteString(*Pipe, fmt.Sprintf("%s\n", m.Content))
-		support.Panik(err, "An error occurred when attempting to pass Discord console to in-game")
+		fmt.Println("wrote to console from channel: \"", m.Content, "\"")
+		support.Send(s, "wrote "+m.Content)
+
+		support.SendToFactorio(m.Content)
 	}
 	return
 }

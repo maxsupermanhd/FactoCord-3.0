@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"io"
 	"strings"
 
 	"../../support"
@@ -26,13 +25,11 @@ func BanPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 		return
 	}
 
-	command := "/ban " + player + " " + reason + "\n"
-	_, err := io.WriteString(*P, command)
-	if err != nil {
+	command := "/ban " + player + " " + reason
+	success := support.SendToFactorio(command)
+	if success {
+		support.Send(s, "Player "+player+" banned with reason \""+reason+"\"!")
+	} else {
 		support.Send(s, "Sorry, there was an error sending /ban command")
-		support.Panik(err, "... when sending \""+command+"\"")
-		return
 	}
-	support.Send(s, "Player "+player+" banned with reason \""+reason+"\"!")
-	return
 }

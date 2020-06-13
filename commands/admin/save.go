@@ -1,8 +1,6 @@
 package admin
 
 import (
-	"io"
-
 	"../../support"
 	"github.com/bwmarrin/discordgo"
 )
@@ -13,12 +11,11 @@ func SaveServer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 		support.Send(s, "Save accepts no arguments")
 		return
 	}
-	_, err := io.WriteString(*P, "/save\n")
-	if err != nil {
+	success := support.SendToFactorio("/save")
+	if success {
+		// TODO read log to be sure it's successful
+		support.Send(s, "Server saved successfully!")
+	} else {
 		support.Send(s, "Sorry, there was an error sending /save command")
-		support.Panik(err, "... when sending \"/save\"")
-		return
 	}
-	support.Send(s, "Server saved successfully!")
-	return
 }

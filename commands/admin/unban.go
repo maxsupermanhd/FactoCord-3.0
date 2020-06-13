@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"io"
 	"strings"
 
 	"../../support"
@@ -17,13 +16,11 @@ func UnbanPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) 
 		support.SendFormat(s, UnbanPlayerUsage)
 		return
 	}
-	command := "/unban " + args + "\n"
-	_, err := io.WriteString(*P, command)
-	if err != nil {
+	command := "/unban " + args
+	success := support.SendToFactorio(command)
+	if success {
+		support.Send(s, "Player "+args+" unbanned!")
+	} else {
 		support.Send(s, "Sorry, there was an error sending /unban command")
-		support.Panik(err, "... when sending \""+command+"\"")
-		return
 	}
-	support.Send(s, "Player "+args+" unbanned!")
-	return
 }
