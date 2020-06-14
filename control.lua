@@ -56,16 +56,14 @@ script.on_event(defines.events.on_player_kicked, function(event)
 	FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** kicked.");
 end)
 script.on_event(defines.events.on_player_unbanned, function(event)
-	local p = game.players[event.player_index];
-	FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** unbanned.");
+	FactoCordIntegration.PrintToDiscord("**" .. event.player_name .. "** unbanned.");
 end)
 script.on_event(defines.events.on_player_unmuted, function(event)
 	local p = game.players[event.player_index];
 	FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** unmuted.");
 end)
 script.on_event(defines.events.on_player_banned, function(event)
-	local p = game.players[event.player_index];
-	FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** banned.");
+	FactoCordIntegration.PrintToDiscord("**" .. event.player_name .. "** banned.");
 end)
 script.on_event(defines.events.on_player_muted, function(event)
 	local p = game.players[event.player_index];
