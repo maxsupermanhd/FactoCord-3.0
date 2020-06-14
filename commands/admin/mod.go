@@ -27,7 +27,7 @@ var ModCommandUsage = "Usage: $mod purge | (add|remove|enable|disable) <modnames
 
 // ModCommand returns the list of mods running on the server.
 func ModCommand(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
-	argsList := strings.Split(args, " ")
+	argsList := strings.SplitN(args, " ", 2)
 	if len(argsList) == 0 {
 		s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(ModCommandUsage))
 		return
@@ -60,7 +60,12 @@ func ModCommand(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
 		return
 	}
 
-	modnames := support.DeleteEmptyStrings(argsList[1:])
+	modnames, mismatched := support.QuoteSplit(strings.Join(argsList[1:], " "), "\"")
+	if mismatched {
+		support.ChunkedMessageSend(s, support.Config.FactorioChannelID, "Error: Mismatched quotes")
+		return
+	}
+
 	var res string
 	if action == "purge" {
 		res = modsPurge(mods)
