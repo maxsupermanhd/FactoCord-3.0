@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -131,73 +132,79 @@ func (t FactorioLogWatcher) Flush() {
 	}
 }
 
+var charRegexp = regexp.MustCompile("^\\d{4}[-/]\\d\\d[-/]\\d\\d \\d\\d:\\d\\d:\\d\\d ")
+var factorioLogRegexp = regexp.MustCompile("^\\d+\\.\\d{3} ")
+
+var forwardMessages = []*regexp.Regexp{
+	regexp.MustCompile("^Player .+ doesn't exist."),
+	regexp.MustCompile("^.+ wasn't banned."),
+}
+
 // ProcessFactorioLogLine pipes in-game chat to Discord.
 func ProcessFactorioLogLine(line string) {
-	if strings.Contains(line, "Quitting: multiplayer error.") {
-		support.Send(Session, support.Config.ServerFail)
+	line = strings.TrimSpace(line)
+	if line == "" {
+		return
 	}
-	if strings.Contains(line, "Info UDPSocket.cpp:39: Opening socket for broadcast") {
-		support.Send(Session, support.Config.ServerStart)
-	}
-	if strings.Contains(line, "Info AppManagerStates.cpp:1843: Saving finished") {
-		support.Send(Session, "Saving finished!")
-	}
-	if strings.Contains(line, "Info ServerMultiplayerManager.cpp:138: Quitting multiplayer connection.") {
-		support.Send(Session, support.Config.ServerStop)
-	}
-	if support.Config.HaveServerEssentials == true {
-		if strings.Contains(line, "[DISCORD]") ||
-			strings.Contains(line, "[DISCORD-EMBED]") {
-			if !strings.Contains(line, "<server>") || support.Config.PassConsoleChat {
-				if strings.Contains(line, "[DISCORD-EMBED]") {
-					TmpList := strings.Split(line, " ")
-					message := new(discordgo.MessageSend)
-					err := json.Unmarshal([]byte(strings.Join(TmpList[3:], " ")), message)
-					if err == nil {
-						message.Tts = false
-						support.SendComplex(Session, message)
-					}
-				} else {
-					TmpList := strings.Split(line, " ")
-					TmpList[3] = strings.Replace(TmpList[3], ":", "", -1)
-					if strings.Contains(strings.Join(TmpList, " "), "@") {
-						index := support.LocateMentionPosition(TmpList)
-						for _, position := range index {
-							User := SearchForUser(TmpList[position])
-							if User == nil {
-								continue
-							}
-							TmpList[position] = User.Mention()
-						}
-					}
-					support.Send(Session, strings.Join(TmpList[3:], " "))
-				}
-			}
+	if charRegexp.FindString(line) != "" {
+		if support.Config.PassConsoleChat {
+			line = line[len("0000-00-00 00:00:00 "):]
+			processFactorioChat(strings.TrimSpace(line))
+		}
+	} else if factorioLogRegexp.FindString(line) != "" {
+		if strings.Contains(line, "Quitting: multiplayer error.") {
+			support.Send(Session, support.Config.ServerFail)
+		}
+		if strings.Contains(line, "Opening socket for broadcast") {
+			support.Send(Session, support.Config.ServerStart)
+		}
+		if strings.Contains(line, "Saving finished") {
+			support.Send(Session, "Saving finished!")
+		}
+		if strings.Contains(line, "Quitting multiplayer connection.") {
+			support.Send(Session, support.Config.ServerStop)
 		}
 	} else {
-		if strings.Contains(line, "[CHAT]") || strings.Contains(line, "[JOIN]") || strings.Contains(line, "[LEAVE]") || strings.Contains(line, "[KICK]") || strings.Contains(line, "[BAN]") {
-			if !strings.Contains(line, "<server>") || support.Config.PassConsoleChat {
-				if strings.Contains(line, "[JOIN]") ||
-					strings.Contains(line, "[LEAVE]") {
-					TmpList := strings.Split(line, " ")
-					support.Send(Session, fmt.Sprintf("%s", strings.Join(TmpList[3:], " ")))
-				} else {
-					TmpList := strings.Split(line, " ")
-					TmpList[3] = strings.Replace(TmpList[3], ":", "", -1)
-					if strings.Contains(strings.Join(TmpList, " "), "@") {
-						index := support.LocateMentionPosition(TmpList)
-						for _, position := range index {
-							User := SearchForUser(TmpList[position])
-							if User == nil {
-								continue
-							}
-							TmpList[position] = User.Mention()
-						}
-					}
-					support.Send(Session, fmt.Sprintf("<%s>: %s", TmpList[3], strings.Join(TmpList[4:], " ")))
-				}
+		for _, pattern := range forwardMessages {
+			if pattern.FindString(line) != "" {
+				support.Send(Session, line)
+				return
 			}
 		}
 	}
+}
 
+var chatStartRegexp = regexp.MustCompile("^\\[(CHAT|JOIN|LEAVE|KICK|BAN|DISCORD|DISCORD-EMBED)]")
+
+func processFactorioChat(line string) {
+	match := chatStartRegexp.FindStringSubmatch(line)
+	if match == nil {
+		return
+	}
+	messageType := match[1]
+	integrationMessage := messageType == "DISCORD-EMBED" || messageType == "DISCORD"
+
+	line = strings.TrimLeft(line[len(messageType)+2:], " ")
+	if strings.HasPrefix(line, "<server>") {
+		return
+	}
+	if messageType == "DISCORD" || messageType == "CHAT" {
+		if strings.Contains(line, "@") {
+			line = AddMentions(line)
+		}
+	}
+	if support.Config.HaveServerEssentials {
+		if messageType == "DISCORD-EMBED" {
+			message := new(discordgo.MessageSend)
+			err := json.Unmarshal([]byte(line), message)
+			if err == nil {
+				message.Tts = false
+				support.SendComplex(Session, message)
+			}
+		} else if messageType == "DISCORD" {
+			support.Send(Session, line)
+		}
+	} else if !integrationMessage {
+		support.Send(Session, line)
+	}
 }

@@ -58,3 +58,21 @@ func SearchForUser(name string) *discordgo.User {
 	}
 	return nil
 }
+
+func AddMentions(message string) string {
+	if !strings.Contains(message, "@") {
+		return message
+	}
+	words := strings.Split(message, " ")
+	for i, word := range words {
+		if len(word) >= 2 && word[0] == '@' {
+			User := SearchForUser(word[1:])
+			if User == nil {
+				continue
+			}
+			words[i] = User.Mention()
+		}
+	}
+	message = strings.Join(words, " ")
+	return message
+}
