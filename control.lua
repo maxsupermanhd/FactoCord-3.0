@@ -1,5 +1,5 @@
  -- This file stands for console logging for FactoCord-3.0 integration
- -- Please configure as needed, any discord messgae will be sent in
+ -- Please configure as needed, any discord message will be sent in
  --  raw format if it starts with `0000-00-00 00:00:00 [DISCORD] `
  -- For more information visit https://github.com/maxsupermanhd/FactoCord-3.0
  -- If you have any question or comments join our Discord https://discord.gg/SUJRG47

@@ -13,7 +13,7 @@ import (
 type Command struct {
 	Name string
 
-	Command func(s *discordgo.Session, m *discordgo.MessageCreate, args string)
+	Command func(s *discordgo.Session, args string)
 
 	Admin bool
 	Desc  string
@@ -159,7 +159,7 @@ func RunCommand(input string, s *discordgo.Session, m *discordgo.MessageCreate) 
 				}
 			}
 			if execute {
-				command.Command(s, m, args)
+				command.Command(s, args)
 			} else {
 				support.Send(s, err)
 			}

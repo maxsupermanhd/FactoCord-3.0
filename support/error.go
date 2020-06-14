@@ -46,22 +46,22 @@ func Panik(err error, message string) {
 	errorLog, rip := os.OpenFile("error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	// If we encounter an error here, something is seriously wrong.
 	if rip != nil {
-		fmt.Println("Error occured:\n")
+		fmt.Println("Error occurred:")
 		fmt.Println(res)
-		fmt.Println("But error.log was unaccessible")
+		fmt.Println("But error.log was inaccessible")
 		panic(rip)
 	}
 	defer errorLog.Close()
 	_, err = errorLog.WriteString(res)
 	if err != nil {
-		fmt.Println("Error occured:\n")
+		fmt.Println("Error occurred:")
 		fmt.Println(res)
 		fmt.Println("But error.log could not be written to")
 		panic(rip)
 	}
 
 	if message == "" {
-		fmt.Println("Opps, it looks like an error happened!")
+		fmt.Println("Oops, it looks like an error happened!")
 	} else {
 		fmt.Println(message)
 	}

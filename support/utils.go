@@ -32,17 +32,6 @@ func SendComplex(s *discordgo.Session, message *discordgo.MessageSend) {
 	}
 }
 
-// LocateMentionPosition locates the position in a string list for the discord mention.
-func LocateMentionPosition(List []string) []int {
-	positionlist := []int{}
-	for i, String := range List {
-		if strings.Contains(String, "@") {
-			positionlist = append(positionlist, i)
-		}
-	}
-	return positionlist
-}
-
 func ChunkedMessageSend(s *discordgo.Session, message string) {
 	lines := strings.Split(message, "\n")
 	message = ""

@@ -62,7 +62,7 @@ func modList(ModList *ModJson, returnEnabled bool, returnDisabled bool) string {
 }
 
 // ModsList returns the list of mods running on the server.
-func ModsList(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
+func ModsList(s *discordgo.Session, args string) {
 	returnEnabled := true
 	returnDisabled := false
 	if args == "on" || args == "" {

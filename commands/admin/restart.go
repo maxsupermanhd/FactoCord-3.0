@@ -14,7 +14,7 @@ var R *bool
 var RestartCount int
 
 // Restart saves and restarts the server
-func Restart(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
+func Restart(s *discordgo.Session, args string) {
 	if len(args) != 0 {
 		support.Send(s, "Restart accepts no arguments")
 		return

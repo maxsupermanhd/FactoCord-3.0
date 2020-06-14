@@ -10,7 +10,7 @@ import (
 
 var VersionStringUsage = "Usage: $version"
 
-func VersionString(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
+func VersionString(s *discordgo.Session, _ string) {
 	cmd := exec.Command(support.Config.Executable, "--version")
 	out, err := cmd.CombinedOutput()
 	factorioVersion := strings.Fields(string(out))[1]

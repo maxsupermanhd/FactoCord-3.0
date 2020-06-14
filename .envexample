@@ -1,6 +1,6 @@
 DiscordToken = "Discord Token Here"
 
-FactorioChannelID = "ChannelMessageswillSendTo"
+FactorioChannelID = "ID of the Channel messages will be sent to"
 
 FactorioConsoleChatID = "FactorioConsoleChannelHere"
 

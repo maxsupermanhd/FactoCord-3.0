@@ -11,7 +11,7 @@ import (
 var BanPlayerUsage = "Usage: $ban <player> <reason>"
 
 // BanPlayer bans a player on the server.
-func BanPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
+func BanPlayer(s *discordgo.Session, args string) {
 	if len(args) == 0 {
 		support.SendFormat(s, BanPlayerUsage)
 		return

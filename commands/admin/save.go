@@ -6,7 +6,7 @@ import (
 )
 
 // SaveServer executes the save command on the server.
-func SaveServer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
+func SaveServer(s *discordgo.Session, args string) {
 	if len(args) != 0 {
 		support.Send(s, "Save accepts no arguments")
 		return

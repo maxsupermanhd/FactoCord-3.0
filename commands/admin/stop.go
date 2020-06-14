@@ -6,7 +6,7 @@ import (
 )
 
 // StopServer saves and stops the server.
-func StopServer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
+func StopServer(s *discordgo.Session, args string) {
 	if len(args) != 0 {
 		support.Send(s, "Stop accepts no arguments")
 		return

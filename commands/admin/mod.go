@@ -26,7 +26,7 @@ type Mod struct {
 var ModCommandUsage = "Usage: $mod purge | (add|remove|enable|disable) <modnames>"
 
 // ModCommand returns the list of mods running on the server.
-func ModCommand(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
+func ModCommand(s *discordgo.Session, args string) {
 	argsList := strings.Split(args, " ")
 	if len(argsList) == 0 {
 		support.SendFormat(s, ModCommandUsage)

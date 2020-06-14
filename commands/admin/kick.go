@@ -11,7 +11,7 @@ import (
 var KickPlayerUsage = "Usage: $kick <player> <reason>"
 
 // KickPlayer kicks a player from the server.
-func KickPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
+func KickPlayer(s *discordgo.Session, args string) {
 	if len(args) == 0 {
 		support.SendFormat(s, KickPlayerUsage)
 		return

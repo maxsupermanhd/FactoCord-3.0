@@ -11,7 +11,7 @@ import (
 var UnbanPlayerUsage = "Usage $unban <player>"
 
 // UnbanPlayer unbans a player on the server.
-func UnbanPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
+func UnbanPlayer(s *discordgo.Session, args string) {
 	if strings.ContainsAny(args, " \n\t") {
 		support.SendFormat(s, UnbanPlayerUsage)
 		return
