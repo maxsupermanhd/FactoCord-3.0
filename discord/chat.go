@@ -13,7 +13,17 @@ import (
 	"../support"
 )
 
+// fuck golang. it's shit
+func min(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
+}
+
 var Session *discordgo.Session
+
+var discordSignature = "[color=#7289DA][Discord][/color]"
 
 func StartSession() {
 	fmt.Println("Starting bot..")
@@ -61,13 +71,40 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		log.Print("[" + m.Author.Username + "] " + m.Content)
 		// Pipes normal chat allowing it to be seen ingame
-		support.SendToFactorio(fmt.Sprintf("[Discord] <%s>: %s", m.Author.Username, strings.Replace(m.ContentWithMentionsReplaced(), "\n", fmt.Sprintf("\n[Discord] <%s>: ", m.Author.Username), -1)))
+		if strings.TrimSpace(m.Content) != "" {
+			// TODO? add color to mentions
+			lines := strings.Split(m.ContentWithMentionsReplaced(), "\n")
+			for i, line := range lines {
+				lines[i] = fmt.Sprintf("<%s>: %s", m.Author.Username, line)
+				lines[i] = "[color=white]" + lines[i] + "[/color]"
+				lines[i] = discordSignature + " " + lines[i]
+			}
+			support.SendToFactorio(strings.Join(lines, "\n"))
+		}
+		for _, attachment := range m.Attachments {
+			attachmentType := ""
+			if attachment.Width == 0 {
+				filename := attachment.Filename
+				if len(filename) > 20 {
+					if strings.Contains(filename, ".") {
+						dotIndex := strings.LastIndex(filename, ".")
+						filename = filename[:min(dotIndex, 20)] + "..." + filename[dotIndex:]
+					} else {
+						filename = filename[:20] + "..."
+					}
+				}
+				attachmentType = "файл: " + filename
+			} else {
+				attachmentType = fmt.Sprintf("изображение %dx%d", attachment.Width, attachment.Height)
+			}
+			message := fmt.Sprintf("[color=white]<%s>:[/color] [color=#35BFFF][%s][/color]", m.Author.Username, attachmentType)
+			support.SendToFactorio(discordSignature + " " + message)
+		}
 		return
 	}
 	if m.ChannelID == support.Config.FactorioConsoleChatID {
 		fmt.Println("wrote to console from channel: \"", m.Content, "\"")
 		support.Send(s, "wrote "+m.Content)
-
 		support.SendToFactorio(m.Content)
 	}
 	return
@@ -94,7 +131,7 @@ func (t FactorioLogWatcher) Flush() {
 	}
 }
 
-// Chat pipes in-game chat to Discord.
+// ProcessFactorioLogLine pipes in-game chat to Discord.
 func ProcessFactorioLogLine(line string) {
 	if strings.Contains(line, "Quitting: multiplayer error.") {
 		support.Send(Session, support.Config.ServerFail)
