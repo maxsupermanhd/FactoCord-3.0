@@ -60,3 +60,33 @@ func DeleteEmptyStrings(s []string) []string {
 	}
 	return r
 }
+
+func QuoteSplit(s string, quote string) ([]string, bool) {
+	var res []string
+	firstQuote := -1
+	for strings.Contains(s[firstQuote+len(quote):], quote) {
+		if firstQuote == -1 {
+			firstQuote = strings.Index(s, quote)
+		} else {
+			before := s[:firstQuote]
+			if strings.TrimSpace(before) != "" {
+				for _, x := range strings.Fields(before) {
+					res = append(res, x)
+				}
+			}
+			secondQuote := strings.Index(s[firstQuote+len(quote):], quote) + firstQuote + len(quote)
+			unquoted := s[firstQuote+len(quote) : secondQuote]
+			res = append(res, unquoted)
+			s = s[secondQuote+len(quote):]
+			firstQuote = -1
+		}
+	}
+	mismatched := false
+	if strings.TrimSpace(s) != "" {
+		for _, x := range strings.Fields(s) {
+			res = append(res, x)
+			mismatched = mismatched || strings.Contains(x, quote)
+		}
+	}
+	return res, mismatched
+}
