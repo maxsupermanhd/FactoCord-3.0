@@ -85,7 +85,7 @@ var Commands = [...]Command{
 	},
 }
 
-func helpCommand(s *discordgo.Session, m *discordgo.Message) {
+func helpCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	var fields []*discordgo.MessageEmbedField
 	for _, command := range Commands {
 		desc := support.FormatUsage(command.Desc)
@@ -125,7 +125,7 @@ func helpCommand(s *discordgo.Session, m *discordgo.Message) {
 }
 
 // RunCommand runs a specified command.
-func RunCommand(input string, s *discordgo.Session, m *discordgo.Message) {
+func RunCommand(input string, s *discordgo.Session, m *discordgo.MessageCreate) {
 	inputvars := strings.SplitN(input+" ", " ", 2)
 	commandName := strings.ToLower(inputvars[0])
 	args := strings.TrimSpace(inputvars[1])
