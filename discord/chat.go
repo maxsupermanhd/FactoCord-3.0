@@ -1,6 +1,7 @@
 package discord
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
@@ -119,25 +120,23 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 	// TODO? refactor duplicate functions
-	if m.Author.ID == s.State.User.ID {
+	if m.Author == nil || m.Author.ID == s.State.User.ID || m.ChannelID != support.Config.FactorioChannelID {
 		return
 	}
-	if m.ChannelID == support.Config.FactorioChannelID {
-		log.Print("[" + m.Author.Username + "]* " + m.Content)
-		// Pipes normal chat allowing it to be seen ingame
-		if strings.TrimSpace(m.Content) != "" {
-			// TODO? add color to mentions
-			lines := strings.Split(m.ContentWithMentionsReplaced(), "\n")
-			for i, line := range lines {
-				if i != 0 {
-					line = "[color=#6CFF3B]⬑[/color] " + line
-				}
-				lines[i] = fmt.Sprintf("[color=#FFAA3B]<%s>*:[/color] %s", colorUsername(m.Message), line)
-				lines[i] = "[color=white]" + lines[i] + "[/color]"
-				lines[i] = discordSignature + " " + lines[i]
+	log.Print("[" + m.Author.Username + "]* " + m.Content)
+	// Pipes normal chat allowing it to be seen ingame
+	if strings.TrimSpace(m.Content) != "" {
+		// TODO? add color to mentions
+		lines := strings.Split(m.ContentWithMentionsReplaced(), "\n")
+		for i, line := range lines {
+			if i != 0 {
+				line = "[color=#6CFF3B]⬑[/color] " + line
 			}
-			support.SendToFactorio(strings.Join(lines, "\n"))
+			lines[i] = fmt.Sprintf("[color=#FFAA3B]<%s>*:[/color] %s", colorUsername(m.Message), line)
+			lines[i] = "[color=white]" + lines[i] + "[/color]"
+			lines[i] = discordSignature + " " + lines[i]
 		}
+		support.SendToFactorio(strings.Join(lines, "\n"))
 	}
 }
 
