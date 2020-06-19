@@ -13,7 +13,7 @@ import (
 type Command struct {
 	Name string
 
-	Command func(s *discordgo.Session, m *discordgo.MessageCreate, args string)
+	Command func(s *discordgo.Session, args string)
 
 	Admin bool
 	Desc  string
@@ -92,7 +92,8 @@ func helpCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if roleID, exists := support.Config.CommandRoles[strings.ToLower(command.Name)]; exists {
 			roles, err := s.GuildRoles(m.GuildID)
 			if err != nil {
-				support.ErrorLog(err)
+				support.Panik(err, "... when querying guild roles")
+				return
 			}
 			found := false
 			for _, role := range roles {
@@ -120,7 +121,7 @@ func helpCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 		Title:       "FactoCord Commands",
 		Fields:      fields,
 	}
-	s.ChannelMessageSendEmbed(support.Config.FactorioChannelID, embed)
+	support.SendEmbed(s, embed)
 }
 
 // RunCommand runs a specified command.
@@ -135,23 +136,22 @@ func RunCommand(input string, s *discordgo.Session, m *discordgo.MessageCreate) 
 	}
 
 	for _, command := range Commands {
-
 		if strings.ToLower(command.Name) == commandName {
 			execute := false
-			error := ""
+			err := ""
 
 			if command.Admin {
 				if CheckAdmin(m.Author.ID) {
 					execute = true
 				} else {
-					error = "You are not an admin!"
+					err = "You are not an admin!"
 				}
 			} else {
 				execute = true
 			}
 			if roleID, exists := support.Config.CommandRoles[commandName]; exists {
 				// TODO? role name
-				error = "You don't have the required role"
+				err = "You don't have the required role"
 				for _, memberRoleID := range m.Member.Roles {
 					if memberRoleID == roleID {
 						execute = true
@@ -159,20 +159,20 @@ func RunCommand(input string, s *discordgo.Session, m *discordgo.MessageCreate) 
 				}
 			}
 			if execute {
-				command.Command(s, m, args)
+				command.Command(s, args)
 			} else {
-				s.ChannelMessageSend(support.Config.FactorioChannelID, error)
+				support.Send(s, err)
 			}
 			return
 		}
 	}
-	s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage("Command not found. Try using \"$help\""))
+	support.SendFormat(s, "Command not found. Try using \"$help\"")
 }
 
 // CheckAdmin checks if the user attempting to run an admin command is an admin
 func CheckAdmin(ID string) bool {
-	for _, admin := range support.Config.AdminIDs {
-		if ID == admin {
+	for _, adminID := range support.Config.AdminIDs {
+		if ID == adminID {
 			return true
 		}
 	}

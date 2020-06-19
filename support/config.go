@@ -31,6 +31,7 @@ type config struct {
 	HaveServerEssentials  bool
 	BotStart              string
 	SendBotStart          bool
+	BotStop               string
 	ServerStart           string
 	ServerStop            string
 	ServerFail            string
@@ -97,8 +98,7 @@ func getRolesMap(key string) commandRolesType {
 func (conf *config) LoadEnv() {
 	if _, err := os.Stat(".env"); os.IsNotExist(err) {
 		fmt.Println("Environment file not found, cannot continue!")
-		Error := errors.New("Failed to load environment file")
-		ErrorLog(Error)
+		Exit(1)
 	}
 	Config = config{
 		DiscordToken:          os.Getenv("DiscordToken"),
@@ -116,6 +116,7 @@ func (conf *config) LoadEnv() {
 		HaveServerEssentials:  getenvBool("HaveServerEssentials"),
 		BotStart:              os.Getenv("BotStart"),
 		SendBotStart:          getenvBool("SendBotStart"),
+		BotStop:               os.Getenv("BotStop"),
 		ServerStart:           os.Getenv("ServerStart"),
 		ServerStop:            os.Getenv("ServerStop"),
 		ServerFail:            os.Getenv("ServerFail"),

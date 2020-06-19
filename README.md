@@ -11,7 +11,7 @@ When FactoCord3 encounters an error will log to error.log within the same direct
 
 If you are having an issue make sure to check the error.log to see what the problem is.
 
-If you are unable to solve the issue yourself, please post an issue containing the error.log, factorio.log (if exists) and unit file if you are using one and I will review and attempt to solve what the problem is.
+If you are unable to solve the issue yourself, please post an issue containing the error.log, factorio.log (if exists) and unit file if you are using one, and I will review and attempt to solve what the problem is.
 
 # Screenshots
 

@@ -22,7 +22,7 @@ type Mod struct {
 
 var ModListUsage = "Usage: $mods [on | off | all]"
 
-func modList(ModList *ModJson, return_enabled bool, return_disabled bool) string {
+func modList(ModList *ModJson, returnEnabled bool, returnDisabled bool) string {
 	var enabled, disabled int
 	var S = "mod"
 	if len(ModList.Mods) > 1 {
@@ -38,7 +38,7 @@ func modList(ModList *ModJson, return_enabled bool, return_disabled bool) string
 
 	res := fmt.Sprintf("%d total %s (%d enabled, %d disabled)", len(ModList.Mods), S, enabled, disabled)
 
-	if return_enabled {
+	if returnEnabled {
 		res += "\n**Enabled:**"
 		for _, mod := range ModList.Mods {
 			if mod.Enabled {
@@ -46,8 +46,8 @@ func modList(ModList *ModJson, return_enabled bool, return_disabled bool) string
 			}
 		}
 	}
-	if return_disabled {
-		if return_enabled {
+	if returnDisabled {
+		if returnEnabled {
 			res += "\n"
 		}
 		res += "\n**Disabled:**"
@@ -62,35 +62,34 @@ func modList(ModList *ModJson, return_enabled bool, return_disabled bool) string
 }
 
 // ModsList returns the list of mods running on the server.
-func ModsList(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
-	return_enabled := true
-	return_disabled := false
+func ModsList(s *discordgo.Session, args string) {
+	returnEnabled := true
+	returnDisabled := false
 	if args == "on" || args == "" {
-		return_enabled = true
+		returnEnabled = true
 	} else if args == "off" {
-		return_enabled = false
-		return_disabled = true
+		returnEnabled = false
+		returnDisabled = true
 	} else if args == "all" {
-		return_disabled = true
+		returnDisabled = true
 	} else {
-		s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(ModListUsage))
+		support.SendFormat(s, ModListUsage)
 		return
 	}
 	ModList := &ModJson{}
 	Json, err := ioutil.ReadFile(support.Config.ModListLocation)
-	// Don't exit on this error, just sent message to the channel!
 	if err != nil {
-		s.ChannelMessageSend(support.Config.FactorioChannelID,
-			fmt.Sprintf("Sorry, there was an error reading your mods list, did you specify it in the .env file? Error details: %s", err))
+		support.Send(s, "Sorry, there was an error reading your mods list")
+		support.Panik(err, "there was an error reading mods list, did you specify it in the .env file?")
 		return
 	}
 
 	err = json.Unmarshal(Json, &ModList)
 	if err != nil {
-		s.ChannelMessageSend(support.Config.FactorioChannelID,
-			fmt.Sprintf("Sorry, there was an error reading your mods list. Error details: %s", err))
+		support.Send(s, "Sorry, there was an error reading your mods list")
+		support.Panik(err, "there was an error reading mods list")
 		return
 	}
-	support.ChunkedMessageSend(s, support.Config.FactorioChannelID, modList(ModList, return_enabled, return_disabled))
+	support.ChunkedMessageSend(s, modList(ModList, returnEnabled, returnDisabled))
 	return
 }

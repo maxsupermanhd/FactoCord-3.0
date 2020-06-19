@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"io"
 	"strings"
 
 	"../../support"
@@ -11,13 +10,17 @@ import (
 // UnbanPlayerUsage comment...
 var UnbanPlayerUsage = "Usage $unban <player>"
 
-// UnbanPlayer unbannes a player on the server.
-func UnbanPlayer(s *discordgo.Session, m *discordgo.MessageCreate, args string) {
+// UnbanPlayer unbans a player on the server.
+func UnbanPlayer(s *discordgo.Session, args string) {
 	if strings.ContainsAny(args, " \n\t") {
-		s.ChannelMessageSend(support.Config.FactorioChannelID, support.FormatUsage(UnbanPlayerUsage))
+		support.SendFormat(s, UnbanPlayerUsage)
 		return
 	}
-	io.WriteString(*P, "/unban "+args+"\n")
-	s.ChannelMessageSend(support.Config.FactorioChannelID, "Player "+args+" unbanned!")
-	return
+	command := "/unban " + args
+	success := support.SendToFactorio(command)
+	if success {
+		support.Send(s, "Player "+args+" unbanned!")
+	} else {
+		support.Send(s, "Sorry, there was an error sending /unban command")
+	}
 }

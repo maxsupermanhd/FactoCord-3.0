@@ -1,6 +1,6 @@
 DiscordToken = "Discord Token Here"
 
-FactorioChannelID = "ChannelMessageswillSendTo"
+FactorioChannelID = "ID of the Channel messages will be sent to"
 
 FactorioConsoleChatID = "FactorioConsoleChannelHere"
 
@@ -23,6 +23,8 @@ ServerStart = "**:white_check_mark: The server has started!**"
 BotStart = "**:white_check_mark: Bot started! Launching server...**"
 
 SendBotStart = True
+
+BotStop = ":v:"
 
 ServerStop = "**:octagonal_sign: The server has stopped!**"
 

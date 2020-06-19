@@ -1,5 +1,5 @@
  -- This file stands for console logging for FactoCord-3.0 integration
- -- Please configure as needed, any discord messgae will be sent in
+ -- Please configure as needed, any discord message will be sent in
  --  raw format if it starts with `0000-00-00 00:00:00 [DISCORD] `
  -- For more information visit https://github.com/maxsupermanhd/FactoCord-3.0
  -- If you have any question or comments join our Discord https://discord.gg/SUJRG47
@@ -56,16 +56,14 @@ script.on_event(defines.events.on_player_kicked, function(event)
 	FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** kicked.");
 end)
 script.on_event(defines.events.on_player_unbanned, function(event)
-	local p = game.players[event.player_index];
-	FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** unbanned.");
+	FactoCordIntegration.PrintToDiscord("**" .. event.player_name .. "** unbanned.");
 end)
 script.on_event(defines.events.on_player_unmuted, function(event)
 	local p = game.players[event.player_index];
 	FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** unmuted.");
 end)
 script.on_event(defines.events.on_player_banned, function(event)
-	local p = game.players[event.player_index];
-	FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** banned.");
+	FactoCordIntegration.PrintToDiscord("**" .. event.player_name .. "** banned.");
 end)
 script.on_event(defines.events.on_player_muted, function(event)
 	local p = game.players[event.player_index];
