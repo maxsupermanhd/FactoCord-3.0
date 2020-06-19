@@ -78,7 +78,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				if i != 0 {
 					line = "[color=#6CFF3B]⬑[/color] " + line
 				}
-				lines[i] = fmt.Sprintf("<%s>: %s", m.Author.Username, line)
+				lines[i] = fmt.Sprintf("<%s>: %s", colorUsername(m.Message), line)
 				lines[i] = "[color=white]" + lines[i] + "[/color]"
 				lines[i] = discordSignature + " " + lines[i]
 			}
@@ -104,7 +104,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			if strings.TrimSpace(m.Content) != "" {
 				attachmentType = "[color=#6CFF3B]⬑[/color] " + attachmentType
 			}
-			message := fmt.Sprintf("[color=white]<%s>:[/color] %s", m.Author.Username, attachmentType)
+			message := fmt.Sprintf("[color=white]<%s>:[/color] %s", colorUsername(m.Message), attachmentType)
 			support.SendToFactorio(discordSignature + " " + message)
 		}
 		return
@@ -132,11 +132,20 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 				if i != 0 {
 					line = "[color=#6CFF3B]⬑[/color] " + line
 				}
-				lines[i] = fmt.Sprintf("[color=#FFAA3B]<%s>*:[/color] %s", m.Author.Username, line)
+				lines[i] = fmt.Sprintf("[color=#FFAA3B]<%s>*:[/color] %s", colorUsername(m.Message), line)
 				lines[i] = "[color=white]" + lines[i] + "[/color]"
 				lines[i] = discordSignature + " " + lines[i]
 			}
 			support.SendToFactorio(strings.Join(lines, "\n"))
 		}
+	}
+}
+
+func colorUsername(message *discordgo.Message) string {
+	if support.Config.IngameDiscordUserColors {
+		color := Session.State.UserColor(message.Author.ID, message.ChannelID)
+		return fmt.Sprintf("[color=#%06x]%s[/color]", color, message.Author.Username)
+	} else {
+		return message.Author.Username
 	}
 }
