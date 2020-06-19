@@ -41,5 +41,3 @@ PassConsoleChat = False
 EnableConsoleChannel = False
 
 HaveServerEssentials = False
-
-IngameDiscordUserColors = False

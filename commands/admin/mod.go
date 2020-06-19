@@ -84,7 +84,6 @@ func ModCommand(s *discordgo.Session, args string) {
 		support.Panik(err, "there was an error converting mod list to json")
 		return
 	}
-	// TODO save to another file and load on start, restart, and stop
 	err = ioutil.WriteFile(support.Config.ModListLocation, modsListFile, 0666)
 	if err != nil {
 		support.Send(s, "Sorry, there was an error saving mod list")

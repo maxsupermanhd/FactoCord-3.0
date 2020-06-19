@@ -1,8 +1,10 @@
 package discord
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -37,7 +39,6 @@ func StartSession() {
 
 func Init() {
 	Session.AddHandler(messageCreate)
-	Session.AddHandler(messageUpdate)
 	go CacheUpdater(Session)
 
 	time.Sleep(3 * time.Second)
@@ -66,7 +67,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.ChannelID == support.Config.FactorioChannelID {
 		if strings.HasPrefix(m.Content, support.Config.Prefix) {
 			input := strings.Replace(m.Content, support.Config.Prefix, "", 1)
-			commands.RunCommand(input, s, m.Message)
+			commands.RunCommand(input, s, m)
 			return
 		}
 		log.Print("[" + m.Author.Username + "] " + m.Content)
@@ -75,10 +76,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			// TODO? add color to mentions
 			lines := strings.Split(m.ContentWithMentionsReplaced(), "\n")
 			for i, line := range lines {
-				if i != 0 {
-					line = "[color=#6CFF3B]⬑[/color] " + line
-				}
-				lines[i] = fmt.Sprintf("<%s>: %s", colorUsername(m.Message), line)
+				lines[i] = fmt.Sprintf("<%s>: %s", m.Author.Username, line)
 				lines[i] = "[color=white]" + lines[i] + "[/color]"
 				lines[i] = discordSignature + " " + lines[i]
 			}
@@ -100,11 +98,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			} else {
 				attachmentType = fmt.Sprintf("изображение %dx%d", attachment.Width, attachment.Height)
 			}
-			attachmentType = fmt.Sprintf("[color=#35BFFF][%s][/color]", attachmentType)
-			if strings.TrimSpace(m.Content) != "" {
-				attachmentType = "[color=#6CFF3B]⬑[/color] " + attachmentType
-			}
-			message := fmt.Sprintf("[color=white]<%s>:[/color] %s", colorUsername(m.Message), attachmentType)
+			message := fmt.Sprintf("[color=white]<%s>:[/color] [color=#35BFFF][%s][/color]", m.Author.Username, attachmentType)
 			support.SendToFactorio(discordSignature + " " + message)
 		}
 		return
@@ -117,35 +111,100 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	return
 }
 
-func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
-	// TODO? refactor duplicate functions
-	if m.Author.ID == s.State.User.ID {
+type FactorioLogWatcher struct {
+	buffer string
+}
+
+func (t FactorioLogWatcher) Write(p []byte) (n int, err error) {
+	t.buffer += string(p)
+	lines := strings.Split(t.buffer, "\n")
+	t.buffer = lines[len(lines)-1]
+	for _, line := range lines[:len(lines)-1] {
+		ProcessFactorioLogLine(line)
+	}
+	return len(p), nil
+}
+
+func (t FactorioLogWatcher) Flush() {
+	if t.buffer != "" {
+		ProcessFactorioLogLine(t.buffer)
+		t.buffer = ""
+	}
+}
+
+var charRegexp = regexp.MustCompile("^\\d{4}[-/]\\d\\d[-/]\\d\\d \\d\\d:\\d\\d:\\d\\d ")
+var factorioLogRegexp = regexp.MustCompile("^\\d+\\.\\d{3} ")
+
+var forwardMessages = []*regexp.Regexp{
+	regexp.MustCompile("^Player .+ doesn't exist."),
+	regexp.MustCompile("^.+ wasn't banned."),
+}
+
+// ProcessFactorioLogLine pipes in-game chat to Discord.
+func ProcessFactorioLogLine(line string) {
+	line = strings.TrimSpace(line)
+	if line == "" {
 		return
 	}
-	if m.ChannelID == support.Config.FactorioChannelID {
-		log.Print("[" + m.Author.Username + "]* " + m.Content)
-		// Pipes normal chat allowing it to be seen ingame
-		if strings.TrimSpace(m.Content) != "" {
-			// TODO? add color to mentions
-			lines := strings.Split(m.ContentWithMentionsReplaced(), "\n")
-			for i, line := range lines {
-				if i != 0 {
-					line = "[color=#6CFF3B]⬑[/color] " + line
-				}
-				lines[i] = fmt.Sprintf("[color=#FFAA3B]<%s>*:[/color] %s", colorUsername(m.Message), line)
-				lines[i] = "[color=white]" + lines[i] + "[/color]"
-				lines[i] = discordSignature + " " + lines[i]
+	if charRegexp.FindString(line) != "" {
+		if support.Config.PassConsoleChat {
+			line = line[len("0000-00-00 00:00:00 "):]
+			processFactorioChat(strings.TrimSpace(line))
+		}
+	} else if factorioLogRegexp.FindString(line) != "" {
+		if strings.Contains(line, "Quitting: multiplayer error.") {
+			support.Send(Session, support.Config.ServerFail)
+		}
+		if strings.Contains(line, "Opening socket for broadcast") {
+			support.Send(Session, support.Config.ServerStart)
+		}
+		if strings.Contains(line, "Saving finished") {
+			support.Send(Session, "Saving finished!")
+		}
+		if strings.Contains(line, "Quitting multiplayer connection.") {
+			support.Send(Session, support.Config.ServerStop)
+		}
+	} else {
+		for _, pattern := range forwardMessages {
+			if pattern.FindString(line) != "" {
+				support.Send(Session, line)
+				return
 			}
-			support.SendToFactorio(strings.Join(lines, "\n"))
 		}
 	}
 }
 
-func colorUsername(message *discordgo.Message) string {
-	if support.Config.IngameDiscordUserColors {
-		color := Session.State.UserColor(message.Author.ID, message.ChannelID)
-		return fmt.Sprintf("[color=#%06x]%s[/color]", color, message.Author.Username)
-	} else {
-		return message.Author.Username
+var chatStartRegexp = regexp.MustCompile("^\\[(CHAT|JOIN|LEAVE|KICK|BAN|DISCORD|DISCORD-EMBED)]")
+
+func processFactorioChat(line string) {
+	match := chatStartRegexp.FindStringSubmatch(line)
+	if match == nil {
+		return
+	}
+	messageType := match[1]
+	integrationMessage := messageType == "DISCORD-EMBED" || messageType == "DISCORD"
+
+	line = strings.TrimLeft(line[len(messageType)+2:], " ")
+	if strings.HasPrefix(line, "<server>") {
+		return
+	}
+	if messageType == "DISCORD" || messageType == "CHAT" {
+		if strings.Contains(line, "@") {
+			line = AddMentions(line)
+		}
+	}
+	if support.Config.HaveServerEssentials {
+		if messageType == "DISCORD-EMBED" {
+			message := new(discordgo.MessageSend)
+			err := json.Unmarshal([]byte(line), message)
+			if err == nil {
+				message.Tts = false
+				support.SendComplex(Session, message)
+			}
+		} else if messageType == "DISCORD" {
+			support.Send(Session, line)
+		}
+	} else if !integrationMessage {
+		support.Send(Session, line)
 	}
 }
