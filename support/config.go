@@ -16,28 +16,29 @@ var ErrEnvVarEmpty = errors.New("getenv: environment variable empty")
 type commandRolesType map[string]string
 
 type config struct {
-	DiscordToken          string
-	FactorioChannelID     string
-	Executable            string
-	LaunchParameters      []string
-	AdminIDs              []string
-	CommandRoles          commandRolesType
-	Prefix                string
-	ModListLocation       string
-	GameName              string
-	PassConsoleChat       bool
-	EnableConsoleChannel  bool
-	FactorioConsoleChatID string
-	HaveServerEssentials  bool
-	BotStart              string
-	SendBotStart          bool
-	BotStop               string
-	ServerStart           string
-	ServerStop            string
-	ServerFail            string
-	ServerSave            string
-	PlayerJoin            string
-	PlayerLeave           string
+	DiscordToken            string
+	FactorioChannelID       string
+	Executable              string
+	LaunchParameters        []string
+	AdminIDs                []string
+	CommandRoles            commandRolesType
+	Prefix                  string
+	ModListLocation         string
+	GameName                string
+	PassConsoleChat         bool
+	EnableConsoleChannel    bool
+	FactorioConsoleChatID   string
+	HaveServerEssentials    bool
+	BotStart                string
+	SendBotStart            bool
+	BotStop                 string
+	ServerStart             string
+	ServerStop              string
+	ServerFail              string
+	ServerSave              string
+	PlayerJoin              string
+	PlayerLeave             string
+	IngameDiscordUserColors bool
 }
 
 func getenvStr(key string) (string, error) {
@@ -101,27 +102,28 @@ func (conf *config) LoadEnv() {
 		Exit(1)
 	}
 	Config = config{
-		DiscordToken:          os.Getenv("DiscordToken"),
-		FactorioChannelID:     os.Getenv("FactorioChannelID"),
-		LaunchParameters:      strings.Split(os.Getenv("LaunchParameters"), " "),
-		Executable:            os.Getenv("Executable"),
-		AdminIDs:              strings.Split(os.Getenv("AdminIDs"), ","),
-		CommandRoles:          getRolesMap("CommandRoles"),
-		Prefix:                os.Getenv("Prefix"),
-		ModListLocation:       os.Getenv("ModListLocation"),
-		GameName:              os.Getenv("GameName"),
-		PassConsoleChat:       getenvBool("PassConsoleChat"),
-		EnableConsoleChannel:  getenvBool("EnableConsoleChannel"),
-		FactorioConsoleChatID: os.Getenv("FactorioConsoleChatID"),
-		HaveServerEssentials:  getenvBool("HaveServerEssentials"),
-		BotStart:              os.Getenv("BotStart"),
-		SendBotStart:          getenvBool("SendBotStart"),
-		BotStop:               os.Getenv("BotStop"),
-		ServerStart:           os.Getenv("ServerStart"),
-		ServerStop:            os.Getenv("ServerStop"),
-		ServerFail:            os.Getenv("ServerFail"),
-		ServerSave:            os.Getenv("ServerSave"),
-		PlayerJoin:            os.Getenv("PlayerJoin"),
-		PlayerLeave:           os.Getenv("PlayerLeave"),
+		DiscordToken:            os.Getenv("DiscordToken"),
+		FactorioChannelID:       os.Getenv("FactorioChannelID"),
+		LaunchParameters:        strings.Split(os.Getenv("LaunchParameters"), " "),
+		Executable:              os.Getenv("Executable"),
+		AdminIDs:                strings.Split(os.Getenv("AdminIDs"), ","),
+		CommandRoles:            getRolesMap("CommandRoles"),
+		Prefix:                  os.Getenv("Prefix"),
+		ModListLocation:         os.Getenv("ModListLocation"),
+		GameName:                os.Getenv("GameName"),
+		PassConsoleChat:         getenvBool("PassConsoleChat"),
+		EnableConsoleChannel:    getenvBool("EnableConsoleChannel"),
+		FactorioConsoleChatID:   os.Getenv("FactorioConsoleChatID"),
+		HaveServerEssentials:    getenvBool("HaveServerEssentials"),
+		BotStart:                os.Getenv("BotStart"),
+		SendBotStart:            getenvBool("SendBotStart"),
+		BotStop:                 os.Getenv("BotStop"),
+		ServerStart:             os.Getenv("ServerStart"),
+		ServerStop:              os.Getenv("ServerStop"),
+		ServerFail:              os.Getenv("ServerFail"),
+		ServerSave:              os.Getenv("ServerSave"),
+		PlayerJoin:              os.Getenv("PlayerJoin"),
+		PlayerLeave:             os.Getenv("PlayerLeave"),
+		IngameDiscordUserColors: getenvBool("IngameDiscordUserColors"),
 	}
 }
