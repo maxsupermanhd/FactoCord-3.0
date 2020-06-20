@@ -61,6 +61,29 @@ func DeleteEmptyStrings(s []string) []string {
 	return r
 }
 
+func SplitAt(s string, index int) (string, string) {
+	if index < 0 {
+		index += len(s)
+	}
+	return s[:index], s[index:]
+}
+
+func SplitBefore(s, sub string) (string, string) {
+	index := strings.Index(s, sub)
+	if index == -1 {
+		return s, ""
+	}
+	return SplitAt(s, index)
+}
+
+func SplitAfter(s, sub string) (string, string) {
+	index := strings.Index(s, sub)
+	if index == -1 {
+		return "", s
+	}
+	return SplitAt(s, index+len(sub))
+}
+
 func QuoteSplit(s string, quote string) ([]string, bool) {
 	var res []string
 	firstQuote := -1

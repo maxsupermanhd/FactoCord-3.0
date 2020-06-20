@@ -3,6 +3,7 @@ package discord
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -67,6 +68,17 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if strings.HasPrefix(m.Content, support.Config.Prefix) {
 			input := strings.Replace(m.Content, support.Config.Prefix, "", 1)
 			commands.RunCommand(input, s, m.Message)
+			return
+		}
+		if regexp.MustCompile(fmt.Sprintf("^<@!?%s>", s.State.User.ID)).MatchString(m.Content) {
+			// when bot is mentioned at the start of the message
+			_, message := support.SplitAfter(m.Content, ">")
+			message = strings.TrimSpace(message)
+			if message == "" {
+				support.SendFormat(s, "Current prefix is: `$`. You can use `$help` or ping me with a command")
+			} else {
+				commands.RunCommand(message, s, m.Message)
+			}
 			return
 		}
 		log.Print("[" + m.Author.Username + "] " + m.Content)
