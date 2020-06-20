@@ -25,7 +25,6 @@ type config struct {
 	Prefix                  string
 	ModListLocation         string
 	GameName                string
-	PassConsoleChat         bool
 	EnableConsoleChannel    bool
 	FactorioConsoleChatID   string
 	HaveServerEssentials    bool
@@ -111,7 +110,6 @@ func (conf *config) LoadEnv() {
 		Prefix:                  os.Getenv("Prefix"),
 		ModListLocation:         os.Getenv("ModListLocation"),
 		GameName:                os.Getenv("GameName"),
-		PassConsoleChat:         getenvBool("PassConsoleChat"),
 		EnableConsoleChannel:    getenvBool("EnableConsoleChannel"),
 		FactorioConsoleChatID:   os.Getenv("FactorioConsoleChatID"),
 		HaveServerEssentials:    getenvBool("HaveServerEssentials"),

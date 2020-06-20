@@ -45,10 +45,8 @@ func ProcessFactorioLogLine(line string) {
 		return
 	}
 	if charRegexp.FindString(line) != "" {
-		if support.Config.PassConsoleChat {
-			line = line[len("0000-00-00 00:00:00 "):]
-			processFactorioChat(strings.TrimSpace(line))
-		}
+		line = line[len("0000-00-00 00:00:00 "):]
+		processFactorioChat(strings.TrimSpace(line))
 	} else if factorioLogRegexp.FindString(line) != "" {
 		if strings.Contains(line, "Quitting: multiplayer error.") {
 			support.Send(Session, support.Config.ServerFail)

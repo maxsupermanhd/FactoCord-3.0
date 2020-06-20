@@ -36,8 +36,6 @@ PlayerJoin = "**:arrow_up: %s**"
 
 PlayerLeave = "**:arrow_down: %s**"
 
-PassConsoleChat = False
-
 EnableConsoleChannel = False
 
 HaveServerEssentials = False
