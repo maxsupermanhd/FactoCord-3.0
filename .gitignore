@@ -1,6 +1,6 @@
 .idea/**
 factorio/
-.env
+config.json
 FactoCord-3.0
 FactoCord
 error.log

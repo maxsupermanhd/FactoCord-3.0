@@ -2,6 +2,7 @@ package support
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -11,6 +12,12 @@ func Send(s *discordgo.Session, message string) {
 	_, err := s.ChannelMessageSend(Config.FactorioChannelID, message)
 	if err != nil {
 		Panik(err, "Failed to send message: "+message)
+	}
+}
+
+func SendMessage(s *discordgo.Session, message string) {
+	if message != "" {
+		Send(s, message)
 	}
 }
 
@@ -112,4 +119,14 @@ func QuoteSplit(s string, quote string) ([]string, bool) {
 		}
 	}
 	return res, mismatched
+}
+
+// FileExists checks if a file exists and is not a directory before we
+// try using it to prevent further errors.
+func FileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }

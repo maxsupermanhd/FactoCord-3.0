@@ -49,16 +49,16 @@ func ProcessFactorioLogLine(line string) {
 		processFactorioChat(strings.TrimSpace(line))
 	} else if factorioLogRegexp.FindString(line) != "" {
 		if strings.Contains(line, "Quitting: multiplayer error.") {
-			support.Send(Session, support.Config.ServerFail)
+			support.SendMessage(Session, support.Config.Messages.ServerFail)
 		}
 		if strings.Contains(line, "Opening socket for broadcast") {
-			support.Send(Session, support.Config.ServerStart)
+			support.SendMessage(Session, support.Config.Messages.ServerStart)
 		}
 		if strings.Contains(line, "Saving finished") {
-			support.Send(Session, "Saving finished!")
+			support.SendMessage(Session, "Saving finished!")
 		}
 		if strings.Contains(line, "Quitting multiplayer connection.") {
-			support.Send(Session, support.Config.ServerStop)
+			support.SendMessage(Session, support.Config.Messages.ServerStop)
 		}
 	} else {
 		for _, pattern := range forwardMessages {

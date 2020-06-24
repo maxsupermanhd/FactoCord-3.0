@@ -46,15 +46,12 @@ func Init() {
 	support.Panik(err, "... when updating bot status")
 
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
-	if support.Config.SendBotStart {
-		support.Send(Session, support.Config.BotStart)
-	}
+	support.SendMessage(Session, support.Config.Messages.BotStart)
 }
 
 func Close() {
-	if support.Config.BotStop != "" {
-		support.Send(Session, support.Config.BotStop)
-	}
+	support.SendMessage(Session, support.Config.Messages.BotStop)
+
 	// Cleanly close down the Discord session.
 	err := Session.Close()
 	support.Panik(err, "... when closing discord connection")

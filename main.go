@@ -12,7 +12,6 @@ import (
 	"./commands/admin"
 	"./discord"
 	"./support"
-	_ "github.com/joho/godotenv/autoload"
 )
 
 // Running is the boolean that tells if the server is running or not
@@ -25,7 +24,7 @@ var Factorio *exec.Cmd
 
 func main() {
 	fmt.Println("Welcome to FactoCord-3.0!")
-	support.Config.LoadEnv()
+	support.Config.Load()
 
 	admin.R = &Running
 
