@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/yosuke-furukawa/json5/encoding/json5"
 	"io/ioutil"
-	"os"
 )
 
 // Config is a config interface.
@@ -41,10 +40,6 @@ type configT struct {
 }
 
 func (conf *configT) Load() {
-	if _, err := os.Stat(".env"); os.IsNotExist(err) {
-		fmt.Println("Environment file not found, cannot continue!")
-		Exit(1)
-	}
 	if !FileExists("./config.json") {
 		fmt.Println("Error: config.json not found.")
 		fmt.Println("Make sure that you copied 'config-example.json' and current working directory is correct")

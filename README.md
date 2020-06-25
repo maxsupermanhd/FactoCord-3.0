@@ -15,10 +15,11 @@ If you are unable to solve the issue yourself, please post an issue containing t
 
 # Screenshots
 
-<p><img src="https://i.imgur.com/nrPMtBK.png" alt="list of commands"></p>
+<p><img src="https://i.imgur.com/VXUbbbL.png" alt="list of commands"></p>
 <p><img src="http://i.imgur.com/dztOTrk.png" alt="in-game chat being sent to discord, notice how you can mention discord members"></p>
 <p><img src="http://i.imgur.com/Npl0vBb.png" alt="discord chat being sent to in-game"></p>
 
 
 Special thanks again to thecmdradama for creating the FactoCord2 project. https://github.com/FactoKit/FactoCord-2.0
+
 Special thanks again to FMCore for creating the initial FactoCord project. https://github.com/FactoKit/FactoCord

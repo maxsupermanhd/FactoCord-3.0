@@ -1,5 +1,7 @@
 .idea/**
 factorio/
+release/**
+.env
 config.json
 FactoCord-3.0
 FactoCord
