@@ -33,7 +33,7 @@ func Restart(s *discordgo.Session, args string) {
 		support.Send(s, "Sorry, there was an error sending /quit command")
 		return
 	}
-	support.Send(s, "Saved server, now restarting!")
+	//support.Send(s, "Saved server, now restarting!")
 	// TODO wait for factorio to exit
 	time.Sleep(3 * time.Second)
 	*R = false
