@@ -59,6 +59,12 @@ var Commands = [...]Command{
 		Desc:    "Unban a user from the server. " + admin.UnbanPlayerUsage,
 	},
 	{
+		Name:    "Config",
+		Command: admin.ConfigCommand,
+		Admin:   true,
+		Desc:    "Manage config.json. " + admin.ConfigCommandUsage,
+	},
+	{
 		Name:    "Mod",
 		Command: admin.ModCommand,
 		Admin:   true,

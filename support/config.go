@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 )
 
+var ConfigPath = "./config.json"
+
 // Config is a config interface.
 var Config configT
 
@@ -39,17 +41,32 @@ type configT struct {
 	} `json:"messages"`
 }
 
-func (conf *configT) Load() {
-	if !FileExists("./config.json") {
+func (conf *configT) MustLoad() {
+	if !FileExists(ConfigPath) {
 		fmt.Println("Error: config.json not found.")
 		fmt.Println("Make sure that you copied 'config-example.json' and current working directory is correct")
 		Exit(7)
 	}
-	contents, err := ioutil.ReadFile("./config.json")
+	contents, err := ioutil.ReadFile(ConfigPath)
 	Critical(err, "... when reading config.json")
 	err = json5.Unmarshal(contents, &conf)
 	if err != nil {
 		fmt.Println("Note that json5 may have several bugs, such as comment before ] or }")
 		Critical(err, "... when parsing config.json")
 	}
+}
+
+func (conf *configT) Load() error {
+	if !FileExists(ConfigPath) {
+		return fmt.Errorf("config.json not found.")
+	}
+	contents, err := ioutil.ReadFile(ConfigPath)
+	if err != nil {
+		return fmt.Errorf("error reading config.json: %s", err)
+	}
+	err = json5.Unmarshal(contents, &conf)
+	if err != nil {
+		return fmt.Errorf("error parsing config.json: %s", err)
+	}
+	return nil
 }

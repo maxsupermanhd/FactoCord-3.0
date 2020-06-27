@@ -39,6 +39,8 @@ func StartSession() {
 func Init() {
 	Session.AddHandler(messageCreate)
 	Session.AddHandler(messageUpdate)
+	// TODO add recover() ↑
+
 	go CacheUpdater(Session)
 
 	time.Sleep(3 * time.Second)

@@ -24,7 +24,7 @@ var Factorio *exec.Cmd
 
 func main() {
 	fmt.Println("Welcome to FactoCord-3.0!")
-	support.Config.Load()
+	support.Config.MustLoad()
 
 	admin.R = &Running
 

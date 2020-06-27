@@ -5,7 +5,7 @@ import "io"
 var FactorioPipe *io.WriteCloser
 
 func SendToFactorio(s string) bool {
-	if *FactorioPipe == nil {
+	if FactorioPipe == nil {
 		return false
 	}
 	if s[len(s)-1] != '\n' {

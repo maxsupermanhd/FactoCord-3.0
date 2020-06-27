@@ -91,6 +91,14 @@ func SplitAfter(s, sub string) (string, string) {
 	return SplitAt(s, index+len(sub))
 }
 
+func SplitDivide(s, sub string) (string, string) {
+	index := strings.Index(s, sub)
+	if index == -1 {
+		return s, ""
+	}
+	return s[:index], s[index+len(sub):]
+}
+
 func QuoteSplit(s string, quote string) ([]string, bool) {
 	var res []string
 	firstQuote := -1
