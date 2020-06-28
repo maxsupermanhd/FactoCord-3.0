@@ -58,7 +58,7 @@ func (conf *configT) MustLoad() {
 
 func (conf *configT) Load() error {
 	if !FileExists(ConfigPath) {
-		return fmt.Errorf("config.json not found.")
+		return fmt.Errorf("config.json not found")
 	}
 	contents, err := ioutil.ReadFile(ConfigPath)
 	if err != nil {
