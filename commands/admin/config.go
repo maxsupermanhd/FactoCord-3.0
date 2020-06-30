@@ -213,10 +213,16 @@ func createValue(t reflect.Type, value string) (reflect.Value, string) {
 		return reflect.New(t).Elem(), ""
 	}
 	switch t.Kind() {
+	case reflect.Bool:
+		val, err := strconv.ParseBool(value)
+		if err != nil {
+			return reflect.Value{}, fmt.Sprintf(" requires bool but \"%s\" can't be converted to bool")
+		}
+		return reflect.ValueOf(val), ""
 	case reflect.Int:
 		num, err := strconv.ParseUint(value, 10, 0)
 		if err != nil {
-			return reflect.Value{}, fmt.Sprintf(" requires int but %s is not an int", value)
+			return reflect.Value{}, fmt.Sprintf(" requires int but \"%s\" is not an int", value)
 		}
 		return reflect.ValueOf(int(num)), ""
 	case reflect.String:
