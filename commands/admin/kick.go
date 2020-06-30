@@ -25,7 +25,7 @@ func KickPlayer(s *discordgo.Session, args string) {
 		return
 	}
 	command := "/kick " + player + " " + reason
-	success := support.SendToFactorio(command)
+	success := support.Factorio.Send(command)
 	if success {
 		support.Send(s, "Player "+player+" kicked with reason "+reason+"!")
 	} else {

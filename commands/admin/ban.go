@@ -26,7 +26,7 @@ func BanPlayer(s *discordgo.Session, args string) {
 	}
 
 	command := "/ban " + player + " " + reason
-	success := support.SendToFactorio(command)
+	success := support.Factorio.Send(command)
 	if success {
 		support.Send(s, "Player "+player+" banned with reason \""+reason+"\"!")
 	} else {

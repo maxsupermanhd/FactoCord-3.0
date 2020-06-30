@@ -7,6 +7,8 @@
         "--server-settings",
         "/path/to/factorio/data/server-settings.json",
     ],
+    // start factorio when factocord starts
+    autolaunch: true,
 
     // Token of the discord bot
     discord_token: "",

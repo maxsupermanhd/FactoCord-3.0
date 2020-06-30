@@ -9,27 +9,6 @@ import (
 	"../support"
 )
 
-type FactorioLogWatcher struct {
-	buffer string
-}
-
-func (t FactorioLogWatcher) Write(p []byte) (n int, err error) {
-	t.buffer += string(p)
-	lines := strings.Split(t.buffer, "\n")
-	t.buffer = lines[len(lines)-1]
-	for _, line := range lines[:len(lines)-1] {
-		ProcessFactorioLogLine(line)
-	}
-	return len(p), nil
-}
-
-func (t FactorioLogWatcher) Flush() {
-	if t.buffer != "" {
-		ProcessFactorioLogLine(t.buffer)
-		t.buffer = ""
-	}
-}
-
 var charRegexp = regexp.MustCompile("^\\d{4}[-/]\\d\\d[-/]\\d\\d \\d\\d:\\d\\d:\\d\\d ")
 var factorioLogRegexp = regexp.MustCompile("^\\d+\\.\\d{3} ")
 
@@ -55,7 +34,10 @@ func ProcessFactorioLogLine(line string) {
 			support.SendMessage(Session, support.Config.Messages.ServerStart)
 		}
 		if strings.Contains(line, "Saving finished") {
-			support.SendMessage(Session, "Saving finished!")
+			if support.Factorio.SaveRequested {
+				support.SendMessage(Session, support.Config.Messages.ServerSave)
+				support.Factorio.SaveRequested = false
+			}
 		}
 		if strings.Contains(line, "Quitting multiplayer connection.") {
 			support.SendMessage(Session, support.Config.Messages.ServerStop)

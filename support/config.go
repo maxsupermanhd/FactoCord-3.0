@@ -14,6 +14,7 @@ var Config configT
 type configT struct {
 	Executable       string   `json:"executable"`
 	LaunchParameters []string `json:"launch_parameters"`
+	Autolaunch       bool     `json:"autolaunch"`
 
 	DiscordToken            string `json:"discord_token"`
 	GameName                string `json:"game_name"`
@@ -49,6 +50,8 @@ func (conf *configT) MustLoad() {
 	}
 	contents, err := ioutil.ReadFile(ConfigPath)
 	Critical(err, "... when reading config.json")
+
+	conf.defaults()
 	err = json5.Unmarshal(contents, &conf)
 	if err != nil {
 		fmt.Println("Note that json5 may have several bugs, such as comment before ] or }")
@@ -64,9 +67,15 @@ func (conf *configT) Load() error {
 	if err != nil {
 		return fmt.Errorf("error reading config.json: %s", err)
 	}
+
+	conf.defaults()
 	err = json5.Unmarshal(contents, &conf)
 	if err != nil {
 		return fmt.Errorf("error parsing config.json: %s", err)
 	}
 	return nil
+}
+
+func (conf *configT) defaults() {
+	conf.Autolaunch = true
 }

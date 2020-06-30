@@ -11,10 +11,10 @@ func SaveServer(s *discordgo.Session, args string) {
 		support.Send(s, "Save accepts no arguments")
 		return
 	}
-	success := support.SendToFactorio("/save")
+	success := support.Factorio.Send("/save")
 	if success {
-		// TODO read log to be sure it's successful
-		support.Send(s, "Server saved successfully!")
+		support.Factorio.SaveRequested = true
+		//support.Send(s, "Server saved successfully!")
 	} else {
 		support.Send(s, "Sorry, there was an error sending /save command")
 	}

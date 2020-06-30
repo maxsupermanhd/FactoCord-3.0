@@ -2,40 +2,85 @@ package support
 
 import (
 	"fmt"
+	"github.com/bwmarrin/discordgo"
 	"os"
 	"strings"
-
-	"github.com/bwmarrin/discordgo"
+	"time"
 )
 
-func Send(s *discordgo.Session, message string) {
-	_, err := s.ChannelMessageSend(Config.FactorioChannelID, message)
+func Send(s *discordgo.Session, message string) *discordgo.Message {
+	sentMessage, err := s.ChannelMessageSend(Config.FactorioChannelID, message)
 	if err != nil {
 		Panik(err, "Failed to send message: "+message)
+		return nil
 	}
+	return sentMessage
 }
 
-func SendMessage(s *discordgo.Session, message string) {
+func SendOptional(s *discordgo.Session, message string) *discordgo.Message {
+	if s == nil {
+		return nil
+	}
+	return Send(s, message)
+}
+
+func SendMessage(s *discordgo.Session, message string) *discordgo.Message {
 	if message != "" {
-		Send(s, message)
+		return Send(s, message)
 	}
+	return nil
 }
 
-func SendFormat(s *discordgo.Session, message string) {
-	Send(s, FormatUsage(message))
+func SendFormat(s *discordgo.Session, message string) *discordgo.Message {
+	return Send(s, FormatUsage(message))
 }
 
-func SendEmbed(s *discordgo.Session, embed *discordgo.MessageEmbed) {
-	_, err := s.ChannelMessageSendEmbed(Config.FactorioChannelID, embed)
+func SendEmbed(s *discordgo.Session, embed *discordgo.MessageEmbed) *discordgo.Message {
+	sentMessage, err := s.ChannelMessageSendEmbed(Config.FactorioChannelID, embed)
 	if err != nil {
 		Panik(err, fmt.Sprintf("Failed to send embed: %+v", embed))
+		return nil
 	}
+	return sentMessage
 }
 
-func SendComplex(s *discordgo.Session, message *discordgo.MessageSend) {
-	_, err := s.ChannelMessageSendComplex(Config.FactorioChannelID, message)
+func SendComplex(s *discordgo.Session, message *discordgo.MessageSend) *discordgo.Message {
+	sentMessage, err := s.ChannelMessageSendComplex(Config.FactorioChannelID, message)
 	if err != nil {
 		Panik(err, fmt.Sprintf("Failed to send embed: %+v", message))
+		return nil
+	}
+	return sentMessage
+}
+
+type MessageForDelete struct {
+	ID      string
+	Channel string
+	Time    time.Time
+}
+
+func (m *MessageForDelete) Delete(s *discordgo.Session) {
+	if m == nil || m.ID == "" {
+		return
+	}
+	_ = s.ChannelMessageDelete(m.Channel, m.ID)
+}
+func (m *MessageForDelete) DeleteIfPassedLess(s *discordgo.Session, t time.Duration) {
+	if m == nil || m.ID == "" {
+		return
+	}
+	if time.Now().Before(m.Time.Add(t)) {
+		m.Delete(s)
+	}
+}
+func PrepareMessageDelete(m *discordgo.Message) *MessageForDelete {
+	if m == nil {
+		return &MessageForDelete{}
+	}
+	return &MessageForDelete{
+		ID:      m.ID,
+		Channel: m.ChannelID,
+		Time:    time.Now(),
 	}
 }
 

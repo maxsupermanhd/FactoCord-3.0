@@ -93,7 +93,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				lines[i] = "[color=white]" + lines[i] + "[/color]"
 				lines[i] = discordSignature + " " + lines[i]
 			}
-			support.SendToFactorio(strings.Join(lines, "\n"))
+			support.Factorio.Send(strings.Join(lines, "\n"))
 		}
 		for _, attachment := range m.Attachments {
 			attachmentType := ""
@@ -116,14 +116,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				attachmentType = "[color=#6CFF3B]⬑[/color] " + attachmentType
 			}
 			message := fmt.Sprintf("[color=white]<%s>:[/color] %s", colorUsername(m.Message), attachmentType)
-			support.SendToFactorio(discordSignature + " " + message)
+			support.Factorio.Send(discordSignature + " " + message)
 		}
 		return
 	}
 	if m.ChannelID == support.Config.FactorioConsoleChatID {
 		fmt.Println("wrote to console from channel: \"", m.Content, "\"")
 		support.Send(s, "wrote "+m.Content)
-		support.SendToFactorio(m.Content)
+		support.Factorio.Send(m.Content)
 	}
 	return
 }
@@ -146,7 +146,7 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 			lines[i] = "[color=white]" + lines[i] + "[/color]"
 			lines[i] = discordSignature + " " + lines[i]
 		}
-		support.SendToFactorio(strings.Join(lines, "\n"))
+		support.Factorio.Send(strings.Join(lines, "\n"))
 	}
 }
 

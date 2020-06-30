@@ -17,7 +17,7 @@ func UnbanPlayer(s *discordgo.Session, args string) {
 		return
 	}
 	command := "/unban " + args
-	success := support.SendToFactorio(command)
+	success := support.Factorio.Send(command)
 	if success {
 		support.Send(s, "Player "+args+" unbanned!")
 	} else {
