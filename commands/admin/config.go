@@ -216,7 +216,7 @@ func createValue(t reflect.Type, value string) (reflect.Value, string) {
 	case reflect.Bool:
 		val, err := strconv.ParseBool(value)
 		if err != nil {
-			return reflect.Value{}, fmt.Sprintf(" requires bool but \"%s\" can't be converted to bool")
+			return reflect.Value{}, fmt.Sprintf(" requires bool but \"%s\" can't be converted to bool", value)
 		}
 		return reflect.ValueOf(val), ""
 	case reflect.Int:
