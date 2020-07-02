@@ -41,7 +41,7 @@ func VersionString(s *discordgo.Session, _ string) {
 	} else if support.FileExists("./.version") {
 		version, err := ioutil.ReadFile("./.version")
 		if err == nil {
-			factocord = "FactoCord version: **" + string(version) + "**"
+			factocord = "FactoCord version: **" + strings.TrimSpace(string(version)) + "**"
 		} else {
 			support.Panik(err, "... when reading .version")
 		}
