@@ -68,11 +68,14 @@ func (conf *configT) Load() error {
 		return fmt.Errorf("error reading config.json: %s", err)
 	}
 
-	conf.defaults()
-	err = json5.Unmarshal(contents, &conf)
+	test := configT{}
+	err = json5.Unmarshal(contents, &test)
 	if err != nil {
 		return fmt.Errorf("error parsing config.json: %s", err)
 	}
+	conf.defaults()
+	err = json5.Unmarshal(contents, &conf)
+	Critical(err, "wtf?? error parsing config.json 2nd time")
 	return nil
 }
 
