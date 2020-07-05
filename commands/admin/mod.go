@@ -6,8 +6,9 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"../../support"
 	"github.com/bwmarrin/discordgo"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
 // ModJSON is struct containing a slice of Mod.

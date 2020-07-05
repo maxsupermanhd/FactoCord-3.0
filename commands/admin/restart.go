@@ -3,8 +3,9 @@ package admin
 import (
 	"time"
 
-	"../../support"
 	"github.com/bwmarrin/discordgo"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
 // R is a reference to the running boolean in main.

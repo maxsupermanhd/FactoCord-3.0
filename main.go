@@ -9,10 +9,11 @@ import (
 	"os/signal"
 	"time"
 
-	"./commands/admin"
-	"./discord"
-	"./support"
 	_ "github.com/joho/godotenv/autoload"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/commands/admin"
+	"github.com/maxsupermanhd/FactoCord-3.0/discord"
+	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
 // Running is the boolean that tells if the server is running or not

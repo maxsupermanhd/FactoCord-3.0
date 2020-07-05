@@ -2,11 +2,12 @@ package discord
 
 import (
 	"encoding/json"
-	"github.com/bwmarrin/discordgo"
 	"regexp"
 	"strings"
 
-	"../support"
+	"github.com/bwmarrin/discordgo"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
 type FactorioLogWatcher struct {
