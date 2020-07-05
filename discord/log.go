@@ -76,7 +76,7 @@ func processFactorioChat(line string) {
 			message := new(discordgo.MessageSend)
 			err := json.Unmarshal([]byte(line), message)
 			if err == nil {
-				message.Tts = false
+				message.TTS = false
 				support.SendComplex(Session, message)
 			}
 		} else if messageType == "DISCORD" {
