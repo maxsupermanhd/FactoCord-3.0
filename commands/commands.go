@@ -3,10 +3,11 @@ package commands
 import (
 	"strings"
 
-	"../support"
-	"./admin"
-	"./utils"
 	"github.com/bwmarrin/discordgo"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/commands/admin"
+	"github.com/maxsupermanhd/FactoCord-3.0/commands/utils"
+	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
 // Command is a struct containing fields that hold command information.

@@ -1,8 +1,9 @@
 package admin
 
 import (
-	"../../support"
 	"github.com/bwmarrin/discordgo"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
 // StopServer saves and stops the server.
