@@ -1,12 +1,13 @@
 package main
 
 import (
-	"./discord"
-	"./support"
 	"bufio"
 	"fmt"
 	"os"
 	"os/signal"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/discord"
+	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
 var closing = false

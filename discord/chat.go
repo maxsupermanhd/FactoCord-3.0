@@ -9,8 +9,8 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 
-	"../commands"
-	"../support"
+	"github.com/maxsupermanhd/FactoCord-3.0/commands"
+	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
 // fuck golang. it's shit

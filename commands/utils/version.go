@@ -5,8 +5,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"../../support"
 	"github.com/bwmarrin/discordgo"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
 var VersionStringUsage = "Usage: $version"
