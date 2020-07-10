@@ -49,7 +49,7 @@ func ModCommand(s *discordgo.Session, args string) {
 	modsListFile, err := ioutil.ReadFile(support.Config.ModListLocation)
 	if err != nil {
 		support.Send(s, "Sorry, there was an error reading your mod list")
-		support.Panik(err, "there was an error reading mods list, did you specify it in the .env file?")
+		support.Panik(err, "there was an error reading mods list, did you specify it in the config.json file?")
 		return
 	}
 

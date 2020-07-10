@@ -24,16 +24,10 @@ type Command struct {
 var Commands = [...]Command{
 	// Admin Commands
 	{
-		Name:    "Stop",
-		Command: admin.StopServer,
+		Name:    "Server",
+		Command: admin.ServerCommand,
 		Admin:   true,
-		Desc:    "Save the game and stop the factorio server.",
-	},
-	{
-		Name:    "Restart",
-		Command: admin.Restart,
-		Admin:   true,
-		Desc:    "Save the game and restart the factorio server.",
+		Desc:    "Manage factorio server. " + admin.ServerCommandUsage,
 	},
 	{
 		Name:    "Save",
@@ -58,6 +52,12 @@ var Commands = [...]Command{
 		Command: admin.UnbanPlayer,
 		Admin:   true,
 		Desc:    "Unban a user from the server. " + admin.UnbanPlayerUsage,
+	},
+	{
+		Name:    "Config",
+		Command: admin.ConfigCommand,
+		Admin:   true,
+		Desc:    "Manage config.json. " + admin.ConfigCommandUsage,
 	},
 	{
 		Name:    "Mod",

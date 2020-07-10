@@ -1,127 +1,84 @@
 package support
 
 import (
-	"errors"
 	"fmt"
-	"os"
-	"strconv"
-	"strings"
+	"github.com/yosuke-furukawa/json5/encoding/json5"
+	"io/ioutil"
 )
 
+var ConfigPath = "./config.json"
+
 // Config is a config interface.
-var Config config
+var Config configT
 
-var ErrEnvVarEmpty = errors.New("getenv: environment variable empty")
+type configT struct {
+	Executable       string   `json:"executable"`
+	LaunchParameters []string `json:"launch_parameters"`
+	Autolaunch       bool     `json:"autolaunch"`
 
-type commandRolesType map[string]string
+	DiscordToken            string `json:"discord_token"`
+	GameName                string `json:"game_name"`
+	FactorioChannelID       string `json:"factorio_channel_id"`
+	Prefix                  string `json:"prefix"`
+	HaveServerEssentials    bool   `json:"have_server_essentials"`
+	IngameDiscordUserColors bool   `json:"ingame_discord_user_colors"`
 
-type config struct {
-	DiscordToken            string
-	FactorioChannelID       string
-	Executable              string
-	LaunchParameters        []string
-	AdminIDs                []string
-	CommandRoles            commandRolesType
-	Prefix                  string
-	ModListLocation         string
-	GameName                string
-	EnableConsoleChannel    bool
-	FactorioConsoleChatID   string
-	HaveServerEssentials    bool
-	BotStart                string
-	SendBotStart            bool
-	BotStop                 string
-	ServerStart             string
-	ServerStop              string
-	ServerFail              string
-	ServerSave              string
-	PlayerJoin              string
-	PlayerLeave             string
-	IngameDiscordUserColors bool
+	EnableConsoleChannel  bool   `json:"enable_console_channel"`
+	FactorioConsoleChatID string `json:"factorio_console_chat_id"`
+
+	AdminIDs        []string          `json:"admin_ids"`
+	CommandRoles    map[string]string `json:"command_roles"`
+	ModListLocation string            `json:"mod_list_location"`
+
+	Messages struct {
+		BotStart    string `json:"bot_start"`
+		BotStop     string `json:"bot_stop"`
+		ServerStart string `json:"server_start"`
+		ServerStop  string `json:"server_stop"`
+		ServerFail  string `json:"server_fail"`
+		ServerSave  string `json:"server_save"`
+		PlayerJoin  string `json:"player_join"`
+		PlayerLeave string `json:"player_leave"`
+	} `json:"messages"`
 }
 
-func getenvStr(key string) (string, error) {
-	v := os.Getenv(key)
-	if v == "" {
-		return v, ErrEnvVarEmpty
+func (conf *configT) MustLoad() {
+	if !FileExists(ConfigPath) {
+		fmt.Println("Error: config.json not found.")
+		fmt.Println("Make sure that you copied 'config-example.json' and current working directory is correct")
+		Exit(7)
 	}
-	return v, nil
-}
+	contents, err := ioutil.ReadFile(ConfigPath)
+	Critical(err, "... when reading config.json")
 
-func getenvBool(key string) bool {
-	s, err := getenvStr(key)
+	conf.defaults()
+	err = json5.Unmarshal(contents, &conf)
 	if err != nil {
-		return false
+		fmt.Println("Note that json5 may have several bugs, such as comment before ] or }")
+		Critical(err, "... when parsing config.json")
 	}
-	v, err := strconv.ParseBool(s)
+}
+
+func (conf *configT) Load() error {
+	if !FileExists(ConfigPath) {
+		return fmt.Errorf("config.json not found")
+	}
+	contents, err := ioutil.ReadFile(ConfigPath)
 	if err != nil {
-		return false
+		return fmt.Errorf("error reading config.json: %s", err)
 	}
-	return v
+
+	test := configT{}
+	err = json5.Unmarshal(contents, &test)
+	if err != nil {
+		return fmt.Errorf("error parsing config.json: %s", err)
+	}
+	conf.defaults()
+	err = json5.Unmarshal(contents, &conf)
+	Critical(err, "wtf?? error parsing config.json 2nd time")
+	return nil
 }
 
-func getRolesMap(key string) commandRolesType {
-	commandRoles := make(commandRolesType)
-	s := os.Getenv(key)
-	for _, roleCommands := range strings.Split(s, ";") {
-		roleCommands = strings.TrimSpace(roleCommands)
-		if roleCommands == "" {
-			continue
-		}
-		roleCommandsSplit := strings.SplitN(roleCommands, ":", 2)
-		if len(roleCommandsSplit) < 2 {
-			fmt.Println(".env CommandRoles: Error parsing role with commands")
-			Exit(1)
-		}
-		role := strings.TrimSpace(roleCommandsSplit[0])
-		commands := strings.Split(strings.TrimSpace(roleCommandsSplit[1]), ",")
-		if num, err := strconv.Atoi(role); err != nil || num <= 0 {
-			fmt.Println(".env CommandRoles: " + key + " is incorrect: role is not an integer")
-			Exit(1)
-		}
-
-		for _, command := range commands {
-			if command == "" {
-				continue
-			}
-			command = strings.ToLower(command)
-			if _, exists := commandRoles[command]; exists {
-				fmt.Println(".env CommandRoles: Command \"" + command + "\" is assigned multiple roles")
-				Exit(1)
-			}
-			commandRoles[command] = role
-		}
-	}
-	return commandRoles
-}
-
-func (conf *config) LoadEnv() {
-	if _, err := os.Stat(".env"); os.IsNotExist(err) {
-		fmt.Println("Environment file not found, cannot continue!")
-		Exit(1)
-	}
-	Config = config{
-		DiscordToken:            os.Getenv("DiscordToken"),
-		FactorioChannelID:       os.Getenv("FactorioChannelID"),
-		LaunchParameters:        strings.Split(os.Getenv("LaunchParameters"), " "),
-		Executable:              os.Getenv("Executable"),
-		AdminIDs:                strings.Split(os.Getenv("AdminIDs"), ","),
-		CommandRoles:            getRolesMap("CommandRoles"),
-		Prefix:                  os.Getenv("Prefix"),
-		ModListLocation:         os.Getenv("ModListLocation"),
-		GameName:                os.Getenv("GameName"),
-		EnableConsoleChannel:    getenvBool("EnableConsoleChannel"),
-		FactorioConsoleChatID:   os.Getenv("FactorioConsoleChatID"),
-		HaveServerEssentials:    getenvBool("HaveServerEssentials"),
-		BotStart:                os.Getenv("BotStart"),
-		SendBotStart:            getenvBool("SendBotStart"),
-		BotStop:                 os.Getenv("BotStop"),
-		ServerStart:             os.Getenv("ServerStart"),
-		ServerStop:              os.Getenv("ServerStop"),
-		ServerFail:              os.Getenv("ServerFail"),
-		ServerSave:              os.Getenv("ServerSave"),
-		PlayerJoin:              os.Getenv("PlayerJoin"),
-		PlayerLeave:             os.Getenv("PlayerLeave"),
-		IngameDiscordUserColors: getenvBool("IngameDiscordUserColors"),
-	}
+func (conf *configT) defaults() {
+	conf.Autolaunch = true
 }

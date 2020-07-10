@@ -12,7 +12,7 @@ version+=")"
 echo "Version: ${version}"
 echo "${version}" > ./release/FactoCord3/.version
 
-cp .envexample control.lua FactoCord-3.0 INSTALL.md LICENSE README.md SECURITY.md ./release/FactoCord3
+cp config-example.json control.lua FactoCord-3.0 INSTALL.md LICENSE README.md SECURITY.md ./release/FactoCord3
 
 pushd ./release > /dev/null
 

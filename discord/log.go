@@ -10,27 +10,6 @@ import (
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
-type FactorioLogWatcher struct {
-	buffer string
-}
-
-func (t FactorioLogWatcher) Write(p []byte) (n int, err error) {
-	t.buffer += string(p)
-	lines := strings.Split(t.buffer, "\n")
-	t.buffer = lines[len(lines)-1]
-	for _, line := range lines[:len(lines)-1] {
-		ProcessFactorioLogLine(line)
-	}
-	return len(p), nil
-}
-
-func (t FactorioLogWatcher) Flush() {
-	if t.buffer != "" {
-		ProcessFactorioLogLine(t.buffer)
-		t.buffer = ""
-	}
-}
-
 var charRegexp = regexp.MustCompile("^\\d{4}[-/]\\d\\d[-/]\\d\\d \\d\\d:\\d\\d:\\d\\d ")
 var factorioLogRegexp = regexp.MustCompile("^\\d+\\.\\d{3} ")
 
@@ -50,16 +29,19 @@ func ProcessFactorioLogLine(line string) {
 		processFactorioChat(strings.TrimSpace(line))
 	} else if factorioLogRegexp.FindString(line) != "" {
 		if strings.Contains(line, "Quitting: multiplayer error.") {
-			support.Send(Session, support.Config.ServerFail)
+			support.SendMessage(Session, support.Config.Messages.ServerFail)
 		}
 		if strings.Contains(line, "Opening socket for broadcast") {
-			support.Send(Session, support.Config.ServerStart)
+			support.SendMessage(Session, support.Config.Messages.ServerStart)
 		}
 		if strings.Contains(line, "Saving finished") {
-			support.Send(Session, "Saving finished!")
+			if support.Factorio.SaveRequested {
+				support.SendMessage(Session, support.Config.Messages.ServerSave)
+				support.Factorio.SaveRequested = false
+			}
 		}
 		if strings.Contains(line, "Quitting multiplayer connection.") {
-			support.Send(Session, support.Config.ServerStop)
+			support.SendMessage(Session, support.Config.Messages.ServerStop)
 		}
 	} else {
 		for _, pattern := range forwardMessages {

@@ -3,6 +3,7 @@ package discord
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -38,6 +39,8 @@ func StartSession() {
 func Init() {
 	Session.AddHandler(messageCreate)
 	Session.AddHandler(messageUpdate)
+	// TODO add recover() ↑
+
 	go CacheUpdater(Session)
 
 	time.Sleep(3 * time.Second)
@@ -45,15 +48,12 @@ func Init() {
 	support.Panik(err, "... when updating bot status")
 
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
-	if support.Config.SendBotStart {
-		support.Send(Session, support.Config.BotStart)
-	}
+	support.SendMessage(Session, support.Config.Messages.BotStart)
 }
 
 func Close() {
-	if support.Config.BotStop != "" {
-		support.Send(Session, support.Config.BotStop)
-	}
+	support.SendMessage(Session, support.Config.Messages.BotStop)
+
 	// Cleanly close down the Discord session.
 	err := Session.Close()
 	support.Panik(err, "... when closing discord connection")
@@ -69,6 +69,17 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			commands.RunCommand(input, s, m.Message)
 			return
 		}
+		if regexp.MustCompile(fmt.Sprintf("^<@!?%s>", s.State.User.ID)).MatchString(m.Content) {
+			// when bot is mentioned at the start of the message
+			_, message := support.SplitAfter(m.Content, ">")
+			message = strings.TrimSpace(message)
+			if message == "" {
+				support.SendFormat(s, "Current prefix is: `$`. You can use `$help` or ping me with a command")
+			} else {
+				commands.RunCommand(message, s, m.Message)
+			}
+			return
+		}
 		log.Print("[" + m.Author.Username + "] " + m.Content)
 		// Pipes normal chat allowing it to be seen ingame
 		if strings.TrimSpace(m.Content) != "" {
@@ -82,7 +93,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				lines[i] = "[color=white]" + lines[i] + "[/color]"
 				lines[i] = discordSignature + " " + lines[i]
 			}
-			support.SendToFactorio(strings.Join(lines, "\n"))
+			support.Factorio.Send(strings.Join(lines, "\n"))
 		}
 		for _, attachment := range m.Attachments {
 			attachmentType := ""
@@ -105,14 +116,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				attachmentType = "[color=#6CFF3B]⬑[/color] " + attachmentType
 			}
 			message := fmt.Sprintf("[color=white]<%s>:[/color] %s", colorUsername(m.Message), attachmentType)
-			support.SendToFactorio(discordSignature + " " + message)
+			support.Factorio.Send(discordSignature + " " + message)
 		}
 		return
 	}
 	if m.ChannelID == support.Config.FactorioConsoleChatID {
 		fmt.Println("wrote to console from channel: \"", m.Content, "\"")
 		support.Send(s, "wrote "+m.Content)
-		support.SendToFactorio(m.Content)
+		support.Factorio.Send(m.Content)
 	}
 	return
 }
@@ -135,14 +146,18 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 			lines[i] = "[color=white]" + lines[i] + "[/color]"
 			lines[i] = discordSignature + " " + lines[i]
 		}
-		support.SendToFactorio(strings.Join(lines, "\n"))
+		support.Factorio.Send(strings.Join(lines, "\n"))
 	}
 }
 
 func colorUsername(message *discordgo.Message) string {
 	if support.Config.IngameDiscordUserColors {
 		color := Session.State.UserColor(message.Author.ID, message.ChannelID)
-		return fmt.Sprintf("[color=#%06x]%s[/color]", color, message.Author.Username)
+		if color == 0 { // some error
+			return message.Author.Username
+		} else {
+			return fmt.Sprintf("[color=#%06x]%s[/color]", color, message.Author.Username)
+		}
 	} else {
 		return message.Author.Username
 	}
