@@ -1,8 +1,8 @@
 package admin
 
 import (
-	"../../support"
 	"github.com/bwmarrin/discordgo"
+	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
 var ServerCommandUsage = "Usage: $server [stop|start|restart]"

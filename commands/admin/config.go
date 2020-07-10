@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"../../support"
 	"encoding/json"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
@@ -9,6 +8,8 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
 // ModCommandUsage ...
