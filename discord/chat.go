@@ -153,7 +153,11 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 func colorUsername(message *discordgo.Message) string {
 	if support.Config.IngameDiscordUserColors {
 		color := Session.State.UserColor(message.Author.ID, message.ChannelID)
-		return fmt.Sprintf("[color=#%06x]%s[/color]", color, message.Author.Username)
+		if color == 0 { // some error
+			return message.Author.Username
+		} else {
+			return fmt.Sprintf("[color=#%06x]%s[/color]", color, message.Author.Username)
+		}
 	} else {
 		return message.Author.Username
 	}
