@@ -30,6 +30,8 @@
     // IDs of the discord users who are considered admins
     admin_ids: [
         // "123456789",
+        // "987654321",
+        // JSON5 HAS A BUG AND CAN'T PARSE COMMENTS BEFORE } OR ]. DELETE THIS ONE AND ABOVE
     ],
     // IDs of discord roles that are allowed to execute certain commands.
     // command names should be lowercase
@@ -43,6 +45,7 @@
         // "kick": "987654321",
         // "ban": "987654321",
         // "unban": "987654321",
+        // JSON5 HAS A BUG AND CAN'T PARSE COMMENTS BEFORE } OR ]. DELETE THIS ONE AND ABOVE
     },
 
     // Path to 'mod-list.json'

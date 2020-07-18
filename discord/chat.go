@@ -64,6 +64,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 	if m.ChannelID == support.Config.FactorioChannelID {
+		support.MyLastMessage = false
 		if strings.HasPrefix(m.Content, support.Config.Prefix) {
 			input := strings.Replace(m.Content, support.Config.Prefix, "", 1)
 			commands.RunCommand(input, s, m.Message)

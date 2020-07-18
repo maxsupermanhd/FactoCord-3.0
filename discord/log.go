@@ -2,7 +2,9 @@ package discord
 
 import (
 	"encoding/json"
+	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -35,8 +37,14 @@ func ProcessFactorioLogLine(line string) {
 			support.SendMessage(Session, support.Config.Messages.ServerStart)
 		}
 		if strings.Contains(line, "Saving finished") {
-			if support.Factorio.SaveRequested {
-				support.SendMessage(Session, support.Config.Messages.ServerSave)
+			if support.MyLastMessage && strings.HasPrefix(support.LastMessage.Metadata, "save") {
+				num, _ := strconv.ParseInt(support.LastMessage.Metadata[len("save"):], 10, 0)
+				num += 1
+				support.LastMessage.Edit(Session, support.Config.Messages.ServerSave+fmt.Sprintf(" [x%d]", num))
+				support.LastMessage.Metadata = fmt.Sprintf("save%d", num)
+			} else {
+				message := support.SendMessage(Session, support.Config.Messages.ServerSave)
+				message.Metadata = "save1"
 				support.Factorio.SaveRequested = false
 			}
 		}

@@ -104,7 +104,7 @@ func (f *factorioState) Stop(s *discordgo.Session) {
 	f.stopping = true
 	f.Send("/quit")
 
-	messageWaiting := PrepareMessageDelete(SendOptional(s, "Waiting for factorio server to exit..."))
+	messageWaiting := SendOptional(s, "Waiting for factorio server to exit...")
 	fmt.Println("Waiting for factorio server to exit...")
 	err := f.Process.Wait()
 	if f.Process.ProcessState.Exited() {
