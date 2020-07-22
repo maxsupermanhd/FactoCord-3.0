@@ -165,3 +165,19 @@ func DirExists(filename string) bool {
 	}
 	return info.IsDir()
 }
+
+type WriteCounter struct {
+	Total    uint64
+	Progress uint64
+	Error    bool
+}
+
+func (wc *WriteCounter) Write(p []byte) (int, error) {
+	n := len(p)
+	wc.Progress += uint64(n)
+	return n, nil
+}
+
+func (wc *WriteCounter) Percent() float32 {
+	return float32(wc.Progress) * 100 / float32(wc.Total)
+}

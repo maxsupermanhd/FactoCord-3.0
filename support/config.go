@@ -26,19 +26,24 @@ type configT struct {
 	EnableConsoleChannel  bool   `json:"enable_console_channel"`
 	FactorioConsoleChatID string `json:"factorio_console_chat_id"`
 
-	AdminIDs        []string          `json:"admin_ids"`
-	CommandRoles    map[string]string `json:"command_roles"`
-	ModListLocation string            `json:"mod_list_location"`
+	AdminIDs     []string          `json:"admin_ids"`
+	CommandRoles map[string]string `json:"command_roles"`
+
+	ModListLocation string `json:"mod_list_location"`
+	Username        string `json:"username"`
+	ModPortalToken  string `json:"mod_portal_token"`
 
 	Messages struct {
-		BotStart    string `json:"bot_start"`
-		BotStop     string `json:"bot_stop"`
-		ServerStart string `json:"server_start"`
-		ServerStop  string `json:"server_stop"`
-		ServerFail  string `json:"server_fail"`
-		ServerSave  string `json:"server_save"`
-		PlayerJoin  string `json:"player_join"`
-		PlayerLeave string `json:"player_leave"`
+		BotStart         string `json:"bot_start"`
+		BotStop          string `json:"bot_stop"`
+		ServerStart      string `json:"server_start"`
+		ServerStop       string `json:"server_stop"`
+		ServerFail       string `json:"server_fail"`
+		ServerSave       string `json:"server_save"`
+		PlayerJoin       string `json:"player_join"`
+		PlayerLeave      string `json:"player_leave"`
+		DownloadProgress string `json:"download_progress"`
+		DownloadComplete string `json:"download_complete"`
 	} `json:"messages"`
 }
 

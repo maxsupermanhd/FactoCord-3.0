@@ -3,9 +3,9 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-
 	"github.com/bwmarrin/discordgo"
+	"io/ioutil"
+	"path"
 
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
@@ -21,7 +21,7 @@ type Mod struct {
 	Enabled bool
 }
 
-var ModListUsage = "Usage: $mods [on | off | all]"
+var ModListUsage = "Usage: $mods [on | off | all | files]"
 
 func modList(ModList *ModJson, returnEnabled bool, returnDisabled bool) string {
 	var enabled, disabled int
@@ -41,10 +41,15 @@ func modList(ModList *ModJson, returnEnabled bool, returnDisabled bool) string {
 
 	if returnEnabled {
 		res += "\n**Enabled:**"
+		any := false
 		for _, mod := range ModList.Mods {
 			if mod.Enabled {
+				any = true
 				res += "\n    " + mod.Name
 			}
+		}
+		if !any {
+			res += " **None**"
 		}
 	}
 	if returnDisabled {
@@ -52,14 +57,39 @@ func modList(ModList *ModJson, returnEnabled bool, returnDisabled bool) string {
 			res += "\n"
 		}
 		res += "\n**Disabled:**"
+		any := false
 		for _, mod := range ModList.Mods {
 			if !mod.Enabled {
+				any = true
 				res += "\n    " + mod.Name
 			}
+		}
+		if !any {
+			res += " **None**"
 		}
 	}
 
 	return res
+}
+
+func modsFiles() string {
+	res := ""
+	baseDir := path.Dir(support.Config.ModListLocation)
+	files, err := ioutil.ReadDir(baseDir)
+	if err != nil {
+		support.Critical(err, "wtf")
+	}
+	for _, file := range files {
+		re := support.ModFileRegexp.FindString(file.Name())
+		if re != "" {
+			res += "\n    " + file.Name()
+		}
+	}
+	if res == "" {
+		return "**No mods**"
+	} else {
+		return "**Installed mods:**" + res
+	}
 }
 
 // ModsList returns the list of mods running on the server.
@@ -73,6 +103,9 @@ func ModsList(s *discordgo.Session, args string) {
 		returnDisabled = true
 	} else if args == "all" {
 		returnDisabled = true
+	} else if args == "files" {
+		support.Send(s, modsFiles())
+		return
 	} else {
 		support.SendFormat(s, ModListUsage)
 		return

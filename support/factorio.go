@@ -123,3 +123,12 @@ func (f *factorioState) Stop(s *discordgo.Session) {
 	f.stopping = false
 	f.SaveRequested = false
 }
+
+func FactorioVersion() (string, error) {
+	cmd := exec.Command(Config.Executable, "--version")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", err
+	}
+	return strings.Fields(string(out))[1], nil
+}

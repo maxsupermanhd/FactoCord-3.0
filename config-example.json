@@ -49,17 +49,24 @@
     },
 
     // Path to 'mod-list.json'
-     mod_list_location: "./factorio/mods/mod-list.json",
+    mod_list_location: "./factorio/mods/mod-list.json",
+
+    // Your username and token to download mods from mod portal
+    // You can get those at https://factorio.com/profile
+    username: "",
+    mod_portal_token: "",
 
     // messages for certain events.  set "" to hide that message
     messages: {
-         bot_start: "**:white_check_mark: Bot started! Launching server...**",
-         bot_stop: ":v:",
-         server_start: "**:white_check_mark: The server has started!**",
-         server_stop: "**:octagonal_sign: The server has stopped!**",
-         server_fail: "**:skull: The server has crashed!**",
-         server_save: "**:floppy_disk: Game saved!**",
-         player_join: "**:arrow_up: %s**",
-         player_leave: "**:arrow_down: %s**",
+        bot_start: "**:white_check_mark: Bot started! Launching server...**",
+        bot_stop: ":v:",
+        server_start: "**:white_check_mark: The server has started!**",
+        server_stop: "**:octagonal_sign: The server has stopped!**",
+        server_fail: "**:skull: The server has crashed!**",
+        server_save: "**:floppy_disk: Game saved!**",
+        player_join: "**:arrow_up: %s**",
+        player_leave: "**:arrow_down: %s**",
+        download_progress: ":arrow_down: Downloading %s: %2.1f%%",
+        download_complete: ":white_check_mark: Downloaded %s",
     }
 }
