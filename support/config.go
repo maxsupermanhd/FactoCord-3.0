@@ -2,7 +2,7 @@ package support
 
 import (
 	"fmt"
-	"github.com/yosuke-furukawa/json5/encoding/json5"
+	"github.com/flynn/json5"
 	"io/ioutil"
 )
 
@@ -59,7 +59,6 @@ func (conf *configT) MustLoad() {
 	conf.defaults()
 	err = json5.Unmarshal(contents, &conf)
 	if err != nil {
-		fmt.Println("Note that json5 may have several bugs, such as comment before ] or }")
 		Critical(err, "... when parsing config.json")
 	}
 }
