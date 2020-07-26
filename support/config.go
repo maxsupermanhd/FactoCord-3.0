@@ -42,6 +42,7 @@ type configT struct {
 		ServerSave       string `json:"server_save"`
 		PlayerJoin       string `json:"player_join"`
 		PlayerLeave      string `json:"player_leave"`
+		DownloadStart    string `json:"download_start"`
 		DownloadProgress string `json:"download_progress"`
 		DownloadComplete string `json:"download_complete"`
 	} `json:"messages"`

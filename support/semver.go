@@ -27,6 +27,14 @@ func SemanticVersion(s string) (*SemanticVersionT, *error) {
 	return &res, nil
 }
 
+func SemanticVersionPanic(s string) *SemanticVersionT {
+	v, err := SemanticVersion(s)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
 func (v *SemanticVersionT) Equal(v2 *SemanticVersionT) bool {
 	return v.Full == "" || v2.Full == "" || v.Full == v2.Full
 }
