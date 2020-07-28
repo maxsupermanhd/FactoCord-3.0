@@ -22,8 +22,6 @@ Then in text editor you must set:
 5. Admin IDs (for commands) (admin_ids)
 6. Mod list .json file location (including the filename) (mod_list_location)
 
-Make sure there are no comments before ] or }, because there's a bug in json5 library
-
 ## Step 1
 Running
 
@@ -65,8 +63,6 @@ Then in text editor you must set:
 4. Executable path (executable)
 5. Admin IDs (for commands) (admin_ids)
 6. Mod list .json file location (including the filename) (mod_list_location)
-
-Make sure there are no comments before ] or }, because there's a bug in json5 library
 
 # Step 3
 Building
