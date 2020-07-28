@@ -25,7 +25,7 @@ Then in text editor you must set:
 ## Step 1
 Running
 
-`./FactoCord-3.0`
+`./FactoCord3`
 
 
 # Installing from sources
