@@ -6,15 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/bwmarrin/discordgo"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
 	"strings"
-	"time"
-
-	"github.com/bwmarrin/discordgo"
 
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
@@ -584,22 +582,6 @@ func checkModPortal(desc *modDescriptionT, factorioVersion string) (*modRelease,
 var downloadQueue = make(chan *modRelease, 100)
 var modDownloaderStarted = false
 
-func downloadProgressUpdater(s *discordgo.Session, wc *support.WriteCounter, modname string) {
-	message := wc.Message
-	time.Sleep(500 * time.Millisecond)
-	for {
-		if wc.Error {
-			return
-		}
-		if wc.Progress >= wc.Total {
-			break
-		}
-		message.Edit(s, fmt.Sprintf(support.Config.Messages.DownloadProgress, modname, wc.Percent()))
-		time.Sleep(2 * time.Second)
-	}
-	message.Edit(s, fmt.Sprintf(support.Config.Messages.DownloadComplete, modname))
-}
-
 func modDownloader(s *discordgo.Session) {
 	modDownloaderStarted = true
 	baseDir := path.Dir(support.Config.ModListLocation)
@@ -639,11 +621,14 @@ func modDownloader(s *discordgo.Session) {
 		}
 
 		message := support.Send(s, fmt.Sprintf(support.Config.Messages.DownloadStart, mod.FileName))
-		counter := &support.WriteCounter{
-			Total:   uint64(resp.ContentLength),
-			Message: message,
+		counter := &support.WriteCounter{Total: uint64(resp.ContentLength)}
+		progress := support.ProgressUpdate{
+			WriteCounter: counter,
+			Message:      message,
+			Progress:     fmt.Sprintf(support.Config.Messages.DownloadProgress, mod.FileName),
+			Finished:     fmt.Sprintf(support.Config.Messages.DownloadComplete, mod.FileName),
 		}
-		go downloadProgressUpdater(s, counter, mod.FileName)
+		go support.DownloadProgressUpdater(s, &progress)
 
 		_, err = io.Copy(io.MultiWriter(file, counter), resp.Body)
 		resp.Body.Close()

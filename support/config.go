@@ -34,17 +34,19 @@ type configT struct {
 	ModPortalToken  string `json:"mod_portal_token"`
 
 	Messages struct {
-		BotStart         string `json:"bot_start"`
-		BotStop          string `json:"bot_stop"`
-		ServerStart      string `json:"server_start"`
-		ServerStop       string `json:"server_stop"`
-		ServerFail       string `json:"server_fail"`
-		ServerSave       string `json:"server_save"`
-		PlayerJoin       string `json:"player_join"`
-		PlayerLeave      string `json:"player_leave"`
-		DownloadStart    string `json:"download_start"`
-		DownloadProgress string `json:"download_progress"`
-		DownloadComplete string `json:"download_complete"`
+		BotStart          string `json:"bot_start"`
+		BotStop           string `json:"bot_stop"`
+		ServerStart       string `json:"server_start"`
+		ServerStop        string `json:"server_stop"`
+		ServerFail        string `json:"server_fail"`
+		ServerSave        string `json:"server_save"`
+		PlayerJoin        string `json:"player_join"`
+		PlayerLeave       string `json:"player_leave"`
+		DownloadStart     string `json:"download_start"`
+		DownloadProgress  string `json:"download_progress"`
+		DownloadComplete  string `json:"download_complete"`
+		Unpacking         string `json:"unpacking"`
+		UnpackingComplete string `json:"unpacking_complete"`
 	} `json:"messages"`
 }
 

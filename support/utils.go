@@ -5,6 +5,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"os"
 	"strings"
+	"time"
 )
 
 func Send(s *discordgo.Session, message string) *MessageControlT {
@@ -217,20 +218,45 @@ func DirExists(filename string) bool {
 }
 
 type WriteCounter struct {
-	Total    uint64
-	Progress uint64
-	Error    bool
-	Message  *MessageControlT
+	Total       uint64
+	Transferred uint64
+	Error       bool
 }
 
 func (wc *WriteCounter) Write(p []byte) (int, error) {
 	n := len(p)
-	wc.Progress += uint64(n)
+	wc.Transferred += uint64(n)
 	return n, nil
 }
 
 func (wc *WriteCounter) Percent() float32 {
-	return float32(wc.Progress) * 100 / float32(wc.Total)
+	return float32(wc.Transferred) * 100 / float32(wc.Total)
+}
+
+type ProgressUpdate struct {
+	*WriteCounter
+	Message                   *MessageControlT
+	Start, Progress, Finished string
+}
+
+func DownloadProgressUpdater(s *discordgo.Session, p *ProgressUpdate) {
+	message := p.Message
+	if message == nil {
+		p.Message = Send(s, p.Start)
+		message = p.Message
+	}
+	time.Sleep(500 * time.Millisecond)
+	for {
+		if p.Error {
+			return
+		}
+		if p.Transferred >= p.Total {
+			break
+		}
+		message.Edit(s, fmt.Sprintf(p.Progress, p.Percent()))
+		time.Sleep(2 * time.Second)
+	}
+	message.Edit(s, p.Finished)
 }
 
 type TextListT struct {

@@ -65,7 +65,9 @@
         player_join: "**:arrow_up: %s**",
         player_leave: "**:arrow_down: %s**",
         download_start: ":arrow_down: Downloading %s...",
-        download_progress: ":arrow_down: Downloading %s: %2.1f%%",
+        download_progress: ":arrow_down: Downloading %s: %%2.1f%%%%", // double formatting. dont ask
         download_complete: ":white_check_mark: Downloaded %s",
+        unpacking: ":pinching_hand: Unpacking %s...",
+        unpacking_complete: ":ok_hand: Server updated to %s",
     }
 }

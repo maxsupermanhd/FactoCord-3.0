@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/maxsupermanhd/FactoCord-3.0/discord"
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
@@ -30,6 +31,9 @@ func main() {
 
 	discord.Close()
 
+	for support.Factorio.IsStopping() {
+		time.Sleep(100 * time.Millisecond)
+	}
 	if support.Factorio.IsRunning() {
 		fmt.Println("Waiting for factorio server to exit...")
 		err := support.Factorio.Process.Wait()
