@@ -136,7 +136,7 @@ func serverUpdate(s *discordgo.Session, version string) {
 	dir = filepath.Dir(dir) // x64
 	dir = filepath.Dir(dir) // bin
 	dir = filepath.Dir(dir) // factorio
-	cmd := exec.Command("tar", "-xf", path, "factorio", "-C", dir)
+	cmd := exec.Command("tar", "-C", dir, "--strip-components=1", "-xf", path)
 	err = cmd.Run()
 	if err != nil {
 		support.Panik(err, "Error running tar to unpack the archive")
