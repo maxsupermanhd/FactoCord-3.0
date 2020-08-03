@@ -108,13 +108,13 @@ func serverUpdate(s *discordgo.Session, version string) {
 		support.Send(s, path+": error opening file for write")
 	}
 
-	message := support.Send(s, fmt.Sprintf(support.Config.Messages.DownloadStart, filename))
+	message := support.Send(s, support.FormatNamed(support.Config.Messages.DownloadStart, "file", filename))
 	counter := &support.WriteCounter{Total: uint64(resp.ContentLength)}
 	progress := support.ProgressUpdate{
 		WriteCounter: counter,
 		Message:      message,
-		Progress:     fmt.Sprintf(support.Config.Messages.DownloadProgress, filename),
-		Finished:     fmt.Sprintf(support.Config.Messages.Unpacking, filename),
+		Progress:     support.FormatNamed(support.Config.Messages.DownloadProgress, "file", filename),
+		Finished:     support.FormatNamed(support.Config.Messages.Unpacking, "file", filename),
 	}
 	go support.DownloadProgressUpdater(s, &progress)
 
@@ -143,7 +143,8 @@ func serverUpdate(s *discordgo.Session, version string) {
 		support.Send(s, "Error running tar to unpack the archive")
 		return
 	}
-	message.Edit(s, fmt.Sprintf(support.Config.Messages.UnpackingComplete, version))
+
+	message.Edit(s, support.FormatNamed(support.Config.Messages.UnpackingComplete, "version", version))
 	_ = os.Remove(path)
 }
 

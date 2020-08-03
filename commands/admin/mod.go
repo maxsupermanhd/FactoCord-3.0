@@ -620,13 +620,13 @@ func modDownloader(s *discordgo.Session) {
 			}
 		}
 
-		message := support.Send(s, fmt.Sprintf(support.Config.Messages.DownloadStart, mod.FileName))
+		message := support.Send(s, support.FormatNamed(support.Config.Messages.DownloadStart, "file", mod.FileName))
 		counter := &support.WriteCounter{Total: uint64(resp.ContentLength)}
 		progress := support.ProgressUpdate{
 			WriteCounter: counter,
 			Message:      message,
-			Progress:     fmt.Sprintf(support.Config.Messages.DownloadProgress, mod.FileName),
-			Finished:     fmt.Sprintf(support.Config.Messages.DownloadComplete, mod.FileName),
+			Progress:     support.FormatNamed(support.Config.Messages.DownloadProgress, "file", mod.FileName),
+			Finished:     support.FormatNamed(support.Config.Messages.DownloadComplete, "file", mod.FileName),
 		}
 		go support.DownloadProgressUpdater(s, &progress)
 

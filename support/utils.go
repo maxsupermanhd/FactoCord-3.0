@@ -78,6 +78,10 @@ func FormatUsage(s string) string {
 	return strings.Replace(s, "$", Config.Prefix, -1)
 }
 
+func FormatNamed(format, name, value string) string {
+	return strings.Replace(format, "{"+name+"}", value, 1)
+}
+
 func DeleteEmptyStrings(s []string) []string {
 	var r []string
 	for _, str := range s {
@@ -253,7 +257,8 @@ func DownloadProgressUpdater(s *discordgo.Session, p *ProgressUpdate) {
 		if p.Transferred >= p.Total {
 			break
 		}
-		message.Edit(s, fmt.Sprintf(p.Progress, p.Percent()))
+		percent := fmt.Sprintf("%2.1f", p.Percent())
+		message.Edit(s, FormatNamed(p.Progress, "percent", percent))
 		time.Sleep(2 * time.Second)
 	}
 	message.Edit(s, p.Finished)

@@ -62,12 +62,12 @@
         server_stop: "**:octagonal_sign: The server has stopped!**",
         server_fail: "**:skull: The server has crashed!**",
         server_save: "**:floppy_disk: Game saved!**",
-        player_join: "**:arrow_up: %s**",
-        player_leave: "**:arrow_down: %s**",
-        download_start: ":arrow_down: Downloading %s...",
-        download_progress: ":arrow_down: Downloading %s: %%2.1f%%%%", // double formatting. dont ask
-        download_complete: ":white_check_mark: Downloaded %s",
-        unpacking: ":pinching_hand: Unpacking %s...",
-        unpacking_complete: ":ok_hand: Server updated to %s",
+        player_join: "**:arrow_up: {username}**",
+        player_leave: "**:arrow_down: {username}s**",
+        download_start: ":arrow_down: Downloading {file}...",
+        download_progress: ":arrow_down: Downloading {file}: {percent}%",
+        download_complete: ":white_check_mark: Downloaded {file}",
+        unpacking: ":pinching_hand: Unpacking {file}...",
+        unpacking_complete: ":ok_hand: Server updated to {version}",
     }
 }
