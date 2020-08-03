@@ -74,6 +74,8 @@ func get(args string) string {
 	if args == "" {
 		config := support.Config // copy
 		config.DiscordToken = "my precious"
+		config.Username = "my precious"
+		config.ModPortalToken = "my precious"
 		value = config
 	} else {
 		path := strings.Split(args, ".")

@@ -27,11 +27,10 @@
     enable_console_channel: false,
     factorio_console_chat_id: "",
 
-    // IDs of the discord users who are considered admins
+    // IDs of the discord users that are allowed to execute any command
     admin_ids: [
         // "123456789",
         // "987654321",
-        // JSON5 HAS A BUG AND CAN'T PARSE COMMENTS BEFORE } OR ]. DELETE THIS ONE AND ABOVE
     ],
     // IDs of discord roles that are allowed to execute certain commands.
     // command names should be lowercase
@@ -45,21 +44,30 @@
         // "kick": "987654321",
         // "ban": "987654321",
         // "unban": "987654321",
-        // JSON5 HAS A BUG AND CAN'T PARSE COMMENTS BEFORE } OR ]. DELETE THIS ONE AND ABOVE
     },
 
     // Path to 'mod-list.json'
-     mod_list_location: "./factorio/mods/mod-list.json",
+    mod_list_location: "./factorio/mods/mod-list.json",
+
+    // Your username and token to download mods from mod portal
+    // You can get those at https://factorio.com/profile
+    username: "",
+    mod_portal_token: "",
 
     // messages for certain events.  set "" to hide that message
     messages: {
-         bot_start: "**:white_check_mark: Bot started! Launching server...**",
-         bot_stop: ":v:",
-         server_start: "**:white_check_mark: The server has started!**",
-         server_stop: "**:octagonal_sign: The server has stopped!**",
-         server_fail: "**:skull: The server has crashed!**",
-         server_save: "**:floppy_disk: Game saved!**",
-         player_join: "**:arrow_up: %s**",
-         player_leave: "**:arrow_down: %s**",
+        bot_start: "**:white_check_mark: Bot started! Launching server...**",
+        bot_stop: ":v:",
+        server_start: "**:white_check_mark: The server has started!**",
+        server_stop: "**:octagonal_sign: The server has stopped!**",
+        server_fail: "**:skull: The server has crashed!**",
+        server_save: "**:floppy_disk: Game saved!**",
+        player_join: "**:arrow_up: %s**",
+        player_leave: "**:arrow_down: %s**",
+        download_start: ":arrow_down: Downloading %s...",
+        download_progress: ":arrow_down: Downloading %s: %%2.1f%%%%", // double formatting. dont ask
+        download_complete: ":white_check_mark: Downloaded %s",
+        unpacking: ":pinching_hand: Unpacking %s...",
+        unpacking_complete: ":ok_hand: Server updated to %s",
     }
 }

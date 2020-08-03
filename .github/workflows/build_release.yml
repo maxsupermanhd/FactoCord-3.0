@@ -28,7 +28,7 @@ jobs:
           fi
 
       - name: Build
-        run: go build -v .
+        run: go build -o FactoCord3 -v .
 
       - name: Create archives
         run: |
@@ -37,7 +37,7 @@ jobs:
 
       - name: ls
         run: ls -l ./release && ls -l ./release/FactoCord3
-      
+
       - name: Upload executable
         id: upload-exe
         uses: actions/upload-release-asset@v1
@@ -45,7 +45,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./release/FactoCord3/FactoCord-3.0
+          asset_path: ./release/FactoCord3/FactoCord3
           asset_name: FactoCord3
           asset_content_type: application/x-executable
 

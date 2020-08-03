@@ -22,12 +22,10 @@ Then in text editor you must set:
 5. Admin IDs (for commands) (admin_ids)
 6. Mod list .json file location (including the filename) (mod_list_location)
 
-Make sure there are no comments before ] or }, because there's a bug in json5 library
-
 ## Step 1
 Running
 
-`./FactoCord-3.0`
+`./FactoCord3`
 
 
 # Installing from sources
@@ -37,7 +35,7 @@ Installing deps
 
 Make sure system is up to date `sudo apt-get update -y && sudo apt-get upgrade -y`
 
-Download go 1.12+ (`sudo apt install golang-go git -y`) (you may need to get it from website, repos can be outdated)
+Download go 1.12+ (`sudo apt install golang-go git -y`) (you may need to get it from the website, repos can be outdated)
 
 Get go packages:
 
@@ -65,8 +63,6 @@ Then in text editor you must set:
 4. Executable path (executable)
 5. Admin IDs (for commands) (admin_ids)
 6. Mod list .json file location (including the filename) (mod_list_location)
-
-Make sure there are no comments before ] or }, because there's a bug in json5 library
 
 # Step 3
 Building

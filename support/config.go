@@ -2,7 +2,7 @@ package support
 
 import (
 	"fmt"
-	"github.com/yosuke-furukawa/json5/encoding/json5"
+	"github.com/flynn/json5"
 	"io/ioutil"
 )
 
@@ -26,19 +26,27 @@ type configT struct {
 	EnableConsoleChannel  bool   `json:"enable_console_channel"`
 	FactorioConsoleChatID string `json:"factorio_console_chat_id"`
 
-	AdminIDs        []string          `json:"admin_ids"`
-	CommandRoles    map[string]string `json:"command_roles"`
-	ModListLocation string            `json:"mod_list_location"`
+	AdminIDs     []string          `json:"admin_ids"`
+	CommandRoles map[string]string `json:"command_roles"`
+
+	ModListLocation string `json:"mod_list_location"`
+	Username        string `json:"username"`
+	ModPortalToken  string `json:"mod_portal_token"`
 
 	Messages struct {
-		BotStart    string `json:"bot_start"`
-		BotStop     string `json:"bot_stop"`
-		ServerStart string `json:"server_start"`
-		ServerStop  string `json:"server_stop"`
-		ServerFail  string `json:"server_fail"`
-		ServerSave  string `json:"server_save"`
-		PlayerJoin  string `json:"player_join"`
-		PlayerLeave string `json:"player_leave"`
+		BotStart          string `json:"bot_start"`
+		BotStop           string `json:"bot_stop"`
+		ServerStart       string `json:"server_start"`
+		ServerStop        string `json:"server_stop"`
+		ServerFail        string `json:"server_fail"`
+		ServerSave        string `json:"server_save"`
+		PlayerJoin        string `json:"player_join"`
+		PlayerLeave       string `json:"player_leave"`
+		DownloadStart     string `json:"download_start"`
+		DownloadProgress  string `json:"download_progress"`
+		DownloadComplete  string `json:"download_complete"`
+		Unpacking         string `json:"unpacking"`
+		UnpackingComplete string `json:"unpacking_complete"`
 	} `json:"messages"`
 }
 
@@ -54,7 +62,6 @@ func (conf *configT) MustLoad() {
 	conf.defaults()
 	err = json5.Unmarshal(contents, &conf)
 	if err != nil {
-		fmt.Println("Note that json5 may have several bugs, such as comment before ] or }")
 		Critical(err, "... when parsing config.json")
 	}
 }

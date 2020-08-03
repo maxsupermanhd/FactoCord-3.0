@@ -60,6 +60,10 @@ func (f *factorioState) IsRunning() bool {
 	return f.running
 }
 
+func (f *factorioState) IsStopping() bool {
+	return f.stopping
+}
+
 func (f *factorioState) Init(logger func(string)) {
 	logging, err := os.OpenFile("factorio.log", os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_TRUNC, 0666)
 	Critical(err, "... when attempting to open factorio.log")
@@ -110,7 +114,7 @@ func (f *factorioState) Stop(s *discordgo.Session) {
 	if f.Process.ProcessState.Exited() {
 		if s != nil {
 			messageWaiting.DeleteIfPassedLess(s, 10*time.Second)
-			SendOptional(s, "Factorio server **closed**")
+			SendOptional(s, "Factorio server has **closed**")
 		}
 		fmt.Println("\nFactorio server was closed, exit code", f.Process.ProcessState.ExitCode())
 	} else {
@@ -122,4 +126,13 @@ func (f *factorioState) Stop(s *discordgo.Session) {
 	f.running = false
 	f.stopping = false
 	f.SaveRequested = false
+}
+
+func FactorioVersion() (string, error) {
+	cmd := exec.Command(Config.Executable, "--version")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", err
+	}
+	return strings.Fields(string(out))[1], nil
 }

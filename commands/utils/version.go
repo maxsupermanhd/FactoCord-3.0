@@ -13,9 +13,7 @@ import (
 var VersionStringUsage = "Usage: $version"
 
 func VersionString(s *discordgo.Session, _ string) {
-	cmd := exec.Command(support.Config.Executable, "--version")
-	out, err := cmd.CombinedOutput()
-	factorioVersion := strings.Fields(string(out))[1]
+	factorioVersion, err := support.FactorioVersion()
 	if err != nil {
 		support.Send(s, "Sorry, there was an error checking factorio version")
 		support.Panik(err, "... when running `factorio --version`")
@@ -26,8 +24,8 @@ func VersionString(s *discordgo.Session, _ string) {
 	factocord := "FactoCord version unknown"
 	if support.DirExists("./.git") {
 		gitNotInstalledErr := exec.Command("sh", "-c", "command -v git").Run()
-		cmd = exec.Command("git", "describe", "--tags")
-		out, err = cmd.CombinedOutput()
+		cmd := exec.Command("git", "describe", "--tags")
+		out, err := cmd.CombinedOutput()
 		if err != nil {
 			if gitNotInstalledErr != nil {
 				factocord += ": git is probably not installed"

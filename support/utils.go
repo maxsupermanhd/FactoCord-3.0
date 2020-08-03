@@ -5,6 +5,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"os"
 	"strings"
+	"time"
 )
 
 func Send(s *discordgo.Session, message string) *MessageControlT {
@@ -148,6 +149,56 @@ func QuoteSplit(s string, quote string) ([]string, bool) {
 	return res, mismatched
 }
 
+func Unique(strs []string) []string {
+	s := make([]string, len(strs))
+	copy(s, strs)
+	for i := 0; i < len(s); i++ {
+		for j := i + 1; j < len(s); j++ {
+			if s[i] == s[j] {
+				copy(s[j:], s[j+1:])
+				s = s[:len(s)-1]
+			}
+		}
+	}
+	return s
+}
+
+func UniqueFunc(objs []interface{}, f func(interface{}, interface{}) bool) []interface{} {
+	o := make([]interface{}, len(objs))
+	copy(o, objs)
+	for i := 0; i < len(o); i++ {
+		for j := i + 1; j < len(o); j++ {
+			if f(o[i], o[j]) {
+				copy(o[j:], o[j+1:])
+				o = o[:len(o)-1]
+			}
+		}
+	}
+	return o
+}
+
+func IsUnique(s []string) bool {
+	for i := 0; i < len(s); i++ {
+		for j := i + 1; j < len(s); j++ {
+			if s[i] == s[j] {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func AnyTwo(o []interface{}, f func(interface{}, interface{}) bool) bool {
+	for i := 0; i < len(o); i++ {
+		for j := i + 1; j < len(o); j++ {
+			if f(o[i], o[j]) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // FileExists checks if a file exists and is not a directory
 func FileExists(filename string) bool {
 	info, err := os.Stat(filename)
@@ -164,4 +215,110 @@ func DirExists(filename string) bool {
 		return false
 	}
 	return info.IsDir()
+}
+
+type WriteCounter struct {
+	Total       uint64
+	Transferred uint64
+	Error       bool
+}
+
+func (wc *WriteCounter) Write(p []byte) (int, error) {
+	n := len(p)
+	wc.Transferred += uint64(n)
+	return n, nil
+}
+
+func (wc *WriteCounter) Percent() float32 {
+	return float32(wc.Transferred) * 100 / float32(wc.Total)
+}
+
+type ProgressUpdate struct {
+	*WriteCounter
+	Message                   *MessageControlT
+	Start, Progress, Finished string
+}
+
+func DownloadProgressUpdater(s *discordgo.Session, p *ProgressUpdate) {
+	message := p.Message
+	if message == nil {
+		p.Message = Send(s, p.Start)
+		message = p.Message
+	}
+	time.Sleep(500 * time.Millisecond)
+	for {
+		if p.Error {
+			return
+		}
+		if p.Transferred >= p.Total {
+			break
+		}
+		message.Edit(s, fmt.Sprintf(p.Progress, p.Percent()))
+		time.Sleep(2 * time.Second)
+	}
+	message.Edit(s, p.Finished)
+}
+
+type TextListT struct {
+	Heading     string
+	List        []string
+	Indentation string
+	None        string
+	Error       string
+}
+
+func DefaultTextList(heading string) TextListT {
+	return TextListT{
+		Heading:     heading,
+		List:        []string{},
+		Indentation: "    ",
+		None:        " **None**",
+	}
+}
+
+func (l *TextListT) IsEmpty() bool {
+	return len(l.List) == 0 && l.Error == ""
+}
+
+func (l *TextListT) NotEmpty() bool {
+	return !l.IsEmpty()
+}
+
+func (l *TextListT) Len() int {
+	return len(l.List)
+}
+
+func (l *TextListT) Append(s string) {
+	l.List = append(l.List, s)
+}
+
+func (l *TextListT) AddToLast(s string) {
+	l.List[len(l.List)-1] += s
+}
+
+func (l *TextListT) FormatHeaderWithLength() {
+	l.Heading = fmt.Sprintf(l.Heading, len(l.List))
+}
+
+func (l *TextListT) Render() string {
+	if l.Error != "" {
+		return l.Error
+	}
+	res := l.Heading
+	if len(l.List) == 0 {
+		res += l.None
+	} else {
+		for _, x := range l.List {
+			res += "\n" + l.Indentation + x
+		}
+	}
+	return res
+}
+
+func (l *TextListT) RenderNotEmpty() string {
+	if l.IsEmpty() {
+		return ""
+	} else {
+		return l.Render()
+	}
 }
