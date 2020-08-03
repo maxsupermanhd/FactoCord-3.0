@@ -80,6 +80,7 @@ func (conf *configT) Load() error {
 	if err != nil {
 		return fmt.Errorf("error parsing config.json: %s", err)
 	}
+
 	conf.defaults()
 	err = json5.Unmarshal(contents, &conf)
 	Critical(err, "wtf?? error parsing config.json 2nd time")
@@ -88,4 +89,21 @@ func (conf *configT) Load() error {
 
 func (conf *configT) defaults() {
 	conf.Autolaunch = true
+	conf.GameName = "Factorio"
+	conf.Prefix = "$"
+	// conf.HaveServerEssentials = false
+	// conf.IngameDiscordUserColors = false
+	conf.Messages.BotStart = "**:white_check_mark: Bot started! Launching server...**"
+	conf.Messages.BotStop = ":v:"
+	conf.Messages.ServerStart = "**:white_check_mark: The server has started!**"
+	conf.Messages.ServerStop = "**:octagonal_sign: The server has stopped!**"
+	conf.Messages.ServerFail = "**:skull: The server has crashed!**"
+	conf.Messages.ServerSave = "**:floppy_disk: Game saved!**"
+	conf.Messages.PlayerJoin = "**:arrow_up: %s**"
+	conf.Messages.PlayerLeave = "**:arrow_down: %s**"
+	conf.Messages.DownloadStart = ":arrow_down: Downloading %s..."
+	conf.Messages.DownloadProgress = ":arrow_down: Downloading %s: %%2.1f%%%%"
+	conf.Messages.DownloadComplete = ":white_check_mark: Downloaded %s"
+	conf.Messages.Unpacking = ":pinching_hand: Unpacking %s..."
+	conf.Messages.UnpackingComplete = ":ok_hand: Server updated to %s"
 }
