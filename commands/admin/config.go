@@ -109,6 +109,10 @@ func set(args string) string {
 		return "Are trying to brainwash me?"
 	}
 	name := path[len(path)-1]
+	pathTo := strings.Join(path[:len(path)-1], ".")
+	if pathTo == "" {
+		pathTo = "."
+	}
 	current, err := walk(&support.Config, path[:len(path)-1])
 	if err != nil {
 		return err.Error()
@@ -142,7 +146,11 @@ func set(args string) string {
 	case reflect.Struct:
 		fieldName := getFieldByTag(name, "json", current.Type())
 		if fieldName == "" {
-			return fmt.Sprintf("struct %s does not have a field called \"%s\"", pathS, name)
+			if pathTo == "." {
+				return fmt.Sprintf("config does not have an option called \"%s\"", name)
+			} else {
+				return fmt.Sprintf("struct %s does not have a field called \"%s\"", pathTo, name)
+			}
 		}
 		field := current.FieldByName(fieldName)
 		value, errs := createValue(field.Type(), valueS)

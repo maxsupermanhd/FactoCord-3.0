@@ -134,7 +134,7 @@ type modPortalResponse struct {
 }
 
 // ModCommandUsage ...
-var ModCommandUsage = "Usage: $mod (add|remove|enable|disable) <modnames> | update <modnames>?"
+var ModCommandUsage = "Usage: $mod (add|remove|enable|disable) <modnames>+ | update <modnames>*"
 
 // ModCommand returns the list of mods running on the server.
 func ModCommand(s *discordgo.Session, args string) {

@@ -114,7 +114,7 @@ func (f *factorioState) Stop(s *discordgo.Session) {
 	if f.Process.ProcessState.Exited() {
 		if s != nil {
 			messageWaiting.DeleteIfPassedLess(s, 10*time.Second)
-			SendOptional(s, "Factorio server has **closed**")
+			SendOptional(s, "Factorio server has **exited**")
 		}
 		fmt.Println("\nFactorio server was closed, exit code", f.Process.ProcessState.ExitCode())
 	} else {
