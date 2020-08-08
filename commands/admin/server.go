@@ -13,7 +13,22 @@ import (
 	"path/filepath"
 )
 
-var ServerCommandUsage = "Usage: $server [stop|start|restart|update <version>?]"
+var ServerCommandDoc = support.CommandDoc{
+	Name:  "server",
+	Usage: "$server [stop|start|restart|update <version>?]",
+	Doc:   `command manages factorio server`,
+	Subcommands: []support.CommandDoc{
+		{Name: "stop", Doc: `command stops the server`},
+		{Name: "start", Doc: `command starts the server`},
+		{Name: "restart", Doc: `command restarts the server`},
+		{
+			Name: "update",
+			Doc:  `command updates to server to the newest version or to the specified version`,
+			Usage: "$server update\n" +
+				"$server update <version>",
+		},
+	},
+}
 
 func ServerCommand(s *discordgo.Session, args string) {
 	action, arg := support.SplitDivide(args, " ")
@@ -34,7 +49,7 @@ func ServerCommand(s *discordgo.Session, args string) {
 	case "update":
 		serverUpdate(s, arg)
 	default:
-		support.SendFormat(s, ServerCommandUsage)
+		support.SendFormat(s, "Usage: "+ServerCommandDoc.Usage)
 	}
 }
 

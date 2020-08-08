@@ -8,13 +8,16 @@ import (
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
-// UnbanPlayerUsage comment...
-var UnbanPlayerUsage = "Usage $unban <player>"
+var UnbanPlayerDoc = support.CommandDoc{
+	Name:  "unban",
+	Usage: "$unban <player>",
+	Doc:   `command removes the player from the banlist on the server`,
+}
 
 // UnbanPlayer unbans a player on the server.
 func UnbanPlayer(s *discordgo.Session, args string) {
 	if strings.ContainsAny(args, " \n\t") {
-		support.SendFormat(s, UnbanPlayerUsage)
+		support.SendFormat(s, "Usage: "+UnbanPlayerDoc.Usage)
 		return
 	}
 	command := "/unban " + args

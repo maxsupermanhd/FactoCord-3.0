@@ -21,7 +21,17 @@ type Mod struct {
 	Enabled bool
 }
 
-var ModListUsage = "Usage: $mods [on | off | all | files]"
+var ModListDoc = support.CommandDoc{
+	Name:  "mods",
+	Doc:   `command outputs information about current mods`,
+	Usage: "$mods [on | off | all | files]",
+	Subcommands: []support.CommandDoc{
+		{Name: "on", Doc: `command sends currently enabled mods`},
+		{Name: "off", Doc: `command sends currently disabled mods`},
+		{Name: "all", Doc: `command sends all mods in mod-list.json`},
+		{Name: "files", Doc: `command sends filenames of all downloaded mods`},
+	},
+}
 
 func modList(ModList *ModJson, returnEnabled bool, returnDisabled bool) string {
 	var enabled, disabled int
@@ -107,7 +117,7 @@ func ModsList(s *discordgo.Session, args string) {
 		support.Send(s, modsFiles())
 		return
 	} else {
-		support.SendFormat(s, ModListUsage)
+		support.SendFormat(s, "Usage: "+ModListDoc.Usage)
 		return
 	}
 	ModList := &ModJson{}

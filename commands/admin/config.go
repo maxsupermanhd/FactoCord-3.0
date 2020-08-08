@@ -12,19 +12,66 @@ import (
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
-// ModCommandUsage ...
-var ConfigCommandUsage = "Usage: $config save | load | get <path> | set <path> <value>"
+var ConfigCommandDoc = support.CommandDoc{
+	Name:  "config",
+	Usage: "$config save | load | get <path> | set <path> <value>?",
+	Doc:   "command manages FactoCord's config",
+	Subcommands: []support.CommandDoc{
+		{Name: "save", Doc: "command saves FactoCord's config from memory to `config.json`"},
+		{
+			Name: "load",
+			Doc: "command loads the config from `config.json`.\n" +
+				"Any unsaved changes after the last `$config save` command will be lost.",
+		},
+		{
+			Name:  "get",
+			Usage: "$config get <path>?",
+			Doc: "command outputs the value of a config setting specified by <path>.\n" +
+				"All path members are separated by a dot '.'\n" +
+				"If the path is empty, it outputs the whole config.\n" +
+				"Examples:\n" +
+				"```\n" +
+				"$config get\n" +
+				"$config get admin_ids\n" +
+				"$config get admin_ids.0\n" +
+				"$config get command_roles\n" +
+				"$config get command_roles.mod\n" +
+				"$config get messages\n" +
+				"```",
+		},
+		{
+			Name: "set",
+			Usage: "$config set <path>\n" +
+				"$config set <path> <value>",
+			Doc: "command sets the value of a config setting specified by <path>.\n" +
+				"This command can set only simple types such as strings, numbers, and booleans.\n" +
+				"If no value is specified, this command deletes the value if possible, otherwise it sets it to a zero-value (0, \"\", false).\n" +
+				"To add a value to an array or an object specify it's index as '*' (e.g. `$config set admin_ids.* 1234`).\n" +
+				"Changes made by this command are not automatically saved. Use `$config save` to do it.\n" +
+				"Examples:" +
+				"```\n" +
+				"$config set prefix !\n" +
+				"$config set game_name \"Factorio 1.0\"\n" +
+				"$config set ingame_discord_user_colors true\n" +
+				"$config set admin_ids.0 123456789\n" +
+				"$config set admin_ids.* 987654321\n" +
+				"$config set command_roles.mod 55555555\n" +
+				"$config set messages.server_save **:mango: Game saved!**\n" +
+				"```",
+		},
+	},
+}
 
 // ModCommand returns the list of mods running on the server.
 func ConfigCommand(s *discordgo.Session, args string) {
 	if args == "" {
-		support.SendFormat(s, ConfigCommandUsage)
+		support.SendFormat(s, "Usage: "+ConfigCommandDoc.Usage)
 		return
 	}
 	action, args := support.SplitDivide(args, " ")
 	args = strings.TrimSpace(args)
 	if _, ok := commands[action]; !ok {
-		support.SendFormat(s, ConfigCommandUsage)
+		support.SendFormat(s, "Usage: "+ConfigCommandDoc.Usage)
 		return
 	}
 	res := commands[action](args)

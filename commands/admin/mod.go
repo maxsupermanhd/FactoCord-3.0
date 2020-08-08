@@ -133,14 +133,54 @@ type modPortalResponse struct {
 	Releases []modRelease
 }
 
-// ModCommandUsage ...
-var ModCommandUsage = "Usage: $mod (add|remove|enable|disable) <modnames>+ | update <modnames>*"
+var ModCommandDoc = support.CommandDoc{
+	Name:  "mod",
+	Usage: "$mod (add|remove|enable|disable) <modnames>+ | update <modnames>*",
+	Doc: "command downloads, removes, enables and disables several mods.\n" +
+		"If mod's name contains a whitespace ' ', it's name should be quoted using double quotes (e.g. `\"Squeak Through\"`).\n" +
+		"All subcommands can process several mods at once. Mods' names should be separated by a whitespace.",
+	Subcommands: []support.CommandDoc{
+		{
+			Name:  "add",
+			Usage: "$mod add <modname>+",
+			Doc: "command adds mods to mod-list.json and downloads the latest version or a specified version.\n" +
+				"To download the latest version of a mod type a mod name.\n" +
+				"To specify a version for a mod add '==' and a version (e.g. `$mod add FNEI==0.3.4`).\n" +
+				"This command ensures that factorio version is the same as mod's factorio version.",
+		},
+		{
+			Name: "update",
+			Usage: "$mod update\n" +
+				"$mod update <modname>+",
+			Doc: "command updates either the specified mods or all mods.\n" +
+				"To update a mod to the latest version specify mod name.\n" +
+				"To update a mod to a specific version type mod name, '==', and mod version (e.g. `$mod update FNEI==0.3.4`).\n" +
+				"To update all mods to the latest version use `$mod update`.\n" +
+				"This command ensures that factorio version is the same as mod's factorio version.",
+		},
+		{
+			Name:  "remove",
+			Usage: "$mod remove <modname>+",
+			Doc:   "command removes mods from mod-list.json and deletes mods' files",
+		},
+		{
+			Name:  "enable",
+			Usage: "$mod enable <modname>+",
+			Doc:   "command enables mods in mod-list.json",
+		},
+		{
+			Name:  "disable",
+			Usage: "$mod disable <modname>+",
+			Doc:   "command disables mods in mod-list.json",
+		},
+	},
+}
 
 // ModCommand returns the list of mods running on the server.
 func ModCommand(s *discordgo.Session, args string) {
 	argsList := strings.SplitN(args, " ", 2)
 	if len(argsList) == 0 {
-		support.SendFormat(s, ModCommandUsage)
+		support.SendFormat(s, "Usage: "+ModCommandDoc.Usage)
 		return
 	}
 
@@ -154,7 +194,7 @@ func ModCommand(s *discordgo.Session, args string) {
 			return
 		}
 	default:
-		support.SendFormat(s, ModCommandUsage)
+		support.SendFormat(s, "Usage: "+ModCommandDoc.Usage)
 		return
 	}
 

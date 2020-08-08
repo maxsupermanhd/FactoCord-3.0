@@ -8,13 +8,16 @@ import (
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
-// BanPlayerUsage comment...
-var BanPlayerUsage = "Usage: $ban <player> <reason>"
+var BanPlayerDoc = support.CommandDoc{
+	Name:  "ban",
+	Usage: "$ban <player> <reason>",
+	Doc:   `command bans the player on the server with a specified reason`,
+}
 
 // BanPlayer bans a player on the server.
 func BanPlayer(s *discordgo.Session, args string) {
 	if len(args) == 0 {
-		support.SendFormat(s, BanPlayerUsage)
+		support.SendFormat(s, "Usage: "+BanPlayerDoc.Usage)
 		return
 	}
 	args2 := strings.SplitN(args+" ", " ", 2)
@@ -22,7 +25,7 @@ func BanPlayer(s *discordgo.Session, args string) {
 	reason := strings.TrimSpace(args2[1])
 
 	if len(player) == 0 || len(reason) == 0 {
-		support.SendFormat(s, BanPlayerUsage)
+		support.SendFormat(s, "Usage: "+BanPlayerDoc.Usage)
 		return
 	}
 

@@ -9,12 +9,17 @@ import (
 )
 
 // KickPlayerUsage comment...
-var KickPlayerUsage = "Usage: $kick <player> <reason>"
+
+var KickPlayerDoc = support.CommandDoc{
+	Name:  "kick",
+	Usage: "$kick <player> <reason>",
+	Doc:   `command kicks the player out from the server with a specified reason`,
+}
 
 // KickPlayer kicks a player from the server.
 func KickPlayer(s *discordgo.Session, args string) {
 	if len(args) == 0 {
-		support.SendFormat(s, KickPlayerUsage)
+		support.SendFormat(s, "Usage: "+KickPlayerDoc.Usage)
 		return
 	}
 	args2 := strings.SplitN(args+" ", " ", 2)
@@ -22,7 +27,7 @@ func KickPlayer(s *discordgo.Session, args string) {
 	reason := strings.TrimSpace(args2[1])
 
 	if len(player) == 0 || len(reason) == 0 {
-		support.SendFormat(s, KickPlayerUsage)
+		support.SendFormat(s, "Usage: "+KickPlayerDoc.Usage)
 		return
 	}
 	command := "/kick " + player + " " + reason

@@ -327,3 +327,10 @@ func (l *TextListT) RenderNotEmpty() string {
 		return l.Render()
 	}
 }
+
+type CommandDoc struct {
+	Name        string
+	Usage       string
+	Doc         string
+	Subcommands []CommandDoc
+}

@@ -10,7 +10,11 @@ import (
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
-var VersionStringUsage = "Usage: $version"
+var VersionDoc = support.CommandDoc{
+	Name: "version",
+	Doc: `command outputs factorio server version and FactoCord version.
+If it says that FactoCord version is unknown look into the error.log`,
+}
 
 func VersionString(s *discordgo.Session, _ string) {
 	factorioVersion, err := support.FactorioVersion()
