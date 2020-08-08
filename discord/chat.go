@@ -34,6 +34,11 @@ func StartSession() {
 
 	err = Session.Open()
 	support.Critical(err, "... when attempting to connect to Discord")
+
+	GuildChannel, err := Session.Channel(support.Config.FactorioChannelID)
+	support.Critical(err, "... when attempting to read the Discord Guild")
+
+	support.GuildID = GuildChannel.GuildID
 }
 
 func Init() {

@@ -8,6 +8,8 @@ import (
 
 var ConfigPath = "./config.json"
 
+var GuildID string
+
 // Config is a config interface.
 var Config configT
 

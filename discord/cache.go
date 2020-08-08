@@ -1,6 +1,7 @@
 package discord
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -14,47 +15,48 @@ func CacheUpdater(session *discordgo.Session) {
 	time.Sleep(10 * time.Second)
 
 	for {
-		CacheDiscordMembers(session)
+		count := CacheDiscordMembers(session)
+		fmt.Printf("%s: discord members update: %d members\n", time.Now().Format("2006.01.02 15:04:05"), count)
+
 		//sleep for 4 hours (caches every 4 hours)
 		time.Sleep(4 * time.Hour)
 	}
 }
 
-// UserList is a struct for member info.
-type UserList struct {
-	UserID string
-	Nick   string
-	User   *discordgo.User
-}
+func CacheDiscordMembers(session *discordgo.Session) (count int) {
+	after := ""
+	limit := 1000
 
-// Users is a slice of UserList.
-var Users []UserList
-
-// CacheDiscordMembers caches the users list to be searched.
-func CacheDiscordMembers(s *discordgo.Session) {
-	// Clear the users list
-	Users = nil
-
-	GuildChannel, err := s.Channel(support.Config.FactorioChannelID)
-	support.Panik(err, "... when attempting to read the Discord Guild")
-
-	GuildID := GuildChannel.GuildID
-	members, err := s.State.Guild(GuildID)
-	support.Panik(err, "... when attempting to read the Discord Guild Members")
-
-	for _, member := range members.Members {
-		Users = append(Users, UserList{UserID: member.User.ID, Nick: member.Nick,
-			User: member.User})
+	for {
+		members, err := session.GuildMembers(support.GuildID, after, limit)
+		if err != nil {
+			support.Panik(err, "... when requesting members")
+			return
+		}
+		for _, member := range members {
+			member.GuildID = support.GuildID
+			err = session.State.MemberAdd(member)
+			support.Panik(err, "... when adding member to state")
+		}
+		count += len(members)
+		if len(members) < limit {
+			break
+		}
+		after = members[len(members)-1].User.ID
 	}
+	return
 }
 
 // SearchForUser searches for the user to be mentioned.
 func SearchForUser(name string) *discordgo.User {
 	name = strings.Replace(name, "@", "", -1)
-	for _, user := range Users {
-		if strings.ToLower(user.Nick) == strings.ToLower(name) ||
-			strings.ToLower(user.User.Username) == strings.ToLower(name) {
-			return user.User
+	guild, err := Session.State.Guild(support.GuildID)
+	support.Panik(err, "... when getting guild")
+
+	for _, member := range guild.Members {
+		if strings.ToLower(member.Nick) == strings.ToLower(name) ||
+			strings.ToLower(member.User.Username) == strings.ToLower(name) {
+			return member.User
 		}
 	}
 	return nil
