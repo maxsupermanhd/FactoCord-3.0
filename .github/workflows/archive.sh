@@ -18,7 +18,7 @@ pushd ./release > /dev/null
 
 pushd ./FactoCord3 > /dev/null
 chmod 664 **
-chmod +x ./FactoCord-3.0
+chmod +x ./FactoCord3
 popd > /dev/null
 
 zip -q ./FactoCord3.zip -r ./FactoCord3 || exit 3
