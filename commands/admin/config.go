@@ -17,7 +17,11 @@ var ConfigCommandDoc = support.CommandDoc{
 	Usage: "$config save | load | get <path> | set <path> <value>?",
 	Doc:   "command manages FactoCord's config",
 	Subcommands: []support.CommandDoc{
-		{Name: "save", Doc: "command saves FactoCord's config from memory to `config.json`"},
+		{
+			Name: "save",
+			Doc: "command saves FactoCord's config from memory to `config.json`.\n" +
+				"It also adds any options missing from config.json",
+		},
 		{
 			Name: "load",
 			Doc: "command loads the config from `config.json`.\n" +
