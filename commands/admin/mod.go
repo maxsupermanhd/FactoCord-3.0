@@ -596,7 +596,7 @@ func checkModPortal(desc *modDescriptionT, factorioVersion string) (*modRelease,
 
 	if desc.version.Full == "" { // no version specified
 		for z := len(response.Releases) - 1; z >= 0; z-- {
-			if response.Releases[z].InfoJson.FactorioVersion == factorioVersion {
+			if compareFactorioVersions(response.Releases[z].InfoJson.FactorioVersion, factorioVersion) {
 				return &response.Releases[z], "", nil
 			}
 		}
@@ -604,7 +604,7 @@ func checkModPortal(desc *modDescriptionT, factorioVersion string) (*modRelease,
 	} else {
 		for _, release := range response.Releases {
 			if release.Version == desc.version.Full {
-				if release.InfoJson.FactorioVersion == factorioVersion {
+				if compareFactorioVersions(release.InfoJson.FactorioVersion, factorioVersion) {
 					return &release, "", nil
 				} else {
 					return nil, fmt.Sprintf(
@@ -617,6 +617,13 @@ func checkModPortal(desc *modDescriptionT, factorioVersion string) (*modRelease,
 		}
 		return nil, "no such version", nil
 	}
+}
+
+func compareFactorioVersions(modVersion, factorioVersion string) bool {
+	if modVersion == "0.18" {
+		return factorioVersion == "0.18" || factorioVersion == "1.0"
+	}
+	return modVersion == factorioVersion
 }
 
 var downloadQueue = make(chan *modRelease, 100)
