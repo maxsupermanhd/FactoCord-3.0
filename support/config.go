@@ -25,6 +25,8 @@ type configT struct {
 	HaveServerEssentials    bool   `json:"have_server_essentials"`
 	IngameDiscordUserColors bool   `json:"ingame_discord_user_colors"`
 
+	AllowPingingEveryone bool `json:"allow_pinging_everyone"`
+
 	EnableConsoleChannel  bool   `json:"enable_console_channel"`
 	FactorioConsoleChatID string `json:"factorio_console_chat_id"`
 

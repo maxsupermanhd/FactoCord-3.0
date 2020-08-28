@@ -23,6 +23,8 @@
     // Color usernames of the discord users in factorio chat
     ingame_discord_user_colors: false,
 
+    allow_pinging_everyone: false,
+
     // Send all console output to that channel
     enable_console_channel: false,
     factorio_console_chat_id: "",

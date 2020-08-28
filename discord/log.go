@@ -78,6 +78,10 @@ func processFactorioChat(line string) {
 	if messageType == "DISCORD" || messageType == "CHAT" {
 		if strings.Contains(line, "@") {
 			line = AddMentions(line)
+			if !support.Config.AllowPingingEveryone {
+				line = strings.ReplaceAll(line, "@here", "@​here")
+				line = strings.ReplaceAll(line, "@everyone", "@​everyone")
+			}
 		}
 	}
 	if support.Config.HaveServerEssentials {
