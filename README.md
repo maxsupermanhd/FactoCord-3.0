@@ -10,29 +10,36 @@
    * Images
    * Mention someone without opening discord<br>
      You can't ping everyone _<sub>(but if you want to... there's a setting for that)</sub>_
- * Save the game
- * Start, stop, or restart the factorio server
- * Update factorio to the latest or a specified version
+   <br>
+   <img src="https://i.imgur.com/35pRKPl.png"/><br>
+   <img src="https://i.imgur.com/O92ehgL.png"/>
+ * Save the game<br>
+   <img src="https://i.imgur.com/vqUWhMq.png"/>
+ * Start, stop, or restart the factorio server<br>
+   <img src="https://i.imgur.com/rtHYHeQ.png"/>
+ * Update factorio to the latest or a specified version<br>
+   <img src="https://i.imgur.com/R7yu78Z.gif"/>
  * Display installed mods
  * Download, update, enable/disable or delete mods
    * You can download a specific version!
    * You can update all the mods to the latest versions at once
    * It makes sure a mod or its version is compatible with the factorio major release
+   <br>
+   <img src="https://i.imgur.com/LM111dY.gif"/>
  * Ban, unban, or kick someone from the server without bothering lifting your butt to join the server
  * Modify the config on the fly, without restarting the bot or even opening config files
+   <br>
+   <img src="https://i.imgur.com/dTZgRKu.png"/>
  * Allow users with a specific role to execute admin-only commands
  * Documentation for all the commands
+   <br>
+   <img src="https://i.imgur.com/miNV86C.png"/><br>
+   <img src="https://i.imgur.com/WfUG4qE.png"/>
  * Highly configurable
-   * See [config-example.json](config-example.json)
+   * See [config-example.json5](config-example.json5)
    * Nice json5 syntax
  * Pre-built executable
  
-
-# Screenshots
-
-<p><img src="https://i.imgur.com/VXUbbbL.png" alt="list of commands"></p>
-<p><img src="http://i.imgur.com/dztOTrk.png" alt="in-game chat being sent to discord, notice how you can mention discord members"></p>
-<p><img src="http://i.imgur.com/Npl0vBb.png" alt="discord chat being sent to in-game"></p>
 
 # For installation instructions see [INSTALL.md](https://github.com/maxsupermanhd/FactoCord-3.0/blob/master/INSTALL.md)
 
