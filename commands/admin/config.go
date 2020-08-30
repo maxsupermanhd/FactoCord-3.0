@@ -33,6 +33,7 @@ var ConfigCommandDoc = support.CommandDoc{
 			Doc: "command outputs the value of a config setting specified by <path>.\n" +
 				"All path members are separated by a dot '.'\n" +
 				"If the path is empty, it outputs the whole config.\n" +
+				"Secrets like discord_token are kept secret.\n" +
 				"Examples:\n" +
 				"```\n" +
 				"$config get\n" +

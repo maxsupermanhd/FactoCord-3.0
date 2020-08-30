@@ -113,9 +113,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 						filename = filename[:20] + "..."
 					}
 				}
-				attachmentType = "файл: " + filename
+				attachmentType = "file: " + filename
 			} else {
-				attachmentType = fmt.Sprintf("изображение %dx%d", attachment.Width, attachment.Height)
+				attachmentType = fmt.Sprintf("image %dx%d", attachment.Width, attachment.Height)
 			}
 			attachmentType = fmt.Sprintf("[color=#35BFFF][%s][/color]", attachmentType)
 			if strings.TrimSpace(m.Content) != "" {

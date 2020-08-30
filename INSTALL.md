@@ -8,19 +8,19 @@ Tested on Ubuntu 18.04.4 LTS, Ubuntu 18.04.4 LTS (Server), WSL1 Ubuntu
 ## Step 0
 Configuring
 
-Enter created directory `cd FactoCord-3.0/`
+Enter installation directory `cd FactoCord-3.0/`
 
 Copy `config-example.json` to `config.json` (`cp config-example.json config.json`)
 
 Open `config.json` with any editor (ex. `nano config.json`)
 
 Then in text editor you must set:
-1. Your Discord token for the bot (discord_token)
-2. ID of factorio channel for chatting (factorio_channel_id)
-3. Launching parameters (flags to factorio executable) (launch_parameters)
-4. Executable path (executable)
-5. Admin IDs (for commands) (admin_ids)
-6. Mod list .json file location (including the filename) (mod_list_location)
+1. Your Discord token for the bot (`discord_token`)
+2. ID of factorio channel for chatting (`factorio_channel_id`)
+3. Launching parameters (flags to factorio executable) (`launch_parameters`)
+4. Executable path (`executable`)
+5. Discord IDs of all the admins (for commands) (`admin_ids`)
+6. `mod-list.json` file location (including the filename) (`mod_list_location`)
 
 ## Step 1
 Running
