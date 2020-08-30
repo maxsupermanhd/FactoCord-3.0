@@ -31,6 +31,8 @@
 # Screenshots
 
 <p><img src="https://i.imgur.com/VXUbbbL.png" alt="list of commands"></p>
+<p><img src="http://i.imgur.com/dztOTrk.png" alt="in-game chat being sent to discord, notice how you can mention discord members"></p>
+<p><img src="http://i.imgur.com/Npl0vBb.png" alt="discord chat being sent to in-game"></p>
 
 # For installation instructions see [INSTALL.md](https://github.com/maxsupermanhd/FactoCord-3.0/blob/master/INSTALL.md)
 
