@@ -38,10 +38,10 @@
     // command names should be lowercase
     command_roles: {
         // "mod": "123456789",
-        // "restart": "123456789",
-        // "stop": "123456789",
+        // "server": "123456789"
         // "save": "123456789",
-        // those who have a role with id '123456789' can execute mod, restart, stop, and save commands
+        // "config": "123456789",
+        // those who have a role with id '123456789' can execute mod, server, save, and config commands
 
         // "kick": "987654321",
         // "ban": "987654321",

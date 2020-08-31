@@ -17,9 +17,13 @@ type Command struct {
 
 	Command func(s *discordgo.Session, args string)
 
-	Admin bool
+	Admin func(args string) bool
 	Doc   *support.CommandDoc
 	Desc  string
+}
+
+func alwaysAdmin(_ string) bool {
+	return true
 }
 
 // Commands is a list of all available commands
@@ -28,49 +32,49 @@ var Commands = [...]Command{
 	{
 		Name:    "server",
 		Command: admin.ServerCommand,
-		Admin:   true,
+		Admin:   admin.ServerCommandAdminPermission,
 		Doc:     &admin.ServerCommandDoc,
 		Desc:    "Manage factorio server",
 	},
 	{
 		Name:    "save",
 		Command: admin.SaveServer,
-		Admin:   true,
+		Admin:   alwaysAdmin,
 		Doc:     &admin.SaveServerDoc,
 		Desc:    "Save the game",
 	},
 	{
 		Name:    "kick",
 		Command: admin.KickPlayer,
-		Admin:   true,
+		Admin:   alwaysAdmin,
 		Doc:     &admin.KickPlayerDoc,
 		Desc:    "Kick a user from the server",
 	},
 	{
 		Name:    "ban",
 		Command: admin.BanPlayer,
-		Admin:   true,
+		Admin:   alwaysAdmin,
 		Doc:     &admin.BanPlayerDoc,
 		Desc:    "Ban a user from the server",
 	},
 	{
 		Name:    "unban",
 		Command: admin.UnbanPlayer,
-		Admin:   true,
+		Admin:   alwaysAdmin,
 		Doc:     &admin.UnbanPlayerDoc,
 		Desc:    "Unban a user from the server",
 	},
 	{
 		Name:    "config",
 		Command: admin.ConfigCommand,
-		Admin:   true,
+		Admin:   alwaysAdmin,
 		Doc:     &admin.ConfigCommandDoc,
 		Desc:    "Manage config.json",
 	},
 	{
 		Name:    "mod",
 		Command: admin.ModCommand,
-		Admin:   true,
+		Admin:   alwaysAdmin,
 		Doc:     &admin.ModCommandDoc,
 		Desc:    "Manage mod-list.json",
 	},
@@ -79,20 +83,20 @@ var Commands = [...]Command{
 	{
 		Name:    "mods",
 		Command: utils.ModsList,
-		Admin:   false,
+		Admin:   nil,
 		Doc:     &utils.ModListDoc,
 		Desc:    "List the mods on the server",
 	},
 	{
 		Name:    "version",
 		Command: utils.VersionString,
-		Admin:   false,
+		Admin:   nil,
 		Doc:     &utils.VersionDoc,
 		Desc:    "Get server version",
 	},
 	{
 		Name:  "help",
-		Admin: false,
+		Admin: nil,
 		Doc: &support.CommandDoc{
 			Name: "help",
 			Usage: "$help\n" +
@@ -197,7 +201,7 @@ func helpAllCommands(s *discordgo.Session) {
 			if !found {
 				desc = "[Role not found in guild] " + desc
 			}
-		} else if command.Admin {
+		} else if command.Admin != nil {
 			desc = "[Admin] " + desc
 		}
 		fields = append(fields, &discordgo.MessageEmbedField{
@@ -231,7 +235,7 @@ func RunCommand(input string, s *discordgo.Session, m *discordgo.Message) {
 			execute := false
 			err := ""
 
-			if command.Admin {
+			if command.Admin != nil && command.Admin(args) {
 				if CheckAdmin(m.Author.ID) {
 					execute = true
 				} else {

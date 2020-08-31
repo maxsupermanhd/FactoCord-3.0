@@ -11,12 +11,15 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 var ServerCommandDoc = support.CommandDoc{
-	Name:  "server",
-	Usage: "$server [stop|start|restart|update <version>?]",
-	Doc:   `command manages factorio server`,
+	Name: "server",
+	Usage: "$server\n" +
+		"$server [stop|start|restart|update <version>?]",
+	Doc: "command manages factorio server.\n" +
+		"`$server` shows current server status. Anyone can execute it.`",
 	Subcommands: []support.CommandDoc{
 		{Name: "stop", Doc: `command stops the server`},
 		{Name: "start", Doc: `command starts the server`},
@@ -28,6 +31,10 @@ var ServerCommandDoc = support.CommandDoc{
 				"$server update <version>",
 		},
 	},
+}
+
+func ServerCommandAdminPermission(args string) bool {
+	return strings.TrimSpace(args) != ""
 }
 
 func ServerCommand(s *discordgo.Session, args string) {
