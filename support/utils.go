@@ -153,6 +153,13 @@ func QuoteSplit(s string, quote string) ([]string, bool) {
 	return res, mismatched
 }
 
+func QuoteSpace(s string) string {
+	if strings.ContainsRune(s, ' ') {
+		s = "\"" + s + "\""
+	}
+	return s
+}
+
 func Unique(strs []string) []string {
 	s := make([]string, len(strs))
 	copy(s, strs)
@@ -333,4 +340,22 @@ type CommandDoc struct {
 	Usage       string
 	Doc         string
 	Subcommands []CommandDoc
+}
+
+func CompareOp(cmp int, op string) bool {
+	switch op {
+	case "=", "==":
+		return cmp == 0
+	case ">":
+		return cmp == 1
+	case ">=":
+		return cmp >= 0
+	case "<":
+		return cmp == -1
+	case "<=":
+		return cmp <= 0
+	}
+	err := fmt.Errorf("`%s` is not a comparison operator", op)
+	Panik(err, "")
+	panic(err)
 }

@@ -35,6 +35,17 @@ func SemanticVersionPanic(s string) *SemanticVersionT {
 	return v
 }
 
+func (v *SemanticVersionT) Compare(v2 *SemanticVersionT) int {
+	if v.Equal(v2) {
+		return 0
+	}
+	if v.NewerThan(v2) {
+		return 1
+	} else {
+		return -1
+	}
+}
+
 func (v *SemanticVersionT) Equal(v2 *SemanticVersionT) bool {
 	return v.Full == "" || v2.Full == "" || v.Full == v2.Full
 }

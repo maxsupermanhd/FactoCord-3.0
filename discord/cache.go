@@ -30,7 +30,12 @@ func CacheDiscordMembers(session *discordgo.Session) (count int) {
 	for {
 		members, err := session.GuildMembers(support.GuildID, after, limit)
 		if err != nil {
-			support.Panik(err, "... when requesting members")
+			if resterr, ok := err.(*discordgo.RESTError); ok && resterr.Message.Code == 50001 { // Missing access
+				fmt.Println("You need to enable \"members intent\" for the bot " +
+					"if you want to use nickname colors and pings. https://i.imgur.com/PdHNJFm.png")
+			} else {
+				support.Panik(err, "... when requesting members")
+			}
 			return
 		}
 		for _, member := range members {

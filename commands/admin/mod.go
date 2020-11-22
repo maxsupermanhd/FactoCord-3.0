@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
@@ -121,8 +122,10 @@ type modRelease struct {
 	DownloadUrl string `json:"download_url"`
 	SHA1        string
 	FileName    string `json:"file_name"`
+	Name        string
 	Version     string
 	InfoJson    struct {
+		Dependencies    []string
 		FactorioVersion string `json:"factorio_version"`
 	} `json:"info_json"`
 }
@@ -304,6 +307,7 @@ func modsAdd(s *discordgo.Session, mods *ModJSON, modDescriptions *[]modDescript
 		toDownload = append(toDownload, release)
 		inserted := mods.sortedInsert(desc.ModEntry())
 		if inserted {
+			release.Name = desc.name
 			addedMods.Append(desc.String())
 		} else {
 			alreadyAdded.Append(desc.String())
@@ -327,6 +331,7 @@ func modsAdd(s *discordgo.Session, mods *ModJSON, modDescriptions *[]modDescript
 		res += alreadyAdded.RenderNotEmpty()
 		res += userErrors.RenderNotEmpty()
 	}
+	res += checkDependencies(toDownload, files)
 
 	if support.Config.ModPortalToken == "" {
 		res += "\n**No token to download mods**"
@@ -428,10 +433,12 @@ func modsUpdate(s *discordgo.Session, mods *ModJSON, modDescriptions *[]modDescr
 	for _, x := range toDownload {
 		downloadQueue <- x
 	}
+
+	dependencies := checkDependencies(toDownload, files)
 	if updateAll {
-		return updatedMods.Render() + alreadyUpdated.RenderNotEmpty() + userErrors.RenderNotEmpty()
+		return updatedMods.Render() + alreadyUpdated.RenderNotEmpty() + userErrors.RenderNotEmpty() + dependencies
 	} else {
-		return updatedMods.Render() + userErrors.RenderNotEmpty()
+		return updatedMods.Render() + userErrors.RenderNotEmpty() + dependencies
 	}
 }
 
@@ -575,7 +582,7 @@ func removeModFiles(files *modsFilesT, modname string) (found []modDescriptionT,
 }
 
 func checkModPortal(desc *modDescriptionT, factorioVersion string) (*modRelease, string, error) {
-	resp, err := http.Get(fmt.Sprintf("https://mods.factorio.com/api/mods/%s", desc.name))
+	resp, err := http.Get(fmt.Sprintf("https://mods.factorio.com/api/mods/%s/full", desc.name))
 	if err != nil {
 		return nil, "", err
 	}
@@ -617,6 +624,101 @@ func checkModPortal(desc *modDescriptionT, factorioVersion string) (*modRelease,
 		}
 		return nil, "no such version", nil
 	}
+}
+
+var dependencyRegexp = regexp.MustCompile(`^(!|\?|\(\?\))? ?([A-Za-z0-9\-_ ]+)( ([<>]?=?) (\d+\.\d+\.\d+))?$`)
+
+func checkDependencies(newMods []*modRelease, files *modsFilesT) string {
+	installed := map[string][]*support.SemanticVersionT{}
+	for _, mod := range newMods {
+		installed[mod.Name] = append(installed[mod.Name], support.SemanticVersionPanic(mod.Version))
+	}
+	for name, modFiles := range files.versions {
+		for _, file := range modFiles {
+			installed[name] = append(installed[name], &file.version)
+		}
+	}
+
+	missingModsList := support.DefaultTextList("\n**Missing dependencies:**")
+	incompatibleModsList := support.DefaultTextList("\n**Incompatible Mods:**")
+	wrongVersionMods := support.DefaultTextList("\n**Wrong version is installed:**")
+	var addMods []string
+	var updateMods []string
+
+	for _, mod := range newMods {
+		for _, dependency := range mod.InfoJson.Dependencies {
+			match := dependencyRegexp.FindStringSubmatch(dependency)
+			prefix := match[1]
+			name := strings.TrimSpace(match[2])
+			compare := match[4]
+			depVersion := match[5]
+			if name == "base" {
+				continue // TODO check factorio version
+			}
+			if prefix == "?" || prefix == "(?)" {
+				continue // optional dependency
+			}
+			versions, found := installed[name]
+			if prefix == "!" {
+				if found {
+					incompatibleModsList.Append(fmt.Sprintf("%s is incompatible with %s", mod.Name, name))
+				}
+				continue
+			}
+			if !found {
+				missingModsList.Append(dependency)
+				if compare == "" || strings.Contains(compare, ">") {
+					addMods = append(addMods, support.QuoteSpace(name))
+				} else if compare != "<" {
+					addMods = append(addMods, support.QuoteSpace(fmt.Sprintf("%s==%s", name, depVersion)))
+				}
+				continue
+			}
+			if compare == "" {
+				continue
+			}
+			matched := false
+			for _, modVersion := range versions {
+				if support.CompareOp(modVersion.Compare(support.SemanticVersionPanic(depVersion)), compare) {
+					matched = true
+					break
+				}
+			}
+			if !matched {
+				if compare == "" || strings.Contains(compare, ">") {
+					updateMods = append(updateMods, support.QuoteSpace(name))
+				} else if compare != "<" {
+					updateMods = append(updateMods, support.QuoteSpace(fmt.Sprintf("%s==%s", name, depVersion)))
+				}
+				versionsStr := ""
+				for _, version := range versions { // fucking golang
+					if versionsStr != "" {
+						versionsStr += ", "
+					}
+					versionsStr += version.Full
+				}
+				wrongVersionMods.Append(fmt.Sprintf(
+					"%s (%s) doesn't satisfy the dependency condition '%s %s' of %s",
+					name, versionsStr, compare, depVersion, mod.Name,
+				))
+			}
+		}
+	}
+	res := missingModsList.RenderNotEmpty() + incompatibleModsList.RenderNotEmpty() + wrongVersionMods.RenderNotEmpty()
+	if len(addMods) != 0 || len(updateMods) != 0 {
+		if len(addMods) != 0 && len(updateMods) != 0 {
+			res += "\nIt is recommended to run these commands:"
+		} else {
+			res += "\nIt is recommended to run this command:"
+		}
+	}
+	if len(addMods) != 0 {
+		res += support.FormatUsage("\n    `$mod add " + strings.Join(addMods, " ") + "`")
+	}
+	if len(updateMods) != 0 {
+		res += support.FormatUsage("\n    `$mod update " + strings.Join(updateMods, " ") + "`")
+	}
+	return res
 }
 
 func compareFactorioVersions(modVersion, factorioVersion string) bool {

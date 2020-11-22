@@ -4,6 +4,7 @@ release/**
 .env
 config.json
 FactoCord-3.0
+FactoCord-3.0.exe
 FactoCord3
 FactoCord
 error.log
