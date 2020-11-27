@@ -74,6 +74,11 @@ func ChunkedMessageSend(s *discordgo.Session, message string) {
 	}
 }
 
+func SetTyping(s *discordgo.Session) {
+	err := s.ChannelTyping(Config.FactorioChannelID)
+	Panik(err, "... when sending 'typing' status")
+}
+
 func FormatUsage(s string) string {
 	return strings.Replace(s, "$", Config.Prefix, -1)
 }

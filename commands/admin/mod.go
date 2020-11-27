@@ -249,8 +249,10 @@ func ModCommand(s *discordgo.Session, args string) {
 	var res string
 	switch action {
 	case "add":
+		support.SetTyping(s)
 		res = modsAdd(s, mods, &modDescriptions)
 	case "update":
+		support.SetTyping(s)
 		res = modsUpdate(s, mods, &modDescriptions)
 	case "remove":
 		res = modsRemove(mods, modnames)
