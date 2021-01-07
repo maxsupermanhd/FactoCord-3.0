@@ -128,6 +128,7 @@ func serverUpdate(s *discordgo.Session, version string) {
 	if err != nil {
 		support.Panik(err, "Error opening "+path+" for write")
 		support.Send(s, path+": error opening file for write")
+		return
 	}
 
 	message := support.Send(s, support.FormatNamed(support.Config.Messages.DownloadStart, "file", filename))
@@ -147,6 +148,7 @@ func serverUpdate(s *discordgo.Session, version string) {
 		counter.Error = true
 		message.Edit(s, ":interrobang: Error downloading "+filename)
 		support.Panik(err, "Error downloading file")
+		return
 	}
 
 	dir, err := filepath.Abs(support.Config.Executable)
