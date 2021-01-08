@@ -12,7 +12,7 @@ import (
 
 var OnlineDoc = support.CommandDoc{
 	Name: "online",
-	Doc:  ``,
+	Doc:  `shows players online (and max number of players if set)`,
 }
 
 func getOnline(info *gameInfo) *support.TextListT {

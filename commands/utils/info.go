@@ -11,7 +11,7 @@ import (
 
 var InfoDoc = support.CommandDoc{
 	Name: "info",
-	Doc:  `Shows info about the server as from the factorio lobby`,
+	Doc:  `shows info about the server as from the factorio lobby`,
 }
 
 type gameInfo struct {
