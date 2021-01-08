@@ -95,6 +95,20 @@ var Commands = [...]Command{
 		Desc:    "Get server version",
 	},
 	{
+		Name:    "info",
+		Command: utils.GameInfo,
+		Admin:   nil,
+		Doc:     &utils.InfoDoc,
+		Desc:    "Get server info",
+	},
+	{
+		Name:    "online",
+		Command: utils.GameOnline,
+		Admin:   nil,
+		Doc:     &utils.OnlineDoc,
+		Desc:    "Get players online",
+	},
+	{
 		Name:  "help",
 		Admin: nil,
 		Doc: &support.CommandDoc{

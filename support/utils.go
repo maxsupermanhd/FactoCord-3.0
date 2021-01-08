@@ -233,6 +233,13 @@ func DirExists(filename string) bool {
 	return info.IsDir()
 }
 
+func PluralS(x int) string {
+	if x > 1 {
+		return "s"
+	}
+	return ""
+}
+
 type WriteCounter struct {
 	Total       uint64
 	Transferred uint64
@@ -322,6 +329,21 @@ func (l *TextListT) Render() string {
 		return l.Error
 	}
 	res := l.Heading
+	if len(l.List) == 0 {
+		res += l.None
+	} else {
+		for _, x := range l.List {
+			res += "\n" + l.Indentation + x
+		}
+	}
+	return res
+}
+
+func (l *TextListT) RenderWithoutHeading() string {
+	if l.Error != "" {
+		return l.Error
+	}
+	res := ""
 	if len(l.List) == 0 {
 		res += l.None
 	} else {

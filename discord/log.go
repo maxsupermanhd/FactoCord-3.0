@@ -14,6 +14,7 @@ import (
 
 var charRegexp = regexp.MustCompile("^\\d{4}[-/]\\d\\d[-/]\\d\\d \\d\\d:\\d\\d:\\d\\d ")
 var factorioLogRegexp = regexp.MustCompile("^\\d+\\.\\d{3} ")
+var gameidRegexp = regexp.MustCompile("Matching server game `(\\d+)` has been created")
 
 var forwardMessages = []*regexp.Regexp{
 	regexp.MustCompile("^Player .+ doesn't exist."),
@@ -50,6 +51,9 @@ func ProcessFactorioLogLine(line string) {
 		}
 		if strings.Contains(line, "Quitting multiplayer connection.") {
 			support.SendMessage(Session, support.Config.Messages.ServerStop)
+		}
+		if match := gameidRegexp.FindStringSubmatch(line); match != nil {
+			support.Factorio.GameID = match[1]
 		}
 	} else {
 		for _, pattern := range forwardMessages {

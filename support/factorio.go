@@ -40,6 +40,7 @@ type factorioState struct {
 	running       bool
 	stopping      bool
 	SaveRequested bool
+	GameID        string
 }
 
 var Factorio factorioState
@@ -82,6 +83,9 @@ func (f *factorioState) Start(s *discordgo.Session) {
 	if f.running {
 		SendOptional(s, "The server is already running")
 		return
+	}
+	if s != nil {
+		SetTyping(s)
 	}
 	f.running = true
 	f.Process = exec.Command(Config.Executable, Config.LaunchParameters...)
