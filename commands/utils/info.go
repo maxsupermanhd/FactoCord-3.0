@@ -41,6 +41,10 @@ type gameInfo struct {
 }
 
 func GameInfo(s *discordgo.Session, _ string) {
+	if !support.Factorio.IsRunning() {
+		support.Send(s, "The server is not running")
+		return
+	}
 	if support.Factorio.GameID == "" {
 		support.Send(s, "The server did not register a game on the factorio server")
 		return
