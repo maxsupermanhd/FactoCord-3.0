@@ -650,6 +650,10 @@ func checkDependencies(newMods []*modRelease, files *modsFilesT) string {
 	for _, mod := range newMods {
 		for _, dependency := range mod.InfoJson.Dependencies {
 			match := dependencyRegexp.FindStringSubmatch(dependency)
+			if match == nil {
+				support.Panik(fmt.Errorf(dependency), "Error matching regexp to dependency")
+				return fmt.Sprintf("Error matching dependency of %s %s: %s", mod.Name, mod.Version, dependency)
+			}
 			prefix := match[1]
 			name := strings.TrimSpace(match[2])
 			compare := match[3]
