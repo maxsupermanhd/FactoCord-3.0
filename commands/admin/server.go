@@ -104,6 +104,11 @@ func serverUpdate(s *discordgo.Session, version string) {
 		support.Send(s, "Some connection error occurred")
 		return
 	}
+	if resp.StatusCode == 404 {
+		support.Send(s, fmt.Sprintf("Version %s not found\n"+
+			"Refer to <https://factorio.com/download/archive> to see available versions", version))
+		return
+	}
 	if resp.ContentLength <= 0 {
 		support.Send(s, "Error with content-length")
 		return
