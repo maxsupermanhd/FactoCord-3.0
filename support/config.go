@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 )
 
+var FactoCordVersion string
+
 var ConfigPath = "./config.json"
 
 var GuildID string

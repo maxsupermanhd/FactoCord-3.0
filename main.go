@@ -14,7 +14,10 @@ import (
 var closing = false
 
 func main() {
-	fmt.Println("Welcome to FactoCord-3.0!")
+	if support.FactoCordVersion == "" {
+		support.FactoCordVersion = "i'm debugging here"
+	}
+	fmt.Printf("Welcome to FactoCord %s!\n", support.FactoCordVersion)
 	support.Config.MustLoad()
 
 	discord.StartSession()

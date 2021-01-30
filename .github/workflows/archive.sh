@@ -4,14 +4,6 @@ rm -rf ./release
 mkdir ./release
 mkdir ./release/FactoCord3
 
-version=`git describe --tags`
-version+=" ("
-version+=`git rev-parse --short HEAD`
-version+=")"
-
-echo "Version: ${version}"
-echo "${version}" > ./release/FactoCord3/.version
-
 cp config-example.json control.lua FactoCord3 INSTALL.md LICENSE README.md SECURITY.md ./release/FactoCord3
 
 pushd ./release > /dev/null

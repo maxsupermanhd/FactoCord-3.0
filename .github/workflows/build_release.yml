@@ -28,15 +28,15 @@ jobs:
           fi
 
       - name: Build
-        run: go build -o FactoCord3 -v .
+        run: |
+          version="`git describe --tags` (`git rev-parse --short HEAD`)"
+          echo "Version: $version"
+          go build -ldflags "-X 'github.com/maxsupermanhd/FactoCord-3.0/support.FactoCordVersion=$version'" -o FactoCord3 -v .
 
       - name: Create archives
         run: |
           chmod u+x ./.github/workflows/archive.sh
           ./.github/workflows/archive.sh
-
-      - name: ls
-        run: ls -l ./release && ls -l ./release/FactoCord3
 
       - name: Upload executable
         id: upload-exe
