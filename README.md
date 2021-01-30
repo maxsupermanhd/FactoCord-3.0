@@ -13,6 +13,8 @@
    <br>
    <img src="https://i.imgur.com/35pRKPl.png"/><br>
    <img src="https://i.imgur.com/O92ehgL.png"/>
+ * Display server info and online<br>
+   <img src="https://i.imgur.com/3UMODTO.png"/>    
  * Save the game<br>
    <img src="https://i.imgur.com/vqUWhMq.png"/>
  * Start, stop, or restart the factorio server<br>
