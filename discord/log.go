@@ -45,7 +45,9 @@ func ProcessFactorioLogLine(line string) {
 				support.LastMessage.Metadata = fmt.Sprintf("save%d", num)
 			} else {
 				message := support.SendMessage(Session, support.Config.Messages.ServerSave)
-				message.Metadata = "save1"
+				if message != nil {
+					message.Metadata = "save1"
+				}
 				support.Factorio.SaveRequested = false
 			}
 		}
