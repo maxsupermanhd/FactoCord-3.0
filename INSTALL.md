@@ -6,9 +6,13 @@ Tested on Ubuntu 18.04.4 LTS, Ubuntu 18.04.4 LTS (Server), WSL1 Ubuntu
 # Installing pre-built binaries
 
 ## Step 0
+
+Download the executable from [a release on github](https://github.com/maxsupermanhd/FactoCord-3.0/releases)
+
+## Step 1
 Configuring
 
-Enter installation directory `cd FactoCord-3.0/`
+Enter installation directory `cd FactoCord/` (or any name you want)
 
 Copy `config-example.json` to `config.json` (`cp config-example.json config.json`)
 
@@ -22,10 +26,13 @@ Then in text editor you must set:
 5. Discord IDs of all the admins (for commands) (`admin_ids`)
 6. `mod-list.json` file location (including the filename) (`mod_list_location`)
 
-## Step 1
+## Step 2
 Running
 
-`./FactoCord3`
+```
+chmod +x ./FactoCord3
+./FactoCord3
+```
 
 
 # Installing from sources
@@ -37,10 +44,7 @@ Make sure system is up to date `sudo apt-get update -y && sudo apt-get upgrade -
 
 Download go 1.12+ (`sudo apt install golang-go git -y`) (you may need to get it from the website, repos can be outdated)
 
-Get go packages:
-
-- [DiscordGo](https://github.com/bwmarrin/discordgo) `go get github.com/bwmarrin/discordgo`
-- [json5](https://github.com/yosuke-furukawa/json5) `go get github.com/yosuke-furukawa/json5`
+Get go packages: `go get`
 
 ## Step 1
 Cloning repo
