@@ -128,7 +128,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	if m.ChannelID == support.Config.FactorioConsoleChatID {
 		fmt.Println("wrote to console from channel: \"", m.Content, "\"")
-		support.Send(s, "wrote "+m.Content)
+		support.SendTo(s, "wrote "+m.Content, support.Config.FactorioConsoleChatID)
 		support.Factorio.Send(m.Content)
 	}
 	return

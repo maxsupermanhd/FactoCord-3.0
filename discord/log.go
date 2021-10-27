@@ -6,13 +6,14 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
-var charRegexp = regexp.MustCompile("^\\d{4}[-/]\\d\\d[-/]\\d\\d \\d\\d:\\d\\d:\\d\\d ")
+var chatRegexp = regexp.MustCompile("^\\d{4}[-/]\\d\\d[-/]\\d\\d \\d\\d:\\d\\d:\\d\\d ")
 var factorioLogRegexp = regexp.MustCompile("^\\d+\\.\\d{3} ")
 var gameidRegexp = regexp.MustCompile("Matching server game `(\\d+)` has been created")
 
@@ -21,13 +22,24 @@ var forwardMessages = []*regexp.Regexp{
 	regexp.MustCompile("^.+ wasn't banned."),
 }
 
+var consoleChannel chan string = nil
+
 // ProcessFactorioLogLine pipes in-game chat to Discord.
 func ProcessFactorioLogLine(line string) {
 	line = strings.TrimSpace(line)
-	if line == "" {
+	if line == "" || strings.Contains(line, "Sendto failed (but can be probably ignored)") {
 		return
 	}
-	if charRegexp.FindString(line) != "" {
+
+	if support.Config.EnableConsoleChannel && support.Config.FactorioConsoleChatID != "" {
+		if consoleChannel == nil {
+			consoleChannel = make(chan string, 10)
+			go forwardToConsoleChannel(Session, consoleChannel)
+		}
+		consoleChannel <- line
+	}
+
+	if chatRegexp.FindString(line) != "" {
 		line = line[len("0000-00-00 00:00:00 "):]
 		processFactorioChat(strings.TrimSpace(line))
 	} else if factorioLogRegexp.FindString(line) != "" {
@@ -103,5 +115,31 @@ func processFactorioChat(line string) {
 		}
 	} else if !integrationMessage {
 		support.Send(Session, line)
+	}
+}
+
+func forwardToConsoleChannel(s *discordgo.Session, lines chan string) {
+	message := ""
+	var timeout <-chan time.Time = nil
+	for {
+		select {
+		case <-timeout:
+			support.SendTo(s, message, support.Config.FactorioConsoleChatID)
+			message = ""
+			timeout = nil
+		case line := <-lines:
+			line = strings.ReplaceAll(line, "_", "\\_")
+			line = strings.ReplaceAll(line, "*", "\\*")
+			line = strings.ReplaceAll(line, ">", "\\>")
+			if len(message)+len(line)+1 >= 2000 {
+				support.SendTo(s, message, support.Config.FactorioConsoleChatID)
+				message = ""
+				timeout = nil
+			}
+			if timeout == nil {
+				timeout = time.After(time.Second * 2)
+			}
+			message += "\n" + line
+		}
 	}
 }

@@ -19,6 +19,13 @@ func Send(s *discordgo.Session, message string) *MessageControlT {
 	return LastMessage
 }
 
+func SendTo(s *discordgo.Session, message string, channelID string) {
+	_, err := s.ChannelMessageSend(channelID, message)
+	if err != nil {
+		Panik(err, "Failed to send message: "+message)
+	}
+}
+
 func SendOptional(s *discordgo.Session, message string) *MessageControlT {
 	if s == nil {
 		return nil
