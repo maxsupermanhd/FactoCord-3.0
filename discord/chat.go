@@ -3,6 +3,7 @@ package discord
 import (
 	"fmt"
 	"log"
+	"reflect"
 	"regexp"
 	"strings"
 	"time"
@@ -46,14 +47,41 @@ func Init() {
 	Session.AddHandler(messageUpdate)
 	// TODO add recover() ↑
 
+	Session.AddHandler(commands.ProcessInteraction)
+
 	go CacheUpdater(Session)
 
 	time.Sleep(3 * time.Second)
-	err := Session.UpdateStatus(0, support.Config.GameName)
+	err := Session.UpdateGameStatus(0, support.Config.GameName)
 	support.Panik(err, "... when updating bot status")
 
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	support.SendMessage(Session, support.Config.Messages.BotStart)
+
+	log.Println("Registering commands...")
+	oldCommands, err := Session.ApplicationCommands(Session.State.User.ID, "")
+	unregistered := make(map[string]*discordgo.ApplicationCommand, len(commands.Commands))
+	for name, command := range commands.Commands {
+		unregistered[name] = command.ToCommand()
+	}
+	for _, command := range oldCommands {
+		unregistered[command.Name].ID = command.ID
+		unregistered[command.Name].ApplicationID = command.ApplicationID
+		unregistered[command.Name].Version = command.Version
+		unregistered[command.Name].Type = discordgo.ChatApplicationCommand
+		if reflect.DeepEqual(command, unregistered[command.Name]) {
+			delete(unregistered, command.Name)
+		}
+	}
+	for _, command := range unregistered {
+		_, err := Session.ApplicationCommandCreate(Session.State.User.ID, "", command)
+		if err != nil {
+			log.Panicf("Cannot create '%v' command: %v", command.Name, err)
+		}
+	}
+	// TODO add command permissions when they are ready
+	// https://github.com/bwmarrin/discordgo/pull/943
+	log.Println("Registered all commands")
 }
 
 func Close() {
@@ -70,20 +98,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	if m.ChannelID == support.Config.FactorioChannelID {
 		support.MyLastMessage = false
-		if strings.HasPrefix(m.Content, support.Config.Prefix) {
-			input := strings.Replace(m.Content, support.Config.Prefix, "", 1)
-			commands.RunCommand(input, s, m.Message)
-			return
-		}
 		if regexp.MustCompile(fmt.Sprintf("^<@!?%s>", s.State.User.ID)).MatchString(m.Content) {
 			// when bot is mentioned at the start of the message
 			_, message := support.SplitAfter(m.Content, ">")
 			message = strings.TrimSpace(message)
-			if message == "" {
-				support.SendFormat(s, "Current prefix is: `$`. You can use `$help` or ping me with a command")
-			} else {
-				commands.RunCommand(message, s, m.Message)
-			}
+			support.Send(s, "I am FactoCord bot. You can use `/help` to learn more about me.")
 			return
 		}
 		log.Print("[" + m.Author.Username + "] " + m.Content)

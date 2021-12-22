@@ -11,135 +11,82 @@ import (
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
-// Command is a struct containing fields that hold command information.
-type Command struct {
-	Name string
-
-	Command func(s *discordgo.Session, args string)
-
-	Admin func(args string) bool
-	Doc   *support.CommandDoc
-	Desc  string
-}
-
-func alwaysAdmin(_ string) bool {
-	return true
-}
-
 // Commands is a list of all available commands
-var Commands = [...]Command{
+var commandsList = [...]support.Command{
 	// Admin Commands
-	{
-		Name:    "server",
-		Command: admin.ServerCommand,
-		Admin:   admin.ServerCommandAdminPermission,
-		Doc:     &admin.ServerCommandDoc,
-		Desc:    "Manage factorio server",
-	},
-	{
-		Name:    "save",
-		Command: admin.SaveServer,
-		Admin:   alwaysAdmin,
-		Doc:     &admin.SaveServerDoc,
-		Desc:    "Save the game",
-	},
-	{
-		Name:    "kick",
-		Command: admin.KickPlayer,
-		Admin:   alwaysAdmin,
-		Doc:     &admin.KickPlayerDoc,
-		Desc:    "Kick a user from the server",
-	},
-	{
-		Name:    "ban",
-		Command: admin.BanPlayer,
-		Admin:   alwaysAdmin,
-		Doc:     &admin.BanPlayerDoc,
-		Desc:    "Ban a user from the server",
-	},
-	{
-		Name:    "unban",
-		Command: admin.UnbanPlayer,
-		Admin:   alwaysAdmin,
-		Doc:     &admin.UnbanPlayerDoc,
-		Desc:    "Unban a user from the server",
-	},
-	{
-		Name:    "config",
-		Command: admin.ConfigCommand,
-		Admin:   alwaysAdmin,
-		Doc:     &admin.ConfigCommandDoc,
-		Desc:    "Manage config.json",
-	},
-	{
-		Name:    "mod",
-		Command: admin.ModCommand,
-		Admin:   alwaysAdmin,
-		Doc:     &admin.ModCommandDoc,
-		Desc:    "Manage mod-list.json",
-	},
+	admin.ServerCommandDoc,
+	admin.SaveServerDoc,
+	admin.KickPlayerDoc,
+	admin.BanPlayerDoc,
+	admin.UnbanPlayerDoc,
+	admin.ConfigCommandDoc,
+	admin.ModCommandDoc,
 
 	// Util Commands
+	utils.ModListDoc,
+	utils.VersionDoc,
+	utils.InfoDoc,
+	utils.OnlineDoc,
 	{
-		Name:    "mods",
-		Command: utils.ModsList,
-		Admin:   nil,
-		Doc:     &utils.ModListDoc,
-		Desc:    "List the mods on the server",
-	},
-	{
-		Name:    "version",
-		Command: utils.VersionString,
-		Admin:   nil,
-		Doc:     &utils.VersionDoc,
-		Desc:    "Get server version",
-	},
-	{
-		Name:    "info",
-		Command: utils.GameInfo,
-		Admin:   nil,
-		Doc:     &utils.InfoDoc,
-		Desc:    "Get server info",
-	},
-	{
-		Name:    "online",
-		Command: utils.GameOnline,
-		Admin:   nil,
-		Doc:     &utils.OnlineDoc,
-		Desc:    "Get players online",
-	},
-	{
-		Name:  "help",
-		Admin: nil,
-		Doc: &support.CommandDoc{
-			Name: "help",
-			Usage: "$help\n" +
-				"$help <command>\n" +
-				"$help <command> <subcommand>",
-			Doc: "command returns list of all commands and documentation about any command and its' subcommands",
+		Name: "help",
+		Desc: "List the commands for FactoСord and get documentation on commands and subcommands. Try `/help help`",
+		Usage: "/help\n" +
+			"/help <command>\n" +
+			"/help <command> <subcommand>",
+		Doc:     "command returns list of all commands and documentation about any command and its' subcommands",
+		Command: nil, // = helpCommand in the init()
+		Options: []*discordgo.ApplicationCommandOption{
+			{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "command",
+				Description: "The command to get the help on",
+				Required:    false,
+				Choices:     nil,
+			},
+			{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "subcommand",
+				Description: "The subcommand to get the help on",
+				Required:    false,
+			},
 		},
-		Desc: "List the commands for Factocord and get documentation on commands and subcommands. Try `$help help`",
 	},
 }
+var Commands = map[string]support.Command{}
 
-func helpCommand(s *discordgo.Session, args string) {
-	if args == "" {
-		helpAllCommands(s)
+func init() {
+	help := &commandsList[len(commandsList)-1]
+	help.Command = helpCommand
+	for _, command := range commandsList {
+		Commands[command.Name] = command
+		help.Options[0].Choices = append(help.Options[0].Choices, &discordgo.ApplicationCommandOptionChoice{
+			Name:  command.Name,
+			Value: command.Name,
+		})
+	}
+}
+
+func helpCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	if len(i.ApplicationCommandData().Options) == 0 {
+		helpAllCommands(s, i)
 		return
 	}
-	args = strings.ToLower(args)
-	commandName, subcommand := support.SplitDivide(args, " ")
+	commandName := strings.ToLower(i.ApplicationCommandData().Options[0].StringValue())
+	subcommand := ""
+	if len(i.ApplicationCommandData().Options) == 2 {
+		subcommand = strings.ToLower(i.ApplicationCommandData().Options[1].StringValue())
+	}
 	for _, command := range Commands {
 		if command.Name == commandName {
-			helpOnCommand(s, command.Doc, subcommand)
+			helpOnCommand(s, i, &command, subcommand)
 			return
 		}
 	}
 	support.Send(s, "There's no such command as \""+commandName+"\"")
 }
 
-func helpOnCommand(s *discordgo.Session, command *support.CommandDoc, subcommandName string) {
-	path := support.Config.Prefix + command.Name
+func helpOnCommand(s *discordgo.Session, i *discordgo.InteractionCreate, command *support.Command, subcommandName string) {
+	path := "/" + command.Name
 	if subcommandName != "" {
 		found := false
 		for _, subcommand := range command.Subcommands {
@@ -160,13 +107,12 @@ func helpOnCommand(s *discordgo.Session, command *support.CommandDoc, subcommand
 		Type:        "rich",
 		Color:       0x6289FF,
 		Title:       fmt.Sprintf("Documentation on `%s` command", path),
-		Description: support.FormatUsage(quoted + " " + command.Doc),
+		Description: quoted + " " + command.Doc,
 	}
 	usage := command.Usage
 	if usage == "" {
 		usage = path
 	}
-	usage = support.FormatUsage(usage)
 	if strings.Contains(usage, "\n") {
 		usage = "```\n" + usage + "\n```"
 	} else {
@@ -187,17 +133,20 @@ func helpOnCommand(s *discordgo.Session, command *support.CommandDoc, subcommand
 		subcommands = "```\n" + subcommands + "\n```"
 		embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
 			Name:  "**Subcommands:**",
-			Value: support.FormatUsage(subcommands),
+			Value: subcommands,
 		})
 	}
-	support.SendEmbed(s, embed)
+	support.RespondComplex(s, i, &discordgo.InteractionResponseData{
+		Embeds: []*discordgo.MessageEmbed{embed},
+		Flags:  1 << 6, // EPHEMERAL
+	})
 }
 
-func helpAllCommands(s *discordgo.Session) {
+func helpAllCommands(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	fields := make([]*discordgo.MessageEmbedField, 0, len(Commands))
 
-	for _, command := range Commands {
-		desc := support.FormatUsage(command.Desc)
+	for _, command := range commandsList {
+		desc := command.Desc
 		if roleID, exists := support.Config.CommandRoles[strings.ToLower(command.Name)]; exists {
 			roles, err := s.GuildRoles(support.GuildID)
 			if err != nil {
@@ -215,11 +164,11 @@ func helpAllCommands(s *discordgo.Session) {
 			if !found {
 				desc = "[Role not found in guild] " + desc
 			}
-		} else if command.Admin != nil {
+		} else if command.Admin {
 			desc = "[Admin] " + desc
 		}
 		fields = append(fields, &discordgo.MessageEmbedField{
-			Name:  support.Config.Prefix + command.Name,
+			Name:  "/" + command.Name,
 			Value: desc,
 		})
 	}
@@ -230,56 +179,64 @@ func helpAllCommands(s *discordgo.Session) {
 		Title:       "FactoCord Commands",
 		Fields:      fields,
 	}
-	support.SendEmbed(s, embed)
+	support.RespondComplex(s, i, &discordgo.InteractionResponseData{
+		Embeds: []*discordgo.MessageEmbed{embed},
+		Flags:  1 << 6, // EPHEMERAL
+	})
 }
 
-// RunCommand runs a specified command.
-func RunCommand(input string, s *discordgo.Session, m *discordgo.Message) {
-	inputvars := strings.SplitN(input+" ", " ", 2)
-	commandName := strings.ToLower(inputvars[0])
-	args := strings.TrimSpace(inputvars[1])
-
-	if commandName == strings.ToLower("Help") {
-		helpCommand(s, args)
+// ProcessInteraction runs a specified command.
+func ProcessInteraction(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	name := i.ApplicationCommandData().Name
+	command, ok := Commands[name]
+	if !ok {
+		//support.Send(s, "Command not found. Try using \"/help\"")
 		return
 	}
-
-	for _, command := range Commands {
-		if strings.ToLower(command.Name) == commandName {
-			execute := false
-			err := ""
-
-			if command.Admin != nil && command.Admin(args) {
-				if CheckAdmin(m.Author.ID) {
-					execute = true
-				} else {
-					err = "You are not an admin!"
-				}
-			} else {
-				execute = true
-			}
-			if roleID, exists := support.Config.CommandRoles[commandName]; exists {
-				// TODO? role name
-				err = "You don't have the required role"
-				for _, memberRoleID := range m.Member.Roles {
-					if memberRoleID == roleID {
-						execute = true
-					}
-				}
-			}
-			if execute {
-				command.Command(s, args)
-			} else {
-				support.Send(s, err)
-			}
-			return
+	subcommand := command
+	if len(i.ApplicationCommandData().Options) > 0 &&
+		i.ApplicationCommandData().Options[0].Type == discordgo.ApplicationCommandOptionSubCommand {
+		found := command.Subcommand(i.ApplicationCommandData().Options[0].Name)
+		if found != nil {
+			subcommand = *found
 		}
 	}
-	support.SendFormat(s, "Command not found. Try using \"$help\"")
+
+	execute := false
+	err := ""
+
+	if subcommand.Admin {
+		if CheckAdmin(i.Member.User.ID) {
+			execute = true
+		} else {
+			err = "You are not an admin!"
+		}
+	} else {
+		execute = true
+	}
+	if roleID, exists := support.Config.CommandRoles[name]; exists {
+		// TODO? role name
+		err = "You don't have the required role"
+		for _, memberRoleID := range i.Member.Roles {
+			if memberRoleID == roleID {
+				execute = true
+			}
+		}
+	}
+	if execute {
+		if command.Command != nil {
+			command.Command(s, i)
+		} else {
+			subcommand.Command(s, i)
+		}
+	} else {
+		support.Respond(s, i, err)
+	}
 }
 
 // CheckAdmin checks if the user attempting to run an admin command is an admin
 func CheckAdmin(ID string) bool {
+	// not using map here because they can be modified by /config set
 	for _, adminID := range support.Config.AdminIDs {
 		if ID == adminID {
 			return true

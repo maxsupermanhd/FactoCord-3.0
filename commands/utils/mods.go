@@ -21,15 +21,33 @@ type Mod struct {
 	Enabled bool
 }
 
-var ModListDoc = support.CommandDoc{
-	Name:  "mods",
-	Doc:   `command outputs information about current mods`,
-	Usage: "$mods [on | off | all | files]",
-	Subcommands: []support.CommandDoc{
-		{Name: "on", Doc: `command sends currently enabled mods`},
-		{Name: "off", Doc: `command sends currently disabled mods`},
-		{Name: "all", Doc: `command sends all mods in mod-list.json`},
-		{Name: "files", Doc: `command sends filenames of all downloaded mods`},
+var ModListDoc = support.Command{
+	Name:    "mods",
+	Desc:    "List the mods on the server",
+	Doc:     `command outputs information about current mods`,
+	Usage:   "/mods on | off | all | files",
+	Command: ModsList,
+	Subcommands: []support.Command{
+		{
+			Name: "on",
+			Desc: `Shows currently enabled mods`,
+			Doc:  `command sends currently enabled mods`,
+		},
+		{
+			Name: "off",
+			Desc: `Shows currently disabled mods`,
+			Doc:  `command sends currently disabled mods`,
+		},
+		{
+			Name: "all",
+			Desc: `Shows all mods in mod-list.json`,
+			Doc:  `command sends all mods in mod-list.json`,
+		},
+		{
+			Name: "files",
+			Desc: `Shows filenames of all downloaded mods`,
+			Doc:  `command sends filenames of all downloaded mods`,
+		},
 	},
 }
 
@@ -103,37 +121,36 @@ func modsFiles() string {
 }
 
 // ModsList returns the list of mods running on the server.
-func ModsList(s *discordgo.Session, args string) {
+func ModsList(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	returnEnabled := true
 	returnDisabled := false
-	if args == "on" || args == "" {
+	command := i.ApplicationCommandData().Options[0].Name
+	if command == "on" || command == "" {
 		returnEnabled = true
-	} else if args == "off" {
+	} else if command == "off" {
 		returnEnabled = false
 		returnDisabled = true
-	} else if args == "all" {
+	} else if command == "all" {
 		returnDisabled = true
-	} else if args == "files" {
-		support.Send(s, modsFiles())
-		return
-	} else {
-		support.SendFormat(s, "Usage: "+ModListDoc.Usage)
+	} else if command == "files" {
+		support.Respond(s, i, modsFiles())
 		return
 	}
 	ModList := &ModJson{}
 	Json, err := ioutil.ReadFile(support.Config.ModListLocation)
 	if err != nil {
-		support.Send(s, "Sorry, there was an error reading your mods list")
+		support.Respond(s, i, "Sorry, there was an error reading your mods list")
 		support.Panik(err, "there was an error reading mods list, did you specify it in the config.json file?")
 		return
 	}
 
 	err = json.Unmarshal(Json, &ModList)
 	if err != nil {
-		support.Send(s, "Sorry, there was an error reading your mods list")
+		support.Respond(s, i, "Sorry, there was an error reading your mods list")
 		support.Panik(err, "there was an error reading mods list")
 		return
 	}
-	support.ChunkedMessageSend(s, modList(ModList, returnEnabled, returnDisabled))
+
+	support.RespondChunked(s, i, modList(ModList, returnEnabled, returnDisabled))
 	return
 }

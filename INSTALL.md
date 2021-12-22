@@ -7,7 +7,7 @@ Tested on Ubuntu 18.04.4 LTS, Ubuntu 18.04.4 LTS (Server), WSL1 Ubuntu
 
 ## Step 0
 
-Download the executable from [a release on github](https://github.com/maxsupermanhd/FactoCord-3.0/releases)
+Download the executable from [a release on GitHub](https://github.com/maxsupermanhd/FactoCord-3.0/releases)
 
 ## Step 1
 Configuring

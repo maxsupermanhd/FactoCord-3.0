@@ -7,16 +7,18 @@ import (
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
-var VersionDoc = support.CommandDoc{
+var VersionDoc = support.Command{
 	Name: "version",
+	Desc: "Get server version",
 	Doc: `command outputs factorio server version and FactoCord version.
 If it says that FactoCord version is unknown look into the error.log`,
+	Command: VersionString,
 }
 
-func VersionString(s *discordgo.Session, _ string) {
+func VersionString(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	factorioVersion, err := support.FactorioVersion()
 	if err != nil {
-		support.Send(s, "Sorry, there was an error checking factorio version")
+		support.Respond(s, i, "Sorry, there was an error checking factorio version")
 		support.Panik(err, "... when running `factorio --version`")
 		return
 	}
@@ -24,5 +26,5 @@ func VersionString(s *discordgo.Session, _ string) {
 
 	res += fmt.Sprintf("\nFactoCord version: **%s**", support.FactoCordVersion)
 
-	support.Send(s, res)
+	support.Respond(s, i, res)
 }

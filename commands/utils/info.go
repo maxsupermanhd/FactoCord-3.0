@@ -9,9 +9,11 @@ import (
 	"strings"
 )
 
-var InfoDoc = support.CommandDoc{
-	Name: "info",
-	Doc:  `shows info about the server as from the factorio lobby`,
+var InfoDoc = support.Command{
+	Name:    "info",
+	Desc:    "Get server info",
+	Doc:     `shows info about the server as from the factorio lobby`,
+	Command: GameInfo,
 }
 
 type gameInfo struct {
@@ -40,27 +42,28 @@ type gameInfo struct {
 	Tags     []string `json:"tags"`
 }
 
-func GameInfo(s *discordgo.Session, _ string) {
+func GameInfo(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if !support.Factorio.IsRunning() {
-		support.Send(s, "The server is not running")
+		support.Respond(s, i, "The server is not running")
 		return
 	}
 	if support.Factorio.GameID == "" {
-		support.Send(s, "The server did not register a game on the factorio server")
+		support.Respond(s, i, "The server did not register a game on the factorio server")
 		return
 	}
+	support.RespondDefer(s, i, "Fetching...")
 
 	resp, err := http.Get("https://multiplayer.factorio.com/get-game-details/" + support.Factorio.GameID)
 	if err != nil {
 		support.Panik(err, "Connection error to /get-game-details")
-		support.Send(s, "Some connection error occurred")
+		support.ResponseEdit(s, i, "Some connection error occurred")
 		return
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
 		support.Panik(err, "Error reading /get-game-details")
-		support.Send(s, "Some connection error occurred")
+		support.ResponseEdit(s, i, "Some connection error occurred")
 		return
 	}
 
@@ -68,11 +71,11 @@ func GameInfo(s *discordgo.Session, _ string) {
 	err = json.Unmarshal(body, &info)
 	if err != nil {
 		support.Panik(err, "Error unmarshalling /get-game-details")
-		support.Send(s, "Some json error occurred")
+		support.ResponseEdit(s, i, "Some json error occurred")
 		return
 	}
 	if info.Message != "" {
-		support.Send(s, "The server reports: "+info.Message)
+		support.ResponseEdit(s, i, "The server reports: "+info.Message)
 		return
 	}
 	embed := &discordgo.MessageEmbed{
@@ -98,5 +101,5 @@ func GameInfo(s *discordgo.Session, _ string) {
 		Name:  online.Heading,
 		Value: online.RenderWithoutHeading(),
 	})
-	support.SendEmbed(s, embed)
+	support.ResponseEditCompex(s, i, embed)
 }

@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-**BUG-FILTER-CHECKLIST.** Anyone who opens up a bug report must fill these checkboxes (add an "x" to `[ ]` to be like `[x]`) to assume that he acknowledged that he red README.md and followed checklist below.
+**BUG-FILTER-CHECKLIST.** Anyone who opens up a bug report must fill these checkboxes (add an "x" to `[ ]` to be like `[x]`) to assume that he acknowledged that he read README.md and followed checklist below.
 - [ ] Bot have rights to write, read and send embeds to desired channel.
 - [ ] Executable not receiving SIGTERM, SIGKILL or other terminating signals during work.
 - [ ] Scenario/mods are working correctly and not crashing game.

@@ -33,10 +33,6 @@ func SendMessage(s *discordgo.Session, message string) *MessageControlT {
 	return nil
 }
 
-func SendFormat(s *discordgo.Session, message string) *MessageControlT {
-	return Send(s, FormatUsage(message))
-}
-
 func SendEmbed(s *discordgo.Session, embed *discordgo.MessageEmbed) *MessageControlT {
 	sentMessage, err := s.ChannelMessageSendEmbed(Config.FactorioChannelID, embed)
 	if err != nil {
@@ -60,27 +56,102 @@ func SendComplex(s *discordgo.Session, message *discordgo.MessageSend) *MessageC
 }
 
 func ChunkedMessageSend(s *discordgo.Session, message string) {
+	chunks := ChunkMessage(message)
+	for _, chunk := range chunks {
+		Send(s, chunk)
+	}
+}
+
+func Respond(s *discordgo.Session, i *discordgo.InteractionCreate, content string) {
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: content,
+		},
+	})
+	if err != nil {
+		Panik(err, "Failed to send message: "+content)
+	}
+}
+func RespondChunked(s *discordgo.Session, i *discordgo.InteractionCreate, content string) {
+	chunks := ChunkMessage(content)
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: chunks[0],
+		},
+	})
+	if err != nil {
+		Panik(err, "Failed to respond: "+content)
+		return
+	}
+	chunks = chunks[1:]
+	for _, chunk := range chunks {
+		_, err := s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
+			Content: chunk,
+		})
+		if err != nil {
+			Panik(err, "Failed to send follow-up message: "+content)
+			return
+		}
+	}
+}
+func RespondComplex(s *discordgo.Session, i *discordgo.InteractionCreate, data *discordgo.InteractionResponseData) {
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: data,
+	})
+	if err != nil {
+		Panik(err, fmt.Sprintf("Failed to send message: %v", data))
+	}
+}
+func RespondDefer(s *discordgo.Session, i *discordgo.InteractionCreate, content string) {
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: content,
+		},
+	})
+	if err != nil {
+		Panik(err, "Failed to send message: "+content)
+	}
+}
+func ResponseEdit(s *discordgo.Session, i *discordgo.InteractionCreate, content string) {
+	_, err := s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+		Content: content,
+	})
+	if err != nil {
+		Panik(err, "Failed to send message: "+content)
+	}
+}
+func ResponseEditCompex(s *discordgo.Session, i *discordgo.InteractionCreate, embed *discordgo.MessageEmbed) {
+	_, err := s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+		Embeds: []*discordgo.MessageEmbed{embed},
+	})
+	if err != nil {
+		Panik(err, fmt.Sprintf("Failed to send message: %v", embed))
+	}
+}
+
+func ChunkMessage(message string) (res []string) {
 	lines := strings.Split(message, "\n")
 	message = ""
 	for _, line := range lines {
 		if len(message)+len(line)+1 >= 2000 {
-			Send(s, message)
+			res = append(res, message)
 			message = ""
 		}
 		message += "\n" + line
 	}
 	if len(message) > 0 {
-		Send(s, message)
+		res = append(res, message)
 	}
+	return res
 }
 
 func SetTyping(s *discordgo.Session) {
 	err := s.ChannelTyping(Config.FactorioChannelID)
 	Panik(err, "... when sending 'typing' status")
-}
-
-func FormatUsage(s string) string {
-	return strings.Replace(s, "$", Config.Prefix, -1)
 }
 
 func FormatNamed(format, name, value string) string {
@@ -258,16 +329,16 @@ func (wc *WriteCounter) Percent() float32 {
 
 type ProgressUpdate struct {
 	*WriteCounter
-	Message                   *MessageControlT
+	Interaction               *discordgo.InteractionCreate
 	Start, Progress, Finished string
 }
 
 func DownloadProgressUpdater(s *discordgo.Session, p *ProgressUpdate) {
-	message := p.Message
-	if message == nil {
-		p.Message = Send(s, p.Start)
-		message = p.Message
-	}
+	//message := p.Message
+	//if message == nil {
+	//	p.Message = Send(s, p.Start)
+	//	message = p.Message
+	//}
 	time.Sleep(500 * time.Millisecond)
 	for {
 		if p.Error {
@@ -277,10 +348,10 @@ func DownloadProgressUpdater(s *discordgo.Session, p *ProgressUpdate) {
 			break
 		}
 		percent := fmt.Sprintf("%2.1f", p.Percent())
-		message.Edit(s, FormatNamed(p.Progress, "percent", percent))
+		ResponseEdit(s, p.Interaction, FormatNamed(p.Progress, "percent", percent))
 		time.Sleep(2 * time.Second)
 	}
-	message.Edit(s, p.Finished)
+	ResponseEdit(s, p.Interaction, p.Finished)
 }
 
 type TextListT struct {
@@ -362,11 +433,49 @@ func (l *TextListT) RenderNotEmpty() string {
 	}
 }
 
-type CommandDoc struct {
+type Command struct {
 	Name        string
+	Desc        string
 	Usage       string
 	Doc         string
-	Subcommands []CommandDoc
+	Admin       bool
+	Command     func(s *discordgo.Session, i *discordgo.InteractionCreate)
+	Subcommands []Command
+	Options     []*discordgo.ApplicationCommandOption
+	Choices     []*discordgo.ApplicationCommandOptionChoice
+}
+
+func (c *Command) Subcommand(s string) *Command {
+	for _, subcommand := range c.Subcommands {
+		if subcommand.Name == s {
+			return &subcommand
+		}
+	}
+	return nil
+}
+
+func (c *Command) ToSubcommand() *discordgo.ApplicationCommandOption {
+	return &discordgo.ApplicationCommandOption{
+		Type:         discordgo.ApplicationCommandOptionSubCommand,
+		Name:         c.Name,
+		Description:  c.Desc,
+		Options:      c.Options,
+		Autocomplete: false,
+		Choices:      c.Choices,
+	}
+}
+
+func (c *Command) ToCommand() *discordgo.ApplicationCommand {
+	res := &discordgo.ApplicationCommand{
+		Name:        c.Name,
+		Description: c.Desc,
+		Options:     c.Options,
+	}
+	for _, subcommand := range c.Subcommands {
+		option := subcommand.ToSubcommand()
+		res.Options = append(res.Options, option)
+	}
+	return res
 }
 
 func CompareOp(cmp int, op string) bool {

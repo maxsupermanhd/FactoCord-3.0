@@ -23,7 +23,6 @@ type configT struct {
 	DiscordToken            string `json:"discord_token"`
 	GameName                string `json:"game_name"`
 	FactorioChannelID       string `json:"factorio_channel_id"`
-	Prefix                  string `json:"prefix"`
 	HaveServerEssentials    bool   `json:"have_server_essentials"`
 	IngameDiscordUserColors bool   `json:"ingame_discord_user_colors"`
 
@@ -96,7 +95,6 @@ func (conf *configT) Load() error {
 func (conf *configT) defaults() {
 	conf.Autolaunch = true
 	conf.GameName = "Factorio"
-	conf.Prefix = "$"
 	// conf.HaveServerEssentials = false
 	// conf.IngameDiscordUserColors = false
 	conf.Messages.BotStart = "**:white_check_mark: Bot started! Launching server...**"

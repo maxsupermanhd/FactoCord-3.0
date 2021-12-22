@@ -14,10 +14,8 @@
     discord_token: "",
     // Name of the game the bot will be "playing".
     game_name: "Factorio",
-    // Id of the channel that will be synchronized with in-game chat
+    // ID of the channel that will be synchronized with in-game chat
     factorio_channel_id:"",
-    // Prefix used to send commands to the bot (e.g. $help)
-    prefix: "$",
     // Whether the scenario that will send custom messages from the game is enabled
     have_server_essentials: false,
     // Color usernames of the discord users in factorio chat
@@ -58,7 +56,7 @@
 
     // messages for certain events.  set "" to hide that message
     messages: {
-        bot_start: "**:white_check_mark: Bot started! Launching server...**",
+        bot_start: "**:white_check_mark: Bot started!**",
         bot_stop: ":v:",
         server_start: "**:white_check_mark: The server has started!**",
         server_stop: "**:octagonal_sign: The server has stopped!**",

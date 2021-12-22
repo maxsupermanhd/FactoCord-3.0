@@ -12,94 +12,110 @@ import (
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 )
 
-var ConfigCommandDoc = support.CommandDoc{
-	Name:  "config",
-	Usage: "$config save | load | get <path> | set <path> <value>?",
-	Doc:   "command manages FactoCord's config",
-	Subcommands: []support.CommandDoc{
+var ConfigCommandDoc = support.Command{
+	Name:    "config",
+	Desc:    "Manage config.json",
+	Usage:   "/config save | load | get <path> | set <path> <value>?",
+	Doc:     "command manages FactoCord's config",
+	Admin:   true,
+	Command: nil, // ConfigCommand
+	Subcommands: []support.Command{
 		{
-			Name: "save",
+			Name:  "save",
+			Admin: true,
+			Desc:  "Save FactoCord's config from memory to `config.json`",
 			Doc: "command saves FactoCord's config from memory to `config.json`.\n" +
 				"It also adds any options missing from config.json",
+			Command: respond(save),
 		},
 		{
-			Name: "load",
+			Name:  "load",
+			Admin: true,
+			Desc:  "Load the config from `config.json`",
 			Doc: "command loads the config from `config.json`.\n" +
-				"Any unsaved changes after the last `$config save` command will be lost.",
+				"Any unsaved changes after the last `/config save` command will be lost.",
+			Command: respond(load),
 		},
 		{
 			Name:  "get",
-			Usage: "$config get <path>?",
+			Admin: true,
+			Usage: "/config get <path>?",
+			Desc:  "Get the value of a config setting specified by `path`",
 			Doc: "command outputs the value of a config setting specified by <path>.\n" +
 				"All path members are separated by a dot '.'\n" +
 				"If the path is empty, it outputs the whole config.\n" +
 				"Secrets like discord_token are kept secret.\n" +
 				"Examples:\n" +
 				"```\n" +
-				"$config get\n" +
-				"$config get admin_ids\n" +
-				"$config get admin_ids.0\n" +
-				"$config get command_roles\n" +
-				"$config get command_roles.mod\n" +
-				"$config get messages\n" +
+				"/config get\n" +
+				"/config get admin_ids\n" +
+				"/config get admin_ids.0\n" +
+				"/config get command_roles\n" +
+				"/config get command_roles.mod\n" +
+				"/config get messages\n" +
 				"```",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "path",
+					Description: "Path of the setting",
+					Required:    false,
+				},
+			},
+			Command: respond(get),
 		},
 		{
-			Name: "set",
-			Usage: "$config set <path>\n" +
-				"$config set <path> <value>",
+			Name:  "set",
+			Admin: true,
+			Usage: "/config set <path>\n" +
+				"/config set <path> <value>",
+			Desc: "Set or delete the value of a config setting specified by `path`",
 			Doc: "command sets the value of a config setting specified by <path>.\n" +
 				"This command can set only simple types such as strings, numbers, and booleans.\n" +
 				"If no value is specified, this command deletes the value if possible, otherwise it sets it to a zero-value (0, \"\", false).\n" +
-				"To add a value to an array or an object specify it's index as '*' (e.g. `$config set admin_ids.* 1234`).\n" +
-				"Changes made by this command are not automatically saved. Use `$config save` to do it.\n" +
+				"To add a value to an array or an object specify it's index as `*` (e.g. `/config set admin_ids.* 1234`).\n" +
+				"Changes made by this command are not automatically saved. Use `/config save` to do it.\n" +
 				"Examples:" +
 				"```\n" +
-				"$config set prefix !\n" +
-				"$config set game_name \"Factorio 1.0\"\n" +
-				"$config set ingame_discord_user_colors true\n" +
-				"$config set admin_ids.0 123456789\n" +
-				"$config set admin_ids.* 987654321\n" +
-				"$config set command_roles.mod 55555555\n" +
-				"$config set messages.server_save **:mango: Game saved!**\n" +
+				"/config set game_name \"Factorio 1.0\"\n" +
+				"/config set ingame_discord_user_colors true\n" +
+				"/config set admin_ids.0 123456789\n" +
+				"/config set admin_ids.* 987654321\n" +
+				"/config set command_roles.mod 55555555\n" +
+				"/config set messages.server_save **:mango: Game saved!**\n" +
 				"```",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "path",
+					Description: "Path of the setting",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "value",
+					Description: "Value to set. If unspecified, deletes the setting.",
+					Required:    false,
+				},
+			},
+			Command: respond(set),
 		},
 	},
 }
 
-// ModCommand returns the list of mods running on the server.
-func ConfigCommand(s *discordgo.Session, args string) {
-	if args == "" {
-		support.SendFormat(s, "Usage: "+ConfigCommandDoc.Usage)
-		return
+func respond(f func(i *discordgo.InteractionCreate) string) func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	return func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		support.Respond(s, i, f(i))
 	}
-	action, args := support.SplitDivide(args, " ")
-	args = strings.TrimSpace(args)
-	if _, ok := commands[action]; !ok {
-		support.SendFormat(s, "Usage: "+ConfigCommandDoc.Usage)
-		return
-	}
-	res := commands[action](args)
-	support.Send(s, res)
 }
 
-var commands = map[string]func(string) string{
-	"save": save,
-	"load": load,
-	"get":  get,
-	"set":  set,
-}
-
-func save(args string) string {
-	if args != "" {
-		return "Save accepts no arguments"
-	}
-	s, err := json.MarshalIndent(support.Config, "", "    ")
+func save(_ *discordgo.InteractionCreate) string {
+	str, err := json.MarshalIndent(support.Config, "", "    ")
 	if err != nil {
 		support.Panik(err, "... when converting config to json")
 		return "Error when converting config to json"
 	}
-	err = ioutil.WriteFile(support.ConfigPath, s, 0666)
+	err = ioutil.WriteFile(support.ConfigPath, str, 0666)
 	if err != nil {
 		support.Panik(err, "... when saving config.json")
 		return "Error when saving config.json"
@@ -107,10 +123,7 @@ func save(args string) string {
 	return "Config saved"
 }
 
-func load(args string) string {
-	if args != "" {
-		return "Load accepts no arguments"
-	}
+func load(_ *discordgo.InteractionCreate) string {
 	err := support.Config.Load()
 	if err != nil {
 		return err.Error()
@@ -118,19 +131,24 @@ func load(args string) string {
 	return "Config reloaded"
 }
 
-func get(args string) string {
-	if strings.Contains(args, " \n\t") {
-		return "Why are there spaces in the path?"
+func get(i *discordgo.InteractionCreate) string {
+	path := ""
+	options := i.ApplicationCommandData().Options[0].Options
+	if len(options) == 1 {
+		path = options[0].StringValue()
+	}
+	if strings.Contains(path, " \n\t") {
+		return "There should be no spaces in the path"
 	}
 	var value interface{}
-	if args == "" {
+	if path == "" {
 		config := support.Config // copy
 		config.DiscordToken = "my precious"
 		config.Username = "my precious"
 		config.ModPortalToken = "my precious"
 		value = config
 	} else {
-		path := strings.Split(args, ".")
+		path := strings.Split(path, ".")
 		if path[0] == "discord_token" {
 			return "Shhhh, it's a secret"
 		}
@@ -148,15 +166,17 @@ func get(args string) string {
 	return fmt.Sprintf("```json\n%s\n```", string(res))
 }
 
-func set(args string) string {
-	pathS, valueS := support.SplitDivide(args, " ")
+func set(i *discordgo.InteractionCreate) string {
+	options := i.ApplicationCommandData().Options[0].Options
+	pathS := options[0].StringValue()
+	valueS := ""
+	if len(options) == 2 {
+		valueS = options[1].StringValue()
+	}
 	if pathS == "" {
-		return support.FormatUsage("Usage: $config set <path> <value>?")
+		return "Path is empty"
 	}
 	path := strings.Split(pathS, ".")
-	if len(path) == 0 {
-		return "wtf??"
-	}
 	if path[0] == "discord_token" {
 		return "Are trying to brainwash me?"
 	}

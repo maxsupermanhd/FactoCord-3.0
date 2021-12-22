@@ -11,58 +11,89 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 )
 
-var ServerCommandDoc = support.CommandDoc{
+var ServerCommandDoc = support.Command{
 	Name: "server",
-	Usage: "$server\n" +
-		"$server [stop|start|restart|update <version>?]",
+	Desc: "Manage factorio server",
+	Usage: "/server\n" +
+		"/server [stop|start|restart|update <version>?]",
 	Doc: "command manages factorio server.\n" +
-		"`$server` shows current server status. Anyone can execute it.`",
-	Subcommands: []support.CommandDoc{
-		{Name: "stop", Doc: `command stops the server`},
-		{Name: "start", Doc: `command starts the server`},
-		{Name: "restart", Doc: `command restarts the server`},
+		"`/server` shows current server status. Anyone can execute it.`",
+	Admin:   false,
+	Command: nil,
+	Subcommands: []support.Command{
+		{
+			Name: "status",
+			Desc: `Show current server status`,
+			Doc:  `command shows current server status`,
+			Command: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+				if support.Factorio.IsRunning() {
+					support.Respond(s, i, "Factorio server is **running**")
+				} else {
+					support.Respond(s, i, "Factorio server is **stopped**")
+				}
+			},
+		},
+		{
+			Name:  "stop",
+			Desc:  `Stop the server`,
+			Doc:   `command stops the server`,
+			Admin: true,
+			Command: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+				support.Factorio.Stop(s)
+				support.Respond(s, i, "Stopping server")
+			},
+		},
+		{
+			Name:  "start",
+			Desc:  `Start the server`,
+			Doc:   `command starts the server`,
+			Admin: true,
+			Command: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+				support.Factorio.Start(s)
+				support.Respond(s, i, "Starting server")
+			},
+		},
+		{
+			Name:  "restart",
+			Desc:  `Restart the server`,
+			Doc:   `command restarts the server`,
+			Admin: true,
+			Command: func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+				support.Factorio.Stop(s)
+				support.Factorio.Start(s)
+				support.Respond(s, i, "Restarting server")
+			},
+		},
 		{
 			Name: "update",
+			Desc: `Update to server to the newest version or to the specified version`,
 			Doc:  `command updates to server to the newest version or to the specified version`,
-			Usage: "$server update\n" +
-				"$server update <version>",
+			Usage: "/server update\n" +
+				"/server update <version>",
+			Admin: true,
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "version",
+					Description: "Factorio version to update to",
+					Required:    false,
+				},
+			},
+			Command: serverUpdate,
 		},
 	},
 }
 
-func ServerCommandAdminPermission(args string) bool {
-	return strings.TrimSpace(args) != ""
-}
-
-func ServerCommand(s *discordgo.Session, args string) {
-	action, arg := support.SplitDivide(args, " ")
-	switch action {
-	case "":
-		if support.Factorio.IsRunning() {
-			support.Send(s, "Factorio server is **running**")
-		} else {
-			support.Send(s, "Factorio server is **stopped**")
-		}
-	case "stop":
-		support.Factorio.Stop(s)
-	case "start":
-		support.Factorio.Start(s)
-	case "restart":
-		support.Factorio.Stop(s)
-		support.Factorio.Start(s)
-	case "update":
-		serverUpdate(s, arg)
-	default:
-		support.SendFormat(s, "Usage: "+ServerCommandDoc.Usage)
+func serverUpdate(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	version := ""
+	options := i.ApplicationCommandData().Options[0].Options
+	if len(options) == 1 {
+		version = i.ApplicationCommandData().Options[0].StringValue()
 	}
-}
-
-func serverUpdate(s *discordgo.Session, version string) {
 	if support.Factorio.IsRunning() {
-		support.Send(s, "You should stop the server first")
+		support.Send(s, "You should `/server stop` first")
 		return
 	}
 	//username := support.Config.Username
@@ -78,53 +109,54 @@ func serverUpdate(s *discordgo.Session, version string) {
 	factorioVersion, err := support.FactorioVersion()
 	if err != nil {
 		support.Panik(err, "... checking factorio version")
-		support.Send(s, "Error checking factorio version")
+		support.Respond(s, i, "Error checking factorio version")
 		return
 	}
+	support.RespondDefer(s, i, "Getting versions...")
 
 	if version == "" {
 		version, err = getLatestVersion()
 		if err != nil {
 			support.Panik(err, "Error getting latest version information")
-			support.Send(s, "Error getting latest version information")
+			support.ResponseEdit(s, i, "Error getting latest version information")
 			return
 		}
 		if version == factorioVersion {
-			support.Send(s, "The server is already updated to the latest version")
+			support.ResponseEdit(s, i, "The server is already updated to the latest version")
 			return
 		}
 	} else if version == factorioVersion {
-		support.Send(s, "The server is already updated to that version")
+		support.ResponseEdit(s, i, "The server is already updated to that version")
 		return
 	}
 
 	resp, err := http.Get(fmt.Sprintf("https://updater.factorio.com/get-download/%s/headless/linux64", version))
 	if err != nil {
 		support.Panik(err, "Connection error downloading factorio")
-		support.Send(s, "Some connection error occurred")
+		support.ResponseEdit(s, i, "Some connection error occurred")
 		return
 	}
 	if resp.StatusCode == 404 {
-		support.Send(s, fmt.Sprintf("Version %s not found\n"+
+		support.ResponseEdit(s, i, fmt.Sprintf("Version %s not found\n"+
 			"Refer to <https://factorio.com/download/archive> to see available versions", version))
 		return
 	}
 	if resp.ContentLength <= 0 {
-		support.Send(s, "Error with content-length")
+		support.ResponseEdit(s, i, "Error with content-length")
 		return
 	}
 	if resp.Header.Get("Content-Disposition") == "" {
-		support.Send(s, "Error with content-disposition")
+		support.ResponseEdit(s, i, "Error with content-disposition")
 		return
 	}
 	_, params, err := mime.ParseMediaType(resp.Header.Get("Content-Disposition"))
 	if err != nil {
-		support.Send(s, "Error with content-disposition")
+		support.ResponseEdit(s, i, "Error with content-disposition")
 		return
 	}
 	filename, ok := params["filename"]
 	if !ok {
-		support.Send(s, "Error with content-disposition")
+		support.ResponseEdit(s, i, "Error with content-disposition")
 		return
 	}
 	path := "/tmp/" + filename
@@ -132,15 +164,15 @@ func serverUpdate(s *discordgo.Session, version string) {
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0664)
 	if err != nil {
 		support.Panik(err, "Error opening "+path+" for write")
-		support.Send(s, path+": error opening file for write")
+		support.ResponseEdit(s, i, path+": error opening file for write")
 		return
 	}
 
-	message := support.Send(s, support.FormatNamed(support.Config.Messages.DownloadStart, "file", filename))
+	support.ResponseEdit(s, i, support.FormatNamed(support.Config.Messages.DownloadStart, "file", filename))
 	counter := &support.WriteCounter{Total: uint64(resp.ContentLength)}
 	progress := support.ProgressUpdate{
 		WriteCounter: counter,
-		Message:      message,
+		Interaction:  i,
 		Progress:     support.FormatNamed(support.Config.Messages.DownloadProgress, "file", filename),
 		Finished:     support.FormatNamed(support.Config.Messages.Unpacking, "file", filename),
 	}
@@ -151,7 +183,7 @@ func serverUpdate(s *discordgo.Session, version string) {
 	file.Close()
 	if err != nil {
 		counter.Error = true
-		message.Edit(s, ":interrobang: Error downloading "+filename)
+		support.ResponseEdit(s, i, ":interrobang: Error downloading "+filename)
 		support.Panik(err, "Error downloading file")
 		return
 	}
@@ -159,7 +191,7 @@ func serverUpdate(s *discordgo.Session, version string) {
 	dir, err := filepath.Abs(support.Config.Executable)
 	if err != nil {
 		support.Panik(err, "Error getting absolute path of executable")
-		support.Send(s, "Error getting absolute path of executable")
+		support.ResponseEdit(s, i, "Error getting absolute path of executable")
 		return
 	}
 	dir = filepath.Dir(dir) // x64
@@ -169,11 +201,11 @@ func serverUpdate(s *discordgo.Session, version string) {
 	err = cmd.Run()
 	if err != nil {
 		support.Panik(err, "Error running tar to unpack the archive")
-		support.Send(s, "Error running tar to unpack the archive")
+		support.ResponseEdit(s, i, "Error running tar to unpack the archive")
 		return
 	}
 
-	message.Edit(s, support.FormatNamed(support.Config.Messages.UnpackingComplete, "version", version))
+	support.ResponseEdit(s, i, support.FormatNamed(support.Config.Messages.UnpackingComplete, "version", version))
 	_ = os.Remove(path)
 }
 
