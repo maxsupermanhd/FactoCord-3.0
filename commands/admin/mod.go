@@ -672,7 +672,7 @@ func checkModPortal(desc *modDescriptionT, factorioVersion string) (*modRelease,
 	}
 }
 
-var dependencyRegexp = regexp.MustCompile(`^(!|\?|\(\?\))? ?([A-Za-z0-9\-_ ]+)(?: ([<>]?=?) (\d+\.\d+(?:\.\d+)?))?/`)
+var dependencyRegexp = regexp.MustCompile(`^(!|\?|\(\?\))? ?([A-Za-z0-9\-_ ]+)(?: ([<>]?=?) (\d+\.\d+(?:\.\d+)?))?$`)
 
 func checkDependencies(newMods []*modRelease, files *modsFilesT) string {
 	installed := map[string][]*support.SemanticVersionT{}

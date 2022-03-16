@@ -90,7 +90,7 @@ func serverUpdate(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	version := ""
 	options := i.ApplicationCommandData().Options[0].Options
 	if len(options) == 1 {
-		version = i.ApplicationCommandData().Options[0].StringValue()
+		version = i.ApplicationCommandData().Options[0].Options[0].StringValue()
 	}
 	if support.Factorio.IsRunning() {
 		support.Send(s, "You should `/server stop` first")
