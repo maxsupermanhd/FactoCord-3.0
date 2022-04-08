@@ -6,11 +6,11 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 	"io"
-	"mime"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 var ServerCommandDoc = support.Command{
@@ -145,18 +145,12 @@ func serverUpdate(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		support.ResponseEdit(s, i, "Error with content-length")
 		return
 	}
-	if resp.Header.Get("Content-Disposition") == "" {
-		support.ResponseEdit(s, i, "Error with content-disposition")
-		return
-	}
-	_, params, err := mime.ParseMediaType(resp.Header.Get("Content-Disposition"))
-	if err != nil {
-		support.ResponseEdit(s, i, "Error with content-disposition")
-		return
-	}
-	filename, ok := params["filename"]
-	if !ok {
-		support.ResponseEdit(s, i, "Error with content-disposition")
+
+	urlPath := strings.Split(resp.Request.URL.Path, "/")
+	filename := urlPath[len(urlPath)-1]
+	if filename == "" {
+		support.ResponseEdit(s, i, "Error with filename")
+		support.Panik(fmt.Errorf("uncorrect url path: %s", resp.Request.URL.Path), "Error with filename")
 		return
 	}
 	path := "/tmp/" + filename

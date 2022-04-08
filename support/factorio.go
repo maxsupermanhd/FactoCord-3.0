@@ -133,6 +133,7 @@ func (f *factorioState) Stop(s *discordgo.Session) {
 }
 
 func FactorioVersion() (string, error) {
+	//return "1.1.53", nil
 	cmd := exec.Command(Config.Executable, "--version")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
