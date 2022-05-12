@@ -49,6 +49,9 @@ func (f *factorioState) Send(s string) bool {
 	if f.Pipe == nil {
 		return false
 	}
+	if s == "" {
+		return false
+	}
 	if s[len(s)-1] != '\n' {
 		s += "\n"
 	}
