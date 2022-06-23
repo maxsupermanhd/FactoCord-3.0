@@ -39,6 +39,7 @@ func main() {
 	}
 	if support.Factorio.IsRunning() {
 		fmt.Println("Waiting for factorio server to exit...")
+		support.Factorio.Send("/quit")
 		err := support.Factorio.Process.Wait()
 		if support.Factorio.Process.ProcessState.Exited() {
 			fmt.Println("\nFactorio server was closed, exit code", support.Factorio.Process.ProcessState.ExitCode())
