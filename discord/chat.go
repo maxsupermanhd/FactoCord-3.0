@@ -49,7 +49,7 @@ func Init() {
 	go CacheUpdater(Session)
 
 	time.Sleep(3 * time.Second)
-	err := Session.UpdateStatus(0, support.Config.GameName)
+	err := Session.UpdateGameStatus(0, support.Config.GameName)
 	support.Panik(err, "... when updating bot status")
 
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
