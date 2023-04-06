@@ -7,7 +7,7 @@
 local FactoCordIntegration = {}
 
 function FactoCordIntegration.PrintToDiscord(msg)
-	print("0000-00-00 00:00:00 [DISCORD] "..msg)
+	print({"", "0000-00-00 00:00:00 [DISCORD] ", msg})
 end
 
 script.on_event(defines.events.on_player_joined_game, function(event)
@@ -49,7 +49,12 @@ script.on_event({defines.events.on_console_chat},
 
 script.on_event(defines.events.on_player_died, function(event)
 	local p = game.players[event.player_index];
-	FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** died.");
+	local c = event.cause
+	if not c then
+		FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** died.");
+	else
+		FactoCordIntegration.PrintToDiscord({"", "**" .. p.name .. "** died to a " , c.localised_name, "."});
+	end
 end)
 script.on_event(defines.events.on_player_kicked, function(event)
 	local p = game.players[event.player_index];
