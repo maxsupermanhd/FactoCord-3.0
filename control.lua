@@ -7,7 +7,7 @@
 local FactoCordIntegration = {}
 
 function FactoCordIntegration.PrintToDiscord(msg)
-	print({"", "0000-00-00 00:00:00 [DISCORD] ", msg})
+	localised_print({"", "0000-00-00 00:00:00 [DISCORD] ", msg})
 end
 
 script.on_event(defines.events.on_player_joined_game, function(event)
