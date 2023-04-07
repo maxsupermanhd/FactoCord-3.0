@@ -2,7 +2,7 @@
  -- Please configure as needed, any discord message will be sent in
  --  raw format if it starts with `0000-00-00 00:00:00 [DISCORD] `
  -- For more information visit https://github.com/maxsupermanhd/FactoCord-3.0
- -- If you have any question or comments join our Discord https://discord.gg/SUJRG47
+ -- If you have any question or comments join our Discord https://discord.gg/uNhtRH8
 
 local FactoCordIntegration = {}
 
@@ -55,7 +55,7 @@ script.on_event(defines.events.on_player_died, function(event)
 	else
 		local name = "Unknown";
 		if c.type == "character" then
-			name = {"", "player", " ", c.player.name};
+			name = c.player.name;
 		elseif c.type == "spider-vehicle" then
 			if c.entity_label then
 				name = {"", c.localised_name, " " , c.entity_label};
