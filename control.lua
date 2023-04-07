@@ -53,7 +53,21 @@ script.on_event(defines.events.on_player_died, function(event)
 	if not c then
 		FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** died.");
 	else
-		FactoCordIntegration.PrintToDiscord({"", "**" .. p.name .. "** died to a " , c.localised_name, "."});
+		local name = "Unknown";
+		if c.type == "character" then
+			name = {"", "player", " ", c.player.name};
+		elseif c.type == "spider-vehicle" then
+			if c.entity_label then
+				name = {"", c.localised_name, " " , c.entity_label};
+			else
+				name = {"", "a ", c.localised_name};
+			end
+		elseif c.type == "locomotive" then
+			name = {"", c.localised_name, " " , c.backer_name};
+		else
+			name = {"", "a ", c.localised_name};
+		end
+		FactoCordIntegration.PrintToDiscord({"", "**", p.name, "** was killed by ", name, "."});
 	end
 end)
 script.on_event(defines.events.on_player_kicked, function(event)
