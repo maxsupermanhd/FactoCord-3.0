@@ -2,12 +2,12 @@
  -- Please configure as needed, any discord message will be sent in
  --  raw format if it starts with `0000-00-00 00:00:00 [DISCORD] `
  -- For more information visit https://github.com/maxsupermanhd/FactoCord-3.0
- -- If you have any question or comments join our Discord https://discord.gg/SUJRG47
+ -- If you have any question or comments join our Discord https://discord.gg/uNhtRH8
 
 local FactoCordIntegration = {}
 
 function FactoCordIntegration.PrintToDiscord(msg)
-	print("0000-00-00 00:00:00 [DISCORD] "..msg)
+	localised_print({"", "0000-00-00 00:00:00 [DISCORD] ", msg})
 end
 
 script.on_event(defines.events.on_player_joined_game, function(event)
@@ -49,7 +49,26 @@ script.on_event({defines.events.on_console_chat},
 
 script.on_event(defines.events.on_player_died, function(event)
 	local p = game.players[event.player_index];
-	FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** died.");
+	local c = event.cause
+	if not c then
+		FactoCordIntegration.PrintToDiscord("**" .. p.name .. "** died.");
+	else
+		local name = "Unknown";
+		if c.type == "character" then
+			name = c.player.name;
+		elseif c.type == "spider-vehicle" then
+			if c.entity_label then
+				name = {"", c.localised_name, " " , c.entity_label};
+			else
+				name = {"", "a ", c.localised_name};
+			end
+		elseif c.type == "locomotive" then
+			name = {"", c.localised_name, " " , c.backer_name};
+		else
+			name = {"", "a ", c.localised_name};
+		end
+		FactoCordIntegration.PrintToDiscord({"", "**", p.name, "** was killed by ", name, "."});
+	end
 end)
 script.on_event(defines.events.on_player_kicked, function(event)
 	local p = game.players[event.player_index];
