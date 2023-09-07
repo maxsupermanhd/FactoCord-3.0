@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
 
       - name: Set up Go 1.x
@@ -32,6 +32,7 @@ jobs:
           version="`git describe --tags` (`git rev-parse --short HEAD`)"
           echo "Version: $version"
           go build -ldflags "-X 'github.com/maxsupermanhd/FactoCord-3.0/support.FactoCordVersion=$version'" -o FactoCord3 -v .
+          CGO_ENABLED=0 go build -ldflags "-X 'github.com/maxsupermanhd/FactoCord-3.0/support.FactoCordVersion=$version'" -o FactoCord3-c -v .
 
       - name: Create archives
         run: |
@@ -47,6 +48,17 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./release/FactoCord3/FactoCord3
           asset_name: FactoCord3
+          asset_content_type: application/x-executable
+
+      - name: Upload executable without CGO
+        id: upload-exe
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./release/FactoCord3/FactoCord3-c
+          asset_name: FactoCord3-c
           asset_content_type: application/x-executable
 
       - name: Upload release zip archive
