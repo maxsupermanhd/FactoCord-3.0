@@ -57,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./release/FactoCord3/FactoCord3-c
+          asset_path: ./FactoCord3-c
           asset_name: FactoCord3-c
           asset_content_type: application/x-executable
 
