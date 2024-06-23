@@ -2,9 +2,10 @@ package utils
 
 import (
 	"fmt"
+
 	"github.com/bwmarrin/discordgo"
 
-	"github.com/maxsupermanhd/FactoCord-3.0/support"
+	"github.com/maxsupermanhd/FactoCord-3.0/v3/support"
 )
 
 var VersionDoc = support.CommandDoc{

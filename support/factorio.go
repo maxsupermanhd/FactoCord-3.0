@@ -2,12 +2,13 @@ package support
 
 import (
 	"fmt"
-	"github.com/bwmarrin/discordgo"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 type FactorioLogWatcher struct {
@@ -15,7 +16,7 @@ type FactorioLogWatcher struct {
 	buffer      string
 }
 
-func (t FactorioLogWatcher) Write(p []byte) (n int, err error) {
+func (t *FactorioLogWatcher) Write(p []byte) (n int, err error) {
 	t.buffer += string(p)
 	lines := strings.Split(t.buffer, "\n")
 	t.buffer = lines[len(lines)-1]
@@ -25,7 +26,7 @@ func (t FactorioLogWatcher) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func (t FactorioLogWatcher) Flush() {
+func (t *FactorioLogWatcher) Flush() {
 	if t.buffer != "" {
 		t.ProcessFunc(t.buffer)
 		t.buffer = ""
@@ -72,7 +73,7 @@ func (f *factorioState) Init(logger func(string)) {
 	logging, err := os.OpenFile("factorio.log", os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_TRUNC, 0666)
 	Critical(err, "... when attempting to open factorio.log")
 
-	factorioLogWatcher := FactorioLogWatcher{ProcessFunc: logger}
+	factorioLogWatcher := &FactorioLogWatcher{ProcessFunc: logger}
 	tmpWatcher := io.MultiWriter(logging, os.Stdout, factorioLogWatcher)
 	f.watcher = &tmpWatcher
 

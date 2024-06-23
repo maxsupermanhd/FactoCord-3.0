@@ -3,8 +3,6 @@ package admin
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bwmarrin/discordgo"
-	"github.com/maxsupermanhd/FactoCord-3.0/support"
 	"io"
 	"mime"
 	"net/http"
@@ -12,6 +10,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/maxsupermanhd/FactoCord-3.0/v3/support"
 )
 
 var ServerCommandDoc = support.CommandDoc{

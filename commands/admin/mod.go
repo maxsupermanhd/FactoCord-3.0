@@ -6,16 +6,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/bwmarrin/discordgo"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
 	"regexp"
 	"strings"
 
-	"github.com/maxsupermanhd/FactoCord-3.0/support"
+	"github.com/bwmarrin/discordgo"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/v3/support"
 )
 
 // Mod is a struct containing info about a mod.
@@ -231,7 +231,7 @@ func ModCommand(s *discordgo.Session, args string) {
 		return
 	}
 
-	modsListFile, err := ioutil.ReadFile(support.Config.ModListLocation)
+	modsListFile, err := os.ReadFile(support.Config.ModListLocation)
 	if err != nil {
 		support.Send(s, "Sorry, there was an error reading your mod list")
 		support.Panik(err, "there was an error reading mods list, did you specify it in the config.json file?")
@@ -268,7 +268,7 @@ func ModCommand(s *discordgo.Session, args string) {
 		support.Panik(err, "there was an error converting mod list to json")
 		return
 	}
-	err = ioutil.WriteFile(support.Config.ModListLocation, modsListFile, 0666)
+	err = os.WriteFile(support.Config.ModListLocation, modsListFile, 0666)
 	if err != nil {
 		support.Send(s, "Sorry, there was an error saving mod list")
 		support.Panik(err, "there was an error saving mod list")
@@ -532,7 +532,7 @@ func matchModsWithFiles(mods *[]Mod) *modsFilesT {
 		res.missing[mod.Name] = true
 	}
 	baseDir := path.Dir(support.Config.ModListLocation)
-	files, err := ioutil.ReadDir(baseDir)
+	files, err := os.ReadDir(baseDir)
 	if err != nil {
 		support.Critical(err, "wtf")
 	}
@@ -588,7 +588,7 @@ func checkModPortal(desc *modDescriptionT, factorioVersion string) (*modRelease,
 	if err != nil {
 		return nil, "", err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
 		return nil, "", err
