@@ -2,8 +2,9 @@ package support
 
 import (
 	"fmt"
-	"github.com/flynn/json5"
-	"io/ioutil"
+	"os"
+
+	"github.com/titanous/json5"
 )
 
 var FactoCordVersion string
@@ -62,7 +63,7 @@ func (conf *configT) MustLoad() {
 		fmt.Println("Make sure that you copied 'config-example.json' and current working directory is correct")
 		Exit(7)
 	}
-	contents, err := ioutil.ReadFile(ConfigPath)
+	contents, err := os.ReadFile(ConfigPath)
 	Critical(err, "... when reading config.json")
 
 	conf.defaults()
@@ -76,7 +77,7 @@ func (conf *configT) Load() error {
 	if !FileExists(ConfigPath) {
 		return fmt.Errorf("config.json not found")
 	}
-	contents, err := ioutil.ReadFile(ConfigPath)
+	contents, err := os.ReadFile(ConfigPath)
 	if err != nil {
 		return fmt.Errorf("error reading config.json: %s", err)
 	}

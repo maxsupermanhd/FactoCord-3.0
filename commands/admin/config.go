@@ -3,13 +3,14 @@ package admin
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bwmarrin/discordgo"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
 
-	"github.com/maxsupermanhd/FactoCord-3.0/support"
+	"github.com/bwmarrin/discordgo"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/v3/support"
 )
 
 var ConfigCommandDoc = support.CommandDoc{
@@ -99,7 +100,7 @@ func save(args string) string {
 		support.Panik(err, "... when converting config to json")
 		return "Error when converting config to json"
 	}
-	err = ioutil.WriteFile(support.ConfigPath, s, 0666)
+	err = os.WriteFile(support.ConfigPath, s, 0666)
 	if err != nil {
 		support.Panik(err, "... when saving config.json")
 		return "Error when saving config.json"

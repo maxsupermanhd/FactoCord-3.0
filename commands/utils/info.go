@@ -2,11 +2,12 @@ package utils
 
 import (
 	"encoding/json"
-	"github.com/bwmarrin/discordgo"
-	"github.com/maxsupermanhd/FactoCord-3.0/support"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/maxsupermanhd/FactoCord-3.0/v3/support"
 )
 
 var InfoDoc = support.CommandDoc{
@@ -56,7 +57,7 @@ func GameInfo(s *discordgo.Session, _ string) {
 		support.Send(s, "Some connection error occurred")
 		return
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	resp.Body.Close()
 	if err != nil {
 		support.Panik(err, "Error reading /get-game-details")

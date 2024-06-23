@@ -9,7 +9,6 @@ jobs:
     name: Build
     runs-on: ubuntu-20.04
     steps:
-
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
@@ -31,8 +30,8 @@ jobs:
         run: |
           version="`git describe --tags` (`git rev-parse --short HEAD`)"
           echo "Version: $version"
-          go build -ldflags "-X 'github.com/maxsupermanhd/FactoCord-3.0/support.FactoCordVersion=$version'" -o FactoCord3 -v .
-          CGO_ENABLED=0 go build -ldflags "-X 'github.com/maxsupermanhd/FactoCord-3.0/support.FactoCordVersion=$version'" -o FactoCord3-c -v .
+          go build -ldflags "-X 'github.com/maxsupermanhd/FactoCord-3.0/v3/support.FactoCordVersion=$version'" -o FactoCord3 -v .
+          CGO_ENABLED=0 go build -ldflags "-X 'github.com/maxsupermanhd/FactoCord-3.0/v3/support.FactoCordVersion=$version'" -o FactoCord3-c -v .
 
       - name: Create archives
         run: |
