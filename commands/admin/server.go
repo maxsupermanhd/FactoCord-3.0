@@ -6,10 +6,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/maxsupermanhd/FactoCord-3.0/support"
 	"io"
-	"mime"
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -65,16 +65,7 @@ func serverUpdate(s *discordgo.Session, version string) {
 		support.Send(s, "You should stop the server first")
 		return
 	}
-	//username := support.Config.Username
-	//token := support.Config.ModPortalToken
-	//if username == "" {
-	//	support.Send(s, "Username is required for update")
-	//	return
-	//}
-	//if token == "" {
-	//	support.Send(s, "Token is required for update")
-	//	return
-	//}
+	var err error
 	factorioVersion, err := support.FactorioVersion()
 	if err != nil {
 		support.Panik(err, "... checking factorio version")
@@ -113,28 +104,16 @@ func serverUpdate(s *discordgo.Session, version string) {
 		support.Send(s, "Error with content-length")
 		return
 	}
-	if resp.Header.Get("Content-Disposition") == "" {
-		support.Send(s, "Error with content-disposition")
-		return
-	}
-	_, params, err := mime.ParseMediaType(resp.Header.Get("Content-Disposition"))
-	if err != nil {
-		support.Send(s, "Error with content-disposition")
-		return
-	}
-	filename, ok := params["filename"]
-	if !ok {
-		support.Send(s, "Error with content-disposition")
-		return
-	}
-	path := "/tmp/" + filename
+	filename := path.Base(resp.Request.URL.Path)
+	filePath := "/tmp/" + filename
 
-	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0664)
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0664)
 	if err != nil {
-		support.Panik(err, "Error opening "+path+" for write")
-		support.Send(s, path+": error opening file for write")
+		support.Panik(err, "Error opening "+filePath+" for write")
+		support.Send(s, filePath+": error opening file for write")
 		return
 	}
+	defer os.Remove(filePath)
 
 	message := support.Send(s, support.FormatNamed(support.Config.Messages.DownloadStart, "file", filename))
 	counter := &support.WriteCounter{Total: uint64(resp.ContentLength)}
@@ -165,7 +144,7 @@ func serverUpdate(s *discordgo.Session, version string) {
 	dir = filepath.Dir(dir) // x64
 	dir = filepath.Dir(dir) // bin
 	dir = filepath.Dir(dir) // factorio
-	cmd := exec.Command("tar", "-C", dir, "--strip-components=1", "-xf", path)
+	cmd := exec.Command("tar", "-C", dir, "--strip-components=1", "-xf", filePath)
 	err = cmd.Run()
 	if err != nil {
 		support.Panik(err, "Error running tar to unpack the archive")
@@ -174,7 +153,6 @@ func serverUpdate(s *discordgo.Session, version string) {
 	}
 
 	message.Edit(s, support.FormatNamed(support.Config.Messages.UnpackingComplete, "version", version))
-	_ = os.Remove(path)
 }
 
 type latestVersions struct {
