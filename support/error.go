@@ -33,7 +33,7 @@ func Panik(err error, message string) {
 		message = "An error occurred " + strings.TrimSpace(message[3:])
 	}
 
-	res := fmt.Sprintf("%s", time.Now())
+	res := time.Now().String()
 	if pc, fn, line, ok := runtime.Caller(1); ok {
 		res += fmt.Sprintf(", %s @ %s:%d", runtime.FuncForPC(pc).Name(), fn, line)
 	}
@@ -57,7 +57,7 @@ func Panik(err error, message string) {
 		fmt.Println("Error occurred:")
 		fmt.Println(res)
 		fmt.Println("But error.log could not be written to")
-		panic(rip)
+		panic(fmt.Errorf("error writing to error.log: %v", err))
 	}
 
 	if message == "" {

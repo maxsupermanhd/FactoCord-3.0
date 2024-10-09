@@ -7,37 +7,28 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-
       - name: Set up Go 1.x
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v5
         with:
-          go-version: ^1.13
+          go-version: ^1.22
         id: go
 
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Get dependencies
-        run: |
-          go get -v -d ./...
-          if [ -f Gopkg.toml ]; then
-              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-              dep ensure
-          fi
-
+        run: go mod download
       - name: Build
-        run: |
-          version="`git describe --tags` (`git rev-parse --short HEAD`)"
+        run: |-
+          version="$(git describe --tags) ($(git rev-parse --short HEAD))"
           echo "Version: $version"
-          go build -ldflags "-X 'github.com/maxsupermanhd/FactoCord-3.0/support.FactoCordVersion=$version'" -o FactoCord3 -v .
-          CGO_ENABLED=0 go build -ldflags "-X 'github.com/maxsupermanhd/FactoCord-3.0/support.FactoCordVersion=$version'" -o FactoCord3-c -v .
+          go build -ldflags "-X 'github.com/maxsupermanhd/FactoCord-3.0/v3/support.FactoCordVersion=$version'" -o FactoCord3 -v .
+          CGO_ENABLED=0 go build -ldflags "-X 'github.com/maxsupermanhd/FactoCord-3.0/v3/support.FactoCordVersion=$version'" -o FactoCord3-c -v .
 
       - name: Create archives
-        run: |
-          chmod u+x ./.github/workflows/archive.sh
-          ./.github/workflows/archive.sh
+        run: ./.github/workflows/archive.sh
 
       - name: Upload executable
         id: upload-exe

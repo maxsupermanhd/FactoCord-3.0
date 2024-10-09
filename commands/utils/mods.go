@@ -3,11 +3,12 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bwmarrin/discordgo"
-	"io/ioutil"
+	"os"
 	"path"
 
-	"github.com/maxsupermanhd/FactoCord-3.0/support"
+	"github.com/bwmarrin/discordgo"
+
+	"github.com/maxsupermanhd/FactoCord-3.0/v3/support"
 )
 
 // ModJson is struct containing a slice of Mod.
@@ -85,7 +86,7 @@ func modList(ModList *ModJson, returnEnabled bool, returnDisabled bool) string {
 func modsFiles() string {
 	res := ""
 	baseDir := path.Dir(support.Config.ModListLocation)
-	files, err := ioutil.ReadDir(baseDir)
+	files, err := os.ReadDir(baseDir)
 	if err != nil {
 		support.Critical(err, "wtf")
 	}
@@ -121,7 +122,7 @@ func ModsList(s *discordgo.Session, args string) {
 		return
 	}
 	ModList := &ModJson{}
-	Json, err := ioutil.ReadFile(support.Config.ModListLocation)
+	Json, err := os.ReadFile(support.Config.ModListLocation)
 	if err != nil {
 		support.Send(s, "Sorry, there was an error reading your mods list")
 		support.Panik(err, "there was an error reading mods list, did you specify it in the config.json file?")

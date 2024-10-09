@@ -2,10 +2,11 @@ package support
 
 import (
 	"fmt"
-	"github.com/bwmarrin/discordgo"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 func Send(s *discordgo.Session, message string) *MessageControlT {
@@ -144,9 +145,7 @@ func QuoteSplit(s string, quote string) ([]string, bool) {
 		} else {
 			before := s[:firstQuote]
 			if strings.TrimSpace(before) != "" {
-				for _, x := range strings.Fields(before) {
-					res = append(res, x)
-				}
+				res = append(res, strings.Fields(before)...)
 			}
 			secondQuote := strings.Index(s[firstQuote+len(quote):], quote) + firstQuote + len(quote)
 			unquoted := s[firstQuote+len(quote) : secondQuote]

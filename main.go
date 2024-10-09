@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/maxsupermanhd/FactoCord-3.0/discord"
-	"github.com/maxsupermanhd/FactoCord-3.0/support"
+	"github.com/maxsupermanhd/FactoCord-3.0/v3/discord"
+	"github.com/maxsupermanhd/FactoCord-3.0/v3/support"
 )
 
 var closing = false
