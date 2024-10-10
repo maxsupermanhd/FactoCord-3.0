@@ -287,7 +287,7 @@ func modsAdd(s *discordgo.Session, mods *ModJSON, modDescriptions *[]modDescript
 	alreadyAdded := support.DefaultTextList("\n**Already added:**")
 	userErrors := support.DefaultTextList("\n**Errors:**")
 
-	factorioVersion, err := factorioVersion()
+	factorioVersion, err := getFactorioVersionNoPatch()
 	if err != nil {
 		return "Error checking factorio version"
 	}
@@ -350,7 +350,7 @@ func modsAdd(s *discordgo.Session, mods *ModJSON, modDescriptions *[]modDescript
 	return res
 }
 
-func factorioVersion() (string, error) {
+func getFactorioVersionNoPatch() (string, error) {
 	factorioVersion, err := support.FactorioVersion()
 	if err != nil {
 		return "", err
@@ -374,7 +374,7 @@ func modsUpdate(s *discordgo.Session, mods *ModJSON, modDescriptions *[]modDescr
 
 	files := matchModsWithFiles(&mods.Mods)
 
-	factorioVersion, err := factorioVersion()
+	factorioVersion, err := getFactorioVersionNoPatch()
 	if err != nil {
 		return "Error checking factorio version"
 	}

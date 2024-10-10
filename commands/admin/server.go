@@ -32,6 +32,12 @@ var ServerCommandDoc = support.CommandDoc{
 			Usage: "$server update\n" +
 				"$server update <version>",
 		},
+		{
+			Name: "install",
+			Doc:  `same as update, but does not check version of the factorio server`,
+			Usage: "$server install\n" +
+				"$server install <version>",
+		},
 	},
 }
 
@@ -55,24 +61,29 @@ func ServerCommand(s *discordgo.Session, args string) {
 	case "restart":
 		support.Factorio.Stop(s)
 		support.Factorio.Start(s)
+	case "install":
+		serverUpdate(s, false, arg)
 	case "update":
-		serverUpdate(s, arg)
+		serverUpdate(s, true, arg)
 	default:
 		support.SendFormat(s, "Usage: "+ServerCommandDoc.Usage)
 	}
 }
 
-func serverUpdate(s *discordgo.Session, version string) {
+func serverUpdate(s *discordgo.Session, checkVersion bool, version string) {
 	if support.Factorio.IsRunning() {
 		support.Send(s, "You should stop the server first")
 		return
 	}
+	var factorioVersion string = "-1"
 	var err error
-	factorioVersion, err := support.FactorioVersion()
-	if err != nil {
-		support.Panik(err, "... checking factorio version")
-		support.Send(s, "Error checking factorio version")
-		return
+	if checkVersion {
+		factorioVersion, err = support.FactorioVersion()
+		if err != nil {
+			support.Panik(err, "... checking factorio version")
+			support.Send(s, "Error checking factorio version")
+			return
+		}
 	}
 
 	if version == "" {
