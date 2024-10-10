@@ -58,7 +58,8 @@
 
     // messages for certain events.  set "" to hide that message
     messages: {
-        bot_start: "**:white_check_mark: Bot started! Launching server...**",
+        bot_start_launch: "**:white_check_mark: Bot started! Launching server...**",
+        bot_start_only: "**:white_check_mark: Bot started! Autolaunch disabled.**",
         bot_stop: ":v:",
         server_start: "**:white_check_mark: The server has started!**",
         server_stop: "**:octagonal_sign: The server has stopped!**",
