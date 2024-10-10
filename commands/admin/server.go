@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -146,8 +147,12 @@ func serverUpdate(s *discordgo.Session, version string) {
 	dir = filepath.Dir(dir) // bin
 	dir = filepath.Dir(dir) // factorio
 	cmd := exec.Command("tar", "-C", dir, "--strip-components=1", "-xf", filePath)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
+		err = fmt.Errorf("%w\nstdout: %s\nstderr: %s", err, stdout.String(), stderr.String())
 		support.Panik(err, "Error running tar to unpack the archive")
 		support.Send(s, "Error running tar to unpack the archive")
 		return
