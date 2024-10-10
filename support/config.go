@@ -41,7 +41,8 @@ type configT struct {
 	ModPortalToken  string `json:"mod_portal_token"`
 
 	Messages struct {
-		BotStart          string `json:"bot_start"`
+		BotStartLaunch    string `json:"bot_start_launch"`
+		BotStartOnly      string `json:"bot_start_only"`
 		BotStop           string `json:"bot_stop"`
 		ServerStart       string `json:"server_start"`
 		ServerStop        string `json:"server_stop"`
@@ -100,7 +101,8 @@ func (conf *configT) defaults() {
 	conf.Prefix = "$"
 	// conf.HaveServerEssentials = false
 	// conf.IngameDiscordUserColors = false
-	conf.Messages.BotStart = "**:white_check_mark: Bot started! Launching server...**"
+	conf.Messages.BotStartLaunch = "**:white_check_mark: Bot started! Launching server...**"
+	conf.Messages.BotStartOnly = "**:white_check_mark: Bot started! Autolaunch disabled.**"
 	conf.Messages.BotStop = ":v:"
 	conf.Messages.ServerStart = "**:white_check_mark: The server has started!**"
 	conf.Messages.ServerStop = "**:octagonal_sign: The server has stopped!**"

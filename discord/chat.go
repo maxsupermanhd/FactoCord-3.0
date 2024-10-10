@@ -53,7 +53,12 @@ func Init() {
 	support.Panik(err, "... when updating bot status")
 
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
-	support.SendMessage(Session, support.Config.Messages.BotStart)
+	if Config.Autolaunch {
+		support.SendMessage(Session, support.Config.Messages.BotStartLaunch)
+	} else {
+		support.SendMessage(Session, support.Config.Messages.BotStartOnly)
+	}
+
 }
 
 func Close() {
