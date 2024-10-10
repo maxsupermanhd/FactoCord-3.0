@@ -41,7 +41,7 @@ type configT struct {
 	ModPortalToken  string `json:"mod_portal_token"`
 
 	Messages struct {
-		BotStartLaunch    string `json:"bot_start_launch"`
+		BotStartLaunch    string `json:"bot_start"`
 		BotStartOnly      string `json:"bot_start_only"`
 		BotStop           string `json:"bot_stop"`
 		ServerStart       string `json:"server_start"`
