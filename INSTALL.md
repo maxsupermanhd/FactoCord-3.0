@@ -44,8 +44,6 @@ Make sure system is up to date `sudo apt-get update -y && sudo apt-get upgrade -
 
 Download go 1.12+ (`sudo apt install golang-go git -y`) (you may need to get it from the website, repos can be outdated)
 
-Get go packages: `go get`
-
 ## Step 1
 Cloning repo
 
